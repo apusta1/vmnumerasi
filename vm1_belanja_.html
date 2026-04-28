@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Belajar Numerasi - Simulator Belanja di Toko</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Poppins', 'Roboto', sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #e0e7f0 0%, #cbdbe6 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: #fffef7;
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        /* header toko */
+        .store-header {
+            background: #ffcd3c;
+            padding: 20px 32px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 5px solid #f5a623;
+        }
+        .store-title h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #2d2f36;
+        }
+        .store-title p {
+            margin: 5px 0 0;
+            font-weight: bold;
+            color: #444;
+        }
+        .budget-area {
+            background: #1e2a3a;
+            border-radius: 60px;
+            padding: 10px 24px;
+            text-align: center;
+            color: white;
+            box-shadow: inset 0 -2px 0 #0f1720;
+        }
+        .budget-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .budget-value {
+            font-size: 2rem;
+            font-weight: bold;
+            line-height: 1;
+            font-family: monospace;
+        }
+        .mission-area {
+            background: #e9f0f5;
+            padding: 14px 32px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px dashed #bbb;
+        }
+        .mission-card {
+            background: white;
+            border-radius: 40px;
+            padding: 8px 25px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .task-badge {
+            background: #3b82f6;
+            color: white;
+            border-radius: 30px;
+            padding: 6px 20px;
+            font-weight: bold;
+        }
+        .reset-btn {
+            background: #ff6b6b;
+            border: none;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+        .reset-btn:hover {
+            background: #e03a3a;
+            transform: scale(0.97);
+        }
+        /* dua kolom utama */
+        .shop-layout {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .product-section {
+            flex: 2;
+            padding: 24px;
+            background: #fffaf2;
+            border-right: 2px solid #ffe1b3;
+        }
+        .cart-section {
+            flex: 1.2;
+            background: #fef6e8;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-left: 8px solid #f5a623;
+            padding-left: 15px;
+            margin: 0 0 20px 0;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 28px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+            transition: 0.1s linear;
+            cursor: pointer;
+            border: 2px solid #ffe0b5;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            border-color: #f5a623;
+            background: #fff7e8;
+        }
+        .product-emoji {
+            font-size: 2.8rem;
+        }
+        .product-name {
+            font-weight: bold;
+            margin: 8px 0 4px;
+        }
+        .product-price {
+            color: #2c7a47;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .btn-add {
+            background: #4caf50;
+            border: none;
+            color: white;
+            border-radius: 50px;
+            padding: 6px 12px;
+            margin-top: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        .cart-list {
+            background: white;
+            border-radius: 32px;
+            padding: 12px;
+            min-height: 280px;
+            max-height: 380px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            box-shadow: inset 0 1px 4px #0001, 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ffd89a;
+            padding: 10px 8px;
+        }
+        .cart-item-info {
+            flex: 1;
+        }
+        .cart-item-name {
+            font-weight: bold;
+        }
+        .cart-item-price {
+            font-size: 0.8rem;
+            color: #3a6b3a;
+        }
+        .remove-item {
+            background: #ffb3b3;
+            border: none;
+            border-radius: 40px;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #a00;
+        }
+        .cart-summary {
+            background: #fff0db;
+            border-radius: 32px;
+            padding: 18px;
+            margin: 12px 0;
+        }
+        .item-counter {
+            font-size: 1rem;
+            background: #f5a62320;
+            padding: 10px;
+            border-radius: 24px;
+            text-align: center;
+            margin: 8px 0;
+        }
+        .kasir-btn {
+            background: #2c7a47;
+            color: white;
+            font-weight: bold;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 60px;
+            padding: 14px;
+            cursor: pointer;
+            transition: 0.1s;
+            margin-top: 10px;
+            box-shadow: 0 4px 0 #1b4d2e;
+        }
+        .kasir-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #1b4d2e;
+        }
+        .message-area {
+            background: #1e293b;
+            color: white;
+            border-radius: 28px;
+            padding: 14px;
+            margin-top: 16px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .warning {
+            background: #b91c1c;
+        }
+        .success {
+            background: #15803d;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        @media (max-width: 780px) {
+            .product-section, .cart-section {
+                flex: auto;
+                border-right: none;
+            }
+            .store-header, .mission-area {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        .required-badge {
+            background: #facc15;
+            color: #1e293b;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            padding: 2px 10px;
+            font-weight: bold;
+        }
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            background: #f6eedf;
+            padding: 10px;
+            color: #6b5e4a;
+        }
+        .manual-hint {
+            background: #fff3e0;
+            border-radius: 20px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #b45f06;
+            border-left: 4px solid #f5a623;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="store-header">
+        <div class="store-title">
+            <h1>🏪 Toko Swalayan</h1>
+            <p>Belanja pintar, latihan numerasi | Hitung sendiri total belanja!</p>
+        </div>
+        <div class="budget-area">
+            <div class="budget-label">💰 Uang kamu</div>
+            <div class="budget-value" id="uangDisplay">Rp0</div>
+        </div>
+    </div>
+
+    <div class="mission-area">
+        <div class="mission-card">
+            📋 <strong>Tugas Belanja:</strong> Kamu harus membeli <span id="targetJumlahSpan" class="task-badge" style="background:#f97316;">3 item</span>
+        </div>
+        <div>
+            <button id="resetGameBtn" class="reset-btn">🔄 Ganti Uang & Reset</button>
+        </div>
+    </div>
+
+    <div class="shop-layout">
+        <!-- DAFTAR BARANG -->
+        <div class="product-section">
+            <div class="section-title">🛒 Rak Belanjaan (Pilih barang)</div>
+            <div class="product-grid" id="productGrid"></div>
+        </div>
+
+        <!-- KERANJANG BELANJA -->
+        <div class="cart-section">
+            <div class="section-title">🛍️ Keranjangku</div>
+            <div class="manual-hint">
+                🧮 <strong>Hitung sendiri!</strong> Total harga tidak ditampilkan. Kamu harus menghitung manual belanjaanmu.
+            </div>
+            <div class="cart-list" id="cartList">
+                <div style="padding: 20px; text-align:center; color:gray;">Keranjang masih kosong</div>
+            </div>
+            <div class="cart-summary">
+                <div class="item-counter">
+                    📦 Jumlah item di keranjang: <strong id="itemCount">0</strong> 
+                    <span id="targetJumlahIndicator" class="required-badge">(target: 3 item)</span>
+                </div>
+            </div>
+            <button id="kasirButton" class="kasir-btn">🧾 CHECKOUT (KE KASIR) 🧾</button>
+            <div id="messageBox" class="message-area">
+                ✨ Belanja sesuai tugas lalu tekan Kasir ✨
+            </div>
+        </div>
+    </div>
+    <footer>
+        📚 Tips: Hitung total harga belanjaanmu sendiri! Jika over budget atau jumlah item tidak sesuai, kasir akan menyuruh mengulang.
+    </footer>
+</div>
+
+<script>
+    // DATA BARANG (seperti Indomaret)
+    const PRODUCTS = [
+        { id: 1, name: "🍪 Choco Snack", price: 5500, category: "snack" },
+        { id: 2, name: "🥤 Teh Botol", price: 6500, category: "minuman" },
+        { id: 3, name: "🍿 Cheetos", price: 8500, category: "snack" },
+        { id: 4, name: "🍚 Beras 1kg", price: 14500, category: "pokok" },
+        { id: 5, name: "🥚 Telur (10 pcs)", price: 23000, category: "pokok" },
+        { id: 6, name: "🫒 Minyak Goreng 1L", price: 18500, category: "pokok" },
+        { id: 7, name: "🧼 Sabun Mandi", price: 7500, category: "kebutuhan" },
+        { id: 8, name: "🧺 Sabun Cuci Cair", price: 12500, category: "kebutuhan" },
+        { id: 9, name: "🥛 Susu UHT", price: 12500, category: "minuman" },
+        { id: 10, name: "🍫 Cokelat Batang", price: 9500, category: "snack" },
+        { id: 11, name: "🍜 Indomie Goreng", price: 3500, category: "pokok" },
+        { id: 12, name: "🧴 Pewangi Pakaian", price: 16500, category: "kebutuhan" }
+    ];
+
+    // Variabel game state
+    let currentBudget = 20000;
+    let requiredItemCount = 3;
+    let cart = [];
+    
+    // DOM Elements
+    const uangDisplay = document.getElementById('uangDisplay');
+    const targetJumlahSpan = document.getElementById('targetJumlahSpan');
+    const productGrid = document.getElementById('productGrid');
+    const cartListEl = document.getElementById('cartList');
+    const itemCountSpan = document.getElementById('itemCount');
+    const kasirButton = document.getElementById('kasirButton');
+    const resetGameBtn = document.getElementById('resetGameBtn');
+    const messageBox = document.getElementById('messageBox');
+    const targetJumlahIndicator = document.getElementById('targetJumlahIndicator');
+
+    // Helper: format Rupiah
+    function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+    }
+
+    // Update tampilan keranjang (tanpa total harga)
+    function updateCartUI() {
+        const itemCount = cart.length;
+        itemCountSpan.innerText = itemCount;
+        targetJumlahIndicator.innerText = `(target: ${requiredItemCount} item)`;
+        
+        // Render cart list
+        if (cart.length === 0) {
+            cartListEl.innerHTML = '<div style="padding: 20px; text-align:center; color:gray;">🛒 Keranjang masih kosong</div>';
+        } else {
+            cartListEl.innerHTML = cart.map((item, idx) => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">${formatRupiah(item.price)}</div>
+                    </div>
+                    <button class="remove-item" data-index="${idx}">✖ Hapus</button>
+                </div>
+            `).join('');
+            // Pasang event listener untuk setiap tombol hapus
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(btn.getAttribute('data-index'));
+                    if (!isNaN(idx)) {
+                        cart.splice(idx, 1);
+                        updateCartUI();
+                        // Hapus pesan sukses jika ada (karena skenario berubah)
+                        if (messageBox.classList.contains('success')) {
+                            messageBox.classList.remove('success');
+                            messageBox.classList.add('message-area');
+                            messageBox.style.backgroundColor = "#1e293b";
+                            messageBox.innerText = "🔄 Keranjang berubah. Hitung ulang belanjaanmu!";
+                        } else {
+                            messageBox.style.backgroundColor = "#1e293b";
+                            messageBox.innerText = "🗑️ Barang dihapus, silakan lanjutkan belanja";
+                        }
+                    }
+                });
+            });
+        }
+    }
+    
+    // Menambah barang ke keranjang
+    function addToCart(product) {
+        const newItem = { id: product.id, name: product.name, price: product.price };
+        cart.push(newItem);
+        updateCartUI();
+        // Jika sebelumnya ada pesan sukses, hilangkan karena skenario berubah
+        if (messageBox.classList.contains('success')) {
+            messageBox.classList.remove('success');
+        }
+        messageBox.style.backgroundColor = "#2c7a47";
+        messageBox.innerText = `➕ ${product.name} ditambahkan (${formatRupiah(product.price)})`;
+        setTimeout(() => {
+            if (messageBox.innerText.includes("ditambahkan") && !messageBox.classList.contains('success')) {
+                messageBox.style.backgroundColor = "#1e293b";
+                messageBox.innerText = "✨ Silakan pilih barang sesuai tugas ✨";
+            }
+        }, 2000);
+    }
+    
+    // PROSES KASIR : cek jumlah item & total budget (dihitung di backend, anak tidak melihat total otomatis)
+    function processCheckout() {
+        const totalBelanja = cart.reduce((sum, i) => sum + i.price, 0);
+        const itemCount = cart.length;
+        let errorMsg = null;
+        
+        if (itemCount !== requiredItemCount) {
+            errorMsg = `❌ KASIR: Jumlah item tidak sesuai! Target belanja ${requiredItemCount} item, tetapi kamu membeli ${itemCount} item. Kembalikan semua barang dan pilih ulang!`;
+        } 
+        else if (totalBelanja > currentBudget) {
+            errorMsg = `❌ KASIR: Uangmu tidak cukup! Total belanja ${formatRupiah(totalBelanja)} melebihi uang ${formatRupiah(currentBudget)}. Kamu harus mengembalikan semua barang dan mulai dari awal.`;
+        }
+        
+        if (errorMsg) {
+            // Harus mengulang, reset keranjang -> kosongkan cart
+            cart = [];
+            updateCartUI();
+            messageBox.classList.remove('success');
+            messageBox.classList.add('warning');
+            messageBox.style.backgroundColor = "#b91c1c";
+            messageBox.innerText = errorMsg + " 🔄 Keranjang sudah dikosongkan. Silakan pilih barang kembali dengan teliti.";
+            return;
+        }
+        
+        // SUKSES! Pesan ini akan tetap ada sampai user mereset atau mengubah keranjang
+        const sisaUang = currentBudget - totalBelanja;
+        messageBox.classList.remove('warning');
+        messageBox.classList.add('success');
+        messageBox.style.backgroundColor = "#15803d";
+        messageBox.innerHTML = `🎉 SELAMAT! Transaksi berhasil! 🎉<br> Total belanja: ${formatRupiah(totalBelanja)}. Sisa uang: ${formatRupiah(sisaUang)}.<br> Kamu pintar numerasi! 🌟<br><small>Tekan "Ganti Uang & Reset" untuk tantangan baru</small>`;
+    }
+    
+    // Generate uang random antara 20000 sampai 50000 dengan kelipatan 5000
+    function generateRandomBudget() {
+        const options = [];
+        for (let i = 20000; i <= 50000; i += 5000) {
+            options.push(i);
+        }
+        const randomIndex = Math.floor(Math.random() * options.length);
+        return options[randomIndex];
+    }
+    
+    // Generate tugas acak jumlah item : 3, 4, atau kadang 5
+    function generateRequiredItemCount() {
+        const variants = [3, 4];
+        if (Math.random() > 0.7) return 5;
+        return variants[Math.floor(Math.random() * variants.length)];
+    }
+    
+    // Reset seluruh game: budget baru, jumlah target baru, keranjang kosong
+    function resetGame() {
+        currentBudget = generateRandomBudget();
+        requiredItemCount = generateRequiredItemCount();
+        cart = [];
+        // update UI
+        uangDisplay.innerText = formatRupiah(currentBudget);
+        targetJumlahSpan.innerText = requiredItemCount;
+        updateCartUI();
+        messageBox.classList.remove('success', 'warning');
+        messageBox.classList.add('message-area');
+        messageBox.style.backgroundColor = "#1e293b";
+        messageBox.innerHTML = `🔄 Game direset! Uangmu sekarang ${formatRupiah(currentBudget)}. Kamu harus membeli ${requiredItemCount} item. Hitung total belanja sendiri ya!`;
+    }
+    
+    // Render semua produk
+    function renderProducts() {
+        productGrid.innerHTML = '';
+        PRODUCTS.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            let emoji = "🛒";
+            if (product.name.includes("Snack")) emoji = "🍪";
+            if (product.name.includes("Teh")) emoji = "🧃";
+            if (product.name.includes("Cheetos")) emoji = "🍿";
+            if (product.name.includes("Beras")) emoji = "🍚";
+            if (product.name.includes("Telur")) emoji = "🥚";
+            if (product.name.includes("Minyak")) emoji = "🫒";
+            if (product.name.includes("Sabun Mandi")) emoji = "🧼";
+            if (product.name.includes("Sabun Cuci")) emoji = "🧺";
+            if (product.name.includes("Susu")) emoji = "🥛";
+            if (product.name.includes("Cokelat")) emoji = "🍫";
+            if (product.name.includes("Indomie")) emoji = "🍜";
+            if (product.name.includes("Pewangi")) emoji = "🌸";
+            card.innerHTML = `
+                <div class="product-emoji">${emoji}</div>
+                <div class="product-name">${product.name}</div>
+                <div class="product-price">${formatRupiah(product.price)}</div>
+                <button class="btn-add">➕ Beli</button>
+            `;
+            const addBtn = card.querySelector('.btn-add');
+            addBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                addToCart(product);
+            });
+            productGrid.appendChild(card);
+        });
+    }
+    
+    // Inisialisasi
+    function init() {
+        renderProducts();
+        resetGame();
+        kasirButton.addEventListener('click', () => {
+            processCheckout();
+        });
+        resetGameBtn.addEventListener('click', () => {
+            resetGame();
+        });
+    }
+    
+    init();
+</script>
+</body>
+</html>
