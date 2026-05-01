@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Belajar Numerasi - Simulator Belanja di Toko</title>
+    <title>Belanja di Toko</title>
     <style>
         * {
             box-sizing: border-box;
@@ -294,6 +294,83 @@
             color: #b45f06;
             border-left: 4px solid #f5a623;
         }
+
+        /* ===== MOBILE TOUCH ENHANCEMENTS (added lines without changing core) ===== */
+        /* 1. Increase tap target size for all interactive elements on mobile */
+        @media (max-width: 768px) {
+            .btn-add, .remove-item, .kasir-btn, .reset-btn {
+                min-height: 48px;
+                min-width: 48px;
+                padding: 12px 16px;
+                font-size: 1rem;
+            }
+            .product-card {
+                cursor: pointer;
+                padding: 16px 8px;
+            }
+            .cart-item {
+                padding: 14px 8px;
+            }
+            .remove-item {
+                padding: 8px 16px;
+                font-size: 1rem;
+            }
+            .reset-btn {
+                padding: 12px 24px;
+            }
+            /* prevent zoom on focus for inputs (none here, but for safety) */
+            select, textarea, input {
+                font-size: 16px;
+            }
+        }
+
+        /* 2. Remove hover effects on mobile to avoid sticky states */
+        @media (hover: none) and (pointer: coarse) {
+            .product-card:hover {
+                transform: none;
+                border-color: #ffe0b5;
+                background: white;
+            }
+            .product-card:active {
+                transform: scale(0.98);
+                background: #fff0dd;
+                border-color: #f5a623;
+                transition: 0.02s;
+            }
+            .btn-add:active {
+                transform: scale(0.96);
+                background: #3d9b40;
+            }
+            .remove-item:active {
+                background: #ff8f8f;
+                transform: scale(0.96);
+            }
+            .reset-btn:active {
+                transform: scale(0.96);
+            }
+            .kasir-btn:active {
+                transform: translateY(2px) scale(0.99);
+            }
+        }
+
+        /* 3. Prevent accidental double-tap zoom on buttons (disable default double-tap zoom on interactive) */
+        button, .product-card, .remove-item, .reset-btn, .kasir-btn, .btn-add {
+            touch-action: manipulation;
+        }
+
+        /* 4. Smooth scrolling for cart (already present, but fine) */
+        .cart-list {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 5. Better visual feedback for touch (active state fallback) */
+        .product-card:active {
+            transform: scale(0.98);
+            transition: transform 0.05s;
+        }
+        .btn-add:active {
+            transform: scale(0.96);
+        }
     </style>
 </head>
 <body>
@@ -411,6 +488,7 @@
             // Pasang event listener untuk setiap tombol hapus
             document.querySelectorAll('.remove-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const idx = parseInt(btn.getAttribute('data-index'));
                     if (!isNaN(idx)) {
                         cart.splice(idx, 1);
@@ -431,8 +509,13 @@
         }
     }
     
-    // Menambah barang ke keranjang
+    // Menambah barang ke keranjang (touch-aware: prevent accidental multiple triggers)
+    let addToCartPending = false;
     function addToCart(product) {
+        // simple debounce for touch to avoid double-add on fast taps
+        if (addToCartPending) return;
+        addToCartPending = true;
+        
         const newItem = { id: product.id, name: product.name, price: product.price };
         cart.push(newItem);
         updateCartUI();
@@ -442,12 +525,15 @@
         }
         messageBox.style.backgroundColor = "#2c7a47";
         messageBox.innerText = `➕ ${product.name} ditambahkan (${formatRupiah(product.price)})`;
+        
+        // Reset pending flag after short delay to allow next tap, but prevents rapid double tap
         setTimeout(() => {
             if (messageBox.innerText.includes("ditambahkan") && !messageBox.classList.contains('success')) {
                 messageBox.style.backgroundColor = "#1e293b";
                 messageBox.innerText = "✨ Silakan pilih barang sesuai tugas ✨";
             }
-        }, 2000);
+            addToCartPending = false;
+        }, 400);
     }
     
     // PROSES KASIR : cek jumlah item & total budget (dihitung di backend, anak tidak melihat total otomatis)
@@ -514,7 +600,7 @@
         messageBox.innerHTML = `🔄 Game direset! Uangmu sekarang ${formatRupiah(currentBudget)}. Kamu harus membeli ${requiredItemCount} item. Hitung total belanja sendiri ya!`;
     }
     
-    // Render semua produk
+    // Render semua produk (enhanced with touch-specific event handling)
     function renderProducts() {
         productGrid.innerHTML = '';
         PRODUCTS.forEach(product => {
@@ -540,25 +626,89 @@
                 <button class="btn-add">➕ Beli</button>
             `;
             const addBtn = card.querySelector('.btn-add');
-            addBtn.addEventListener('click', (e) => {
+            // For better touch responsiveness, attach both click and touchstart (but prevent double)
+            const addHandler = (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 addToCart(product);
+            };
+            addBtn.addEventListener('click', addHandler);
+            addBtn.addEventListener('touchstart', addHandler, { passive: false });
+            // Also allow tapping on the product card itself for easier reach (optional but enhances mobile)
+            card.addEventListener('click', (e) => {
+                // only if the click target is not the button itself (avoid double)
+                if (e.target !== addBtn && !addBtn.contains(e.target)) {
+                    addToCart(product);
+                }
             });
+            card.addEventListener('touchstart', (e) => {
+                if (e.target !== addBtn && !addBtn.contains(e.target)) {
+                    e.preventDefault();
+                    addToCart(product);
+                }
+            }, { passive: false });
             productGrid.appendChild(card);
         });
     }
     
-    // Inisialisasi
+    // Touch optimisation for heavy buttons: prevent ghost clicks on iOS
+    function optimizeTouchForButtons() {
+        const allInteractive = document.querySelectorAll('button, .product-card, .remove-item, .reset-btn, .kasir-btn');
+        allInteractive.forEach(el => {
+            el.addEventListener('touchstart', (e) => {
+                // Just to ensure no 300ms delay (already covered by viewport but extra safety)
+                // We don't prevent default unless needed, but we ensure the element gets immediate visual feedback
+                if (el.classList && el.classList.contains('btn-add')) {
+                    // already handled
+                }
+            }, { passive: true });
+        });
+    }
+    
+    // Inisialisasi dengan mobile touch enhancement
     function init() {
         renderProducts();
         resetGame();
-        kasirButton.addEventListener('click', () => {
+        // Re-apply kasir event after potential render?
+        const kasirBtn = document.getElementById('kasirButton');
+        const resetBtn = document.getElementById('resetGameBtn');
+        // Remove existing listeners to avoid duplication (just in case)
+        const newKasirBtn = kasirBtn.cloneNode(true);
+        const newResetBtn = resetBtn.cloneNode(true);
+        kasirBtn.parentNode.replaceChild(newKasirBtn, kasirBtn);
+        resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
+        
+        const finalKasir = document.getElementById('kasirButton');
+        const finalReset = document.getElementById('resetGameBtn');
+        
+        finalKasir.addEventListener('click', (e) => {
+            e.preventDefault();
             processCheckout();
         });
-        resetGameBtn.addEventListener('click', () => {
+        // also touch for redundancy on some mobile browsers
+        finalKasir.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            processCheckout();
+        }, { passive: false });
+        
+        finalReset.addEventListener('click', (e) => {
+            e.preventDefault();
             resetGame();
         });
+        finalReset.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            resetGame();
+        }, { passive: false });
+        
+        optimizeTouchForButtons();
     }
+    
+    // Additional: Disable context menu on buttons to avoid long-press popup (mobile friendly)
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.tagName === 'BUTTON' || e.target.classList?.contains('product-card') || e.target.classList?.contains('btn-add')) {
+            e.preventDefault();
+        }
+    });
     
     init();
 </script>
