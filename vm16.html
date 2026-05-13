@@ -2,49 +2,86 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Urutan Nama</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Urutan Nama - Petualangan Seru!</title>
     <style>
         :root {
             --primary: #4CAF50;
+            --primary-dark: #388E3C;
             --secondary: #2196F3;
-            --bg: #fcdbbd; /* Disamakan dengan latar belakang gambar PNG */
+            --secondary-dark: #1976D2;
+            --bg: #fcdbbd;
+            --card-bg: rgba(255, 248, 235, 0.9);
+            --text-dark: #2c3e2f;
         }
 
         * {
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'Poppins', 'Comic Neue', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Hapus overflow:hidden agar bisa scroll */
-            overflow: auto;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        @media screen and (orientation: portrait) {
-            #landscape-warning { display: flex; }
-            #game-container, #start-screen { display: none !important; }
-        }
-
+        /* LANDSCAPE WARNING - Deteksi orientasi yang lebih presisi */
         #landscape-warning {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #333; color: white;
-            justify-content: center; align-items: center;
-            text-align: center; padding: 20px;
-            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #2c3e2f;
+            background-image: radial-gradient(circle at 10% 20%, #3e5a3a, #1e2a1c);
+            color: #f9e7c2;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+            z-index: 10000;
+            flex-direction: column;
+            backdrop-filter: blur(2px);
+            font-weight: bold;
         }
 
-        /* Tampilan Transisi / Start Screen */
+        #landscape-warning h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            background: rgba(0,0,0,0.4);
+            padding: 12px 24px;
+            border-radius: 60px;
+        }
+
+        #landscape-warning p {
+            font-size: 1.2rem;
+            max-width: 280px;
+            margin: 20px auto;
+        }
+
+        .rotate-icon {
+            font-size: 4rem;
+            animation: rotateAnim 1.5s infinite ease;
+            display: inline-block;
+        }
+
+        @keyframes rotateAnim {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+            100% { transform: rotate(90deg); }
+        }
+
+        /* START SCREEN */
         #start-screen {
             display: flex;
             flex-direction: column;
@@ -52,13 +89,22 @@
             justify-content: center;
             text-align: center;
             z-index: 100;
+            background: var(--bg);
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         #start-screen h1 {
-            font-size: 2.5rem;
+            font-size: 2.3rem;
             color: #1e3c5c;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0 #ffdd99;
+            background: rgba(255,255,200,0.6);
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 80px;
+            backdrop-filter: blur(2px);
         }
 
         .play-btn-container {
@@ -66,197 +112,343 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: transform 0.2s;
+            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            margin-top: 20px;
         }
 
-        .play-btn-container:hover {
-            transform: scale(1.1);
+        .play-btn-container:active {
+            transform: scale(0.96);
         }
 
         .play-icon {
-            width: 100px;
-            height: 100px;
-            background: var(--primary);
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            margin-bottom: 15px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.25);
+            margin-bottom: 20px;
+            transition: all 0.2s;
         }
 
         .play-icon svg {
-            width: 50px;
-            height: 50px;
+            width: 52px;
+            height: 52px;
             fill: white;
-            margin-left: 8px; /* Offset to visually center the triangle */
+            margin-left: 8px;
         }
 
         .play-label {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: white;
-            background: var(--primary);
-            padding: 8px 30px;
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: var(--primary-dark);
+            padding: 10px 40px;
+            border-radius: 50px;
+            letter-spacing: 2px;
+            box-shadow: 0 6px 0 #1b5e20;
         }
 
-        /* Game Container */
+        /* GAME CONTAINER - Horizontal scroll untuk landscape/tablet */
         #game-container {
-            display: none; /* Sembunyi sampai tombol MAIN diklik */
-            width: 95%;
-            max-width: 1100px;
+            display: none;
+            width: 100%;
+            max-width: 1300px;
             margin: 0 auto;
             text-align: center;
             flex-direction: column;
+            padding: 12px 16px 20px;
+            background: var(--bg);
+            min-height: 100vh;
+            justify-content: center;
         }
 
+        .instruction-box {
+            background: rgba(255, 251, 240, 0.95);
+            padding: 12px 20px;
+            border-radius: 50px;
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+            color: #1e3c5c;
+            display: inline-block;
+            width: auto;
+            backdrop-filter: blur(4px);
+        }
+
+        /* FLEX ROW: PASTIKAN SEMUA ANAK DALAM SATU BARIS TANPA TURUN */
         .character-row {
             display: flex;
+            flex-direction: row;
             justify-content: center;
-            align-items: flex-end;
-            gap: 16px;
-            margin: 15px 0 25px 0;
-            min-height: 250px;
-            flex-wrap: wrap; /* tambahan agar rapi jika terlalu sempit, tapi tetap bisa scroll */
+            align-items: stretch;
+            gap: 12px;
+            margin: 10px 0 20px;
+            padding: 12px 8px;
+            overflow-x: auto;
+            overflow-y: visible;
+            flex-wrap: nowrap;  /* KUNCI: Tidak membungkus ke baris baru */
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
         }
 
+        /* Styling wrapper tiap karakter - ukuran konsisten */
         .char-wrapper {
             position: relative;
             cursor: pointer;
-            transition: transform 0.2s;
-            width: 140px;
+            transition: transform 0.2s ease;
+            width: 130px;
+            min-width: 130px;
+            flex-shrink: 0;   /* Tidak menyusut, tetap satu baris */
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* Tambahkan margin bottom agar ruang untuk label cukup tanpa overflow */
-            margin-bottom: 40px;
+            background: rgba(250, 235, 215, 0.6);
+            border-radius: 32px;
+            padding: 12px 8px 8px;
+            scroll-snap-align: start;
+            backdrop-filter: blur(2px);
+        }
+
+        .char-wrapper:active {
+            transform: scale(0.97);
         }
 
         .char-img {
             width: 100%;
             height: auto;
-            max-height: 210px;
-            border-radius: 20px;
-            background: #fcc295; 
-            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+            max-height: 170px;
             object-fit: contain;
+            border-radius: 24px;
+            background: #ffe3c2;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            transition: all 0.2s;
             display: block;
         }
 
-        /* Perbaikan: label nama sementara agar berada secara vertikal di tengah gambar */
+        /* Label nama sementara di tengah gambar */
         .temp-name-label {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #ffeb3b;
-            color: #333;
-            padding: 8px 18px;
-            border-radius: 40px;
-            font-weight: bold;
+            background: #ffdd77;
+            color: #1e3c2c;
+            padding: 6px 18px;
+            border-radius: 48px;
+            font-weight: 800;
             font-size: 1.2rem;
             white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 20;
-            animation: fadeInOut 2s forwards;
-            pointer-events: none; /* agar label tidak menghalangi klik ulang */
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+            z-index: 30;
+            animation: bouncePulse 0.5s ease forwards;
+            pointer-events: none;
+            font-family: monospace;
+            letter-spacing: 1px;
+            border: 2px solid gold;
         }
 
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-            15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        @keyframes bouncePulse {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7);}
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1);}
+            40% { transform: translate(-50%, -50%) scale(1);}
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1);}
         }
 
-        .instruction-box {
-            background: white;
-            padding: 14px 18px;
-            border-radius: 36px;
-            margin-bottom: 12px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            color: #1e3c5c;
+        /* area pertanyaan & tombol */
+        #question-area {
+            background: rgba(255, 248, 230, 0.9);
+            border-radius: 56px;
+            padding: 16px 10px;
+            margin: 10px auto;
+            width: 95%;
+            max-width: 650px;
+            backdrop-filter: blur(8px);
+        }
+
+        #question-text {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #003366;
+            background: #fff2df;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 48px;
+            margin: 6px 0;
+            box-shadow: inset 0 1px 4px #0001, 0 5px 12px rgba(0,0,0,0.05);
+        }
+
+        .number-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 12px;
         }
 
         .btn-number {
-            padding: 10px 20px;
-            font-size: 1.6rem;
+            padding: 12px 22px;
+            font-size: 1.8rem;
             font-weight: bold;
             border: none;
             border-radius: 60px;
-            background: var(--secondary);
+            background: linear-gradient(145deg, var(--secondary), var(--secondary-dark));
             color: white;
             cursor: pointer;
-            min-width: 70px;
+            min-width: 75px;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 7px 0 #0d3c5c;
+        }
+
+        .btn-number:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #0d3c5c;
         }
 
         .btn-play-again {
-            padding: 12px 28px;
-            font-size: 1.3rem;
+            padding: 14px 32px;
+            font-size: 1.4rem;
             font-weight: bold;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #2e7d32);
             color: white;
             border: none;
-            border-radius: 40px;
+            border-radius: 60px;
             cursor: pointer;
-            margin-top: 20px;
-            margin-bottom: 30px; /* Tambahan bottom margin agar tidak menempel border */
+            margin: 20px auto 25px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transition: 0.1s linear;
+            display: inline-block;
+        }
+
+        .btn-play-again:active {
+            transform: scale(0.96);
         }
 
         #feedback {
             font-weight: bold;
-            margin-top: 20px;
-            min-height: 3.8em;
+            margin-top: 16px;
+            min-height: 70px;
             font-size: 1.2rem;
-            padding: 10px 18px;
-            background: #ffffffaa;
-            border-radius: 60px;
+            padding: 12px 20px;
+            background: #fdf8efee;
+            border-radius: 48px;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            color: #2c3e2f;
+            transition: 0.2s;
         }
 
-        #question-text {
-            font-size: 1.4rem;
-            font-weight: 700;
-            background: #ffffffdd;
-            display: inline-block;
-            padding: 10px 24px;
-            border-radius: 60px;
-            margin: 6px auto;
-            color: #004070;
+        /* RESPONSIVE: untuk HP dalam mode LANDSCAPE kita pastikan row tetap horizontal */
+        @media (max-width: 900px) {
+            .char-wrapper {
+                width: 110px;
+                min-width: 110px;
+            }
+            .char-img {
+                max-height: 140px;
+            }
+            .btn-number {
+                padding: 8px 18px;
+                font-size: 1.5rem;
+                min-width: 65px;
+            }
+            .instruction-box {
+                font-size: 1rem;
+            }
+            #question-text {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .char-wrapper {
+                width: 100px;
+                min-width: 100px;
+                padding: 8px 5px;
+            }
+            .char-img {
+                max-height: 125px;
+            }
+            .temp-name-label {
+                font-size: 0.9rem;
+                padding: 4px 12px;
+            }
+        }
+
+        /* Landscape WARNING: Gunakan media query untuk menampilkan hanya saat portrait dan device mobile */
+        @media (orientation: portrait) and (max-width: 900px) {
+            #landscape-warning {
+                display: flex !important;
+            }
+            #game-container, #start-screen {
+                display: none !important;
+            }
+        }
+
+        /* Mode landscape di HP atau tablet: tampilkan game normal */
+        @media (orientation: landscape) {
+            #landscape-warning {
+                display: none !important;
+            }
+        }
+
+        /* Tuning untuk desktop tetap rapi */
+        @media (min-width: 1024px) {
+            .character-row {
+                justify-content: center;
+                flex-wrap: nowrap;
+                overflow-x: visible;
+            }
+            .char-wrapper {
+                width: 150px;
+                min-width: 150px;
+            }
+        }
+
+        /* Sembunyikan tombol retry di awal */
+        #btn-retry {
+            transition: 0.2s;
         }
     </style>
 </head>
 <body>
 
 <div id="landscape-warning">
-    <h2>🔄 Putar layar ponselmu ke posisi mendatar (Landscape) untuk bermain!</h2>
+    <div class="rotate-icon">🔄</div>
+    <h2>Mode Landscape Diperlukan</h2>
+    <p>Putar HP-mu ke posisi <strong>MENDATAR (Landscape)</strong> untuk bermain seru bersama Andi, Budi, Caca, Dani & Edo!</p>
+    <p>✨ Setelah diputar, halaman akan otomatis siap ✨</p>
 </div>
 
 <!-- Layar Awal -->
 <div id="start-screen">
-    <h1>Ayo main urutan nama!</h1>
+    <h1>🐣 Ayo Belajar Urutan!</h1>
     <div class="play-btn-container" onclick="initGame()">
         <div class="play-icon">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </div>
         <div class="play-label">MAIN</div>
     </div>
+    <p style="margin-top: 40px; font-weight:500; background:#ffffffaa; padding:8px 18px; border-radius:40px;">Klik anak, dengar namanya, lalu jawab posisi!</p>
 </div>
 
 <!-- Kontainer Utama Game -->
 <div id="game-container">
     <div class="instruction-box" id="instruction">
-        ✨ Klik setiap anak untuk tahu namanya! ✨
+        🎈 Klik gambar anak untuk tahu namanya! 🎈
     </div>
 
+    <!-- Baris karakter: SEMUA DALAM SATU BARIS (horizontal, tidak turun ke bawah) -->
     <div class="character-row" id="char-area"></div>
 
     <div id="question-area" style="visibility: hidden;">
         <p id="question-text"></p>
-        <div style="display: flex; justify-content: center; gap: 10px;">
+        <div class="number-buttons">
             <button class="btn-number" onclick="checkAnswer(1)">1</button>
             <button class="btn-number" onclick="checkAnswer(2)">2</button>
             <button class="btn-number" onclick="checkAnswer(3)">3</button>
@@ -270,6 +462,7 @@
 </div>
 
 <script>
+    // DATA KARAKTER (sesuai dengan file gambar yang dirujuk)
     const characters = [
         { name: "Andi", img: "images/vm16_Andi.png" },
         { name: "Budi", img: "images/vm16_Budi.png" },
@@ -278,113 +471,231 @@
         { name: "Edo",  img: "images/vm16_Edo.png" }
     ];
 
-    let currentOrder = [];
+    let currentOrder = [];          // urutan acak
     let targetChar = null;
-    let targetSide = "";
+    let targetSide = "";            // "kiri" atau "kanan"
     let targetPos = 0;
     let isAnswered = false;
+    let speechSynth = window.speechSynthesis;
 
+    // Fungsi speak dengan fallback
     function speak(text) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'id-ID';
-        utterance.rate = 0.9;
-        window.speechSynthesis.speak(utterance);
+        if (!window.speechSynthesis) return;
+        try {
+            speechSynth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'id-ID';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = 1;
+            speechSynth.speak(utterance);
+        } catch(e) { console.warn(e); }
     }
 
+    // Render semua karakter dalam satu baris HORIZONTAL murni
     function renderCharacters() {
         const charArea = document.getElementById('char-area');
         charArea.innerHTML = "";
         
-        currentOrder.forEach((char) => {
+        currentOrder.forEach((char, idx) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'char-wrapper';
+            wrapper.setAttribute('data-name', char.name);
             
             const img = document.createElement('img');
             img.className = 'char-img';
             img.src = char.img;
+            img.alt = `Gambar ${char.name}`;
+            // Fallback jika gambar tidak ditemukan
+            img.onerror = function() {
+                this.style.background = "#d9c2a7";
+                this.style.padding = "20px";
+                this.alt = char.name;
+            };
             
-            wrapper.onclick = () => {
+            // Event klik untuk bicara nama + label cantik
+            wrapper.onclick = (e) => {
+                e.stopPropagation();
                 speak(char.name);
-                
-                // Hapus label yang mungkin masih tersisa dari sebelumnya
-                const existingLabels = wrapper.querySelectorAll('.temp-name-label');
-                existingLabels.forEach(label => label.remove());
+                // Bersihkan label lama di wrapper ini
+                const oldLabel = wrapper.querySelector('.temp-name-label');
+                if(oldLabel) oldLabel.remove();
                 
                 const label = document.createElement('div');
                 label.className = 'temp-name-label';
                 label.innerText = char.name;
                 wrapper.appendChild(label);
+                // Hapus label setelah 2 detik animasi smooth
                 setTimeout(() => {
-                    if(label.parentNode) label.remove();
-                }, 2000);
+                    if(label && label.parentNode) label.remove();
+                }, 1900);
             };
             
             wrapper.appendChild(img);
             charArea.appendChild(wrapper);
         });
+        
+        // Pastikan scroll halus dan tidak ada overflow yang mematahkan baris
+        // Memberi sedikit jeda untuk memastikan tata letak stabil
+        setTimeout(() => {
+            if (charArea.scrollWidth > charArea.clientWidth) {
+                // Jika overflow, tetap pertahankan nowrap, biarkan user scroll horizontal
+                charArea.style.overflowX = "auto";
+            }
+        }, 20);
     }
 
+    // Fungsi inisiasi layar utama setelah klik MAIN
     function initGame() {
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('game-container').style.display = 'flex';
+        const startScreen = document.getElementById('start-screen');
+        const gameContainer = document.getElementById('game-container');
+        startScreen.style.display = 'none';
+        gameContainer.style.display = 'flex';
         startGame();
     }
-
+    
+    // Memulai permainan (acak urutan, reset state)
     function startGame() {
         isAnswered = false;
-        document.getElementById('btn-retry').style.display = "none";
-        document.getElementById('feedback').innerText = "";
-        document.getElementById('feedback').style.color = ""; // reset warna
+        const retryBtn = document.getElementById('btn-retry');
+        if (retryBtn) retryBtn.style.display = "none";
+        const feedbackDiv = document.getElementById('feedback');
+        feedbackDiv.innerText = "";
+        feedbackDiv.style.color = "#1e3c5c";
         
-        currentOrder = [...characters].sort(() => Math.random() - 0.5);
+        // Shuffle array (Fisher-Yates)
+        currentOrder = [...characters];
+        for (let i = currentOrder.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [currentOrder[i], currentOrder[j]] = [currentOrder[j], currentOrder[i]];
+        }
+        
         renderCharacters();
-        showQuestion(true); 
-    }
-
-    function showQuestion(isInitial = false) {
+        // Sembunyikan sementara area pertanyaan sampai pertanyaan baru siap
         const qArea = document.getElementById('question-area');
+        qArea.style.visibility = "hidden";
         
+        // Hasilkan pertanyaan baru setelah render
+        generateNewQuestion(true);
+    }
+    
+    // Membangkitkan pertanyaan baru berdasarkan urutan terbaru
+    function generateNewQuestion(isInitial = false) {
+        if (!currentOrder.length) return;
+        
+        // Pilih secara acak salah satu karakter dari posisi acak
         const randomIndex = Math.floor(Math.random() * currentOrder.length);
         targetChar = currentOrder[randomIndex];
         targetSide = Math.random() > 0.5 ? "kiri" : "kanan";
         
-        const idx = currentOrder.indexOf(targetChar);
-        targetPos = (targetSide === "kiri") ? idx + 1 : currentOrder.length - idx;
+        // Hitung posisi dari sisi kiri atau kanan
+        const idx = currentOrder.findIndex(ch => ch.name === targetChar.name && ch.img === targetChar.img);
+        if (idx === -1) return;
         
-        const qText = `Pada urutan berapa dari ${targetSide}, ${targetChar.name} berdiri?`;
-        document.getElementById('question-text').innerText = qText;
-        qArea.style.visibility = "visible";
-
-        if(isInitial) {
-            speak("Ayo main urutan nama! Klik setiap anak untuk mengetahui namanya. " + qText);
+        if (targetSide === "kiri") {
+            targetPos = idx + 1;   // posisi dari kiri: 1-index
         } else {
-            speak(qText);
+            targetPos = currentOrder.length - idx; // dari kanan
+        }
+        
+        const questionText = `Dari ${targetSide}, ${targetChar.name} berada di urutan ke berapa?`;
+        const qElement = document.getElementById('question-text');
+        qElement.innerText = questionText;
+        
+        const qArea = document.getElementById('question-area');
+        qArea.style.visibility = "visible";
+        
+        if (isInitial) {
+            speak("Ayo main urutan nama! Klik setiap anak untuk tahu namanya. " + questionText);
+        } else {
+            speak(questionText);
         }
     }
-
+    
+    // Fungsi pengecekan jawaban user
     function checkAnswer(num) {
-        if (isAnswered) return;
+        if (isAnswered) {
+            // Jika sudah terjawab, jangan lakukan apapun
+            return;
+        }
         
         const feedbackDiv = document.getElementById('feedback');
         if (num === targetPos) {
-            const msg = `Benar! ${targetChar.name} ada di nomor ${num} dari ${targetSide}.`;
-            feedbackDiv.innerText = msg + " 🎉";
-            feedbackDiv.style.color = "green";
+            const msg = `Hebat! Benar sekali ✨ ${targetChar.name} ada di urutan nomor ${num} dari ${targetSide}.`;
+            feedbackDiv.innerText = msg + " 🎉🎉";
+            feedbackDiv.style.color = "#1f6d1a";
+            feedbackDiv.style.backgroundColor = "#e8f5e9";
             speak(msg);
         } else {
-            const msg = `Kurang tepat. ${targetChar.name} sebenarnya ada di nomor ${targetPos} dari ${targetSide}.`;
-            feedbackDiv.innerText = msg + " 💪";
-            feedbackDiv.style.color = "red";
+            const msg = `Yah kurang tepat. ${targetChar.name} sebenarnya ada di urutan nomor ${targetPos} dari ${targetSide}. Coba lagi ya! 💪`;
+            feedbackDiv.innerText = msg;
+            feedbackDiv.style.color = "#a5260c";
+            feedbackDiv.style.backgroundColor = "#fff0ed";
             speak(msg);
         }
         
         isAnswered = true;
-        document.getElementById('btn-retry').style.display = "inline-block";
         
-        // Scroll halus agar tombol Main Lagi terlihat (opsional)
-        document.getElementById('btn-retry').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Tampilkan tombol main lagi
+        const retryBtn = document.getElementById('btn-retry');
+        if (retryBtn) retryBtn.style.display = "inline-block";
+        
+        // Scroll sedikit ke tombol agar nyaman disentuh (tapi tidak paksa paksa)
+        setTimeout(() => {
+            retryBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
     }
+    
+    // Deteksi perubahan orientasi secara realtime -> refresh layout jika perlu (memastikan baris tetap lurus)
+    function handleOrientationChange() {
+        // Hanya jika game container sedang aktif
+        const gameContainer = document.getElementById('game-container');
+        if (gameContainer && gameContainer.style.display === 'flex') {
+            // Re-render ringan tanpa mengacak ulang state untuk menjaga posisi urutan dan pertanyaan
+            // Pastikan row tetap horizontal dengan memaksa ulang style
+            const charRow = document.getElementById('char-area');
+            if (charRow) {
+                charRow.style.flexWrap = 'nowrap';
+                // sedikit force reflow
+                charRow.style.display = 'flex';
+            }
+            // juga pastikan jika ada temporary label yang aneh, tidak masalah
+        }
+        
+        // Jika layar portrait dan device mobile, warning akan muncul via css
+        // Tidak perlu manipulasi lebih
+    }
+    
+    // Inisialisasi event listener + pencegahan default scroll yang mengganggu
+    window.addEventListener('resize', () => {
+        setTimeout(handleOrientationChange, 80);
+    });
+    window.addEventListener('orientationchange', () => {
+        setTimeout(handleOrientationChange, 100);
+    });
+    
+    // Untuk mencegah kesalahan jika gambar tidak loading, beri placeholder
+    // dan tombol mulai aman dari klik ganda
+    let isGameStarting = false;
+    window.initGame = function() {
+        if (isGameStarting) return;
+        isGameStarting = true;
+        initGame();
+        setTimeout(() => { isGameStarting = false; }, 500);
+    };
+    
+    // Pastikan saat pertama load, jika dalam mode landscape langsung siap, portrait akan ada warning
+    document.addEventListener('DOMContentLoaded', () => {
+        // cek orientasi awal jika sudah landscape dan start screen muncul, tidak masalah
+        handleOrientationChange();
+        // Tambahkan fallback suara: pastikan speech diijinkan (user gesture nanti di klik)
+        const startBtnArea = document.querySelector('.play-btn-container');
+        if (startBtnArea) {
+            startBtnArea.addEventListener('touchstart', (e) => {
+                // hanya untuk mengaktifkan audio context di beberapa browser tidak diperlukan
+            });
+        }
+    });
 </script>
 </body>
 </html>
