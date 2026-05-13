@@ -435,16 +435,16 @@
     <div id="question-area" style="visibility: hidden;">
         <p id="question-text"></p>
         <div class="number-buttons">
-            <button class="btn-number" onclick="checkAnswer(1)">1</button>
-            <button class="btn-number" onclick="checkAnswer(2)">2</button>
-            <button class="btn-number" onclick="checkAnswer(3)">3</button>
-            <button class="btn-number" onclick="checkAnswer(4)">4</button>
-            <button class="btn-number" onclick="checkAnswer(5)">5</button>
+            <button class="btn-number" data-num="1">1</button>
+            <button class="btn-number" data-num="2">2</button>
+            <button class="btn-number" data-num="3">3</button>
+            <button class="btn-number" data-num="4">4</button>
+            <button class="btn-number" data-num="5">5</button>
         </div>
     </div>
 
     <div id="feedback"></div>
-    <button class="btn-play-again" id="btn-retry" style="display: none;" onclick="startGame()">🔁 Main Lagi!</button>
+    <button class="btn-play-again" id="btn-retry" style="display: none;">🔁 Main Lagi!</button>
 </div>
 
 <script>
@@ -514,34 +514,56 @@
             charArea.appendChild(wrapper);
         });
         
-        // Pastikan baris tetap horizontal (flex-wrap already nowrap)
         if (charArea.scrollWidth > charArea.clientWidth) {
             charArea.style.overflowX = "auto";
         }
     }
 
-    // Fungsi inisiasi game dari tombol MAIN
-    function initGame() {
-        // Hanya jalan jika tidak dalam mode portrait (warning tidak aktif)
-        const isPortrait = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches;
-        if (isPortrait) {
-            // Jika masih portrait, beri tahu user via alert atau tetap di start screen
-            // Tapi lebih baik tidak menghalangi, namun kita bisa tetap block dengan syarat
-            const warningDiv = document.getElementById('landscape-warning');
-            if (warningDiv && warningDiv.style.display === 'flex') {
-                // Tidak bisa main karena masih portrait
-                speak("Mohon putar layar ke posisi mendatar terlebih dahulu");
-                return;
-            }
+    function checkAnswer(num) {
+        if (!currentGameActive) return;
+        if (isAnswered) return;
+        
+        const feedbackDiv = document.getElementById('feedback');
+        if (!feedbackDiv) return;
+        
+        if (num === targetPos) {
+            const msg = `Hebat! Benar sekali ✨ ${targetChar.name} ada di urutan nomor ${num} dari ${targetSide}.`;
+            feedbackDiv.innerText = msg + " 🎉🎉";
+            feedbackDiv.style.color = "#1f6d1a";
+            feedbackDiv.style.backgroundColor = "#e8f5e9";
+            speak(msg);
+        } else {
+            const msg = `Yah kurang tepat. ${targetChar.name} sebenarnya ada di urutan nomor ${targetPos} dari ${targetSide}. Ayo main lagi!`;
+            feedbackDiv.innerText = msg;
+            feedbackDiv.style.color = "#a5260c";
+            feedbackDiv.style.backgroundColor = "#fff0ed";
+            speak(msg);
         }
         
-        // Sembunyikan start screen, tampilkan game
+        isAnswered = true;
+        
+        const retryBtn = document.getElementById('btn-retry');
+        if (retryBtn) retryBtn.style.display = "inline-block";
+        
+        setTimeout(() => {
+            if (retryBtn) retryBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+
+    function initGame() {
+        const isPortrait = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches;
+        if (isPortrait) {
+            speak("Putar layar ke posisi landscape dulu ya!");
+            const warnDiv = document.getElementById('landscape-warning');
+            if (warnDiv) warnDiv.style.display = 'flex';
+            return;
+        }
+        
         const startScreen = document.getElementById('start-screen');
         const gameContainer = document.getElementById('game-container');
         if (startScreen) startScreen.style.display = 'none';
         if (gameContainer) gameContainer.style.display = 'flex';
         
-        // Reset dan mulai game
         startGame();
     }
     
@@ -557,7 +579,6 @@
             feedbackDiv.style.backgroundColor = "#fdf8efee";
         }
         
-        // Acak urutan
         currentOrder = [...characters];
         for (let i = currentOrder.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -566,11 +587,9 @@
         
         renderCharacters();
         
-        // Sembunyikan area pertanyaan dulu
         const qArea = document.getElementById('question-area');
         if (qArea) qArea.style.visibility = "hidden";
         
-        // Buat pertanyaan baru
         generateNewQuestion(true);
     }
     
@@ -604,134 +623,67 @@
         }
     }
     
-    function checkAnswer(num) {
-        if (!currentGameActive) return;
-        if (isAnswered) return;
-        
-        const feedbackDiv = document.getElementById('feedback');
-        if (!feedbackDiv) return;
-        
-        if (num === targetPos) {
-            const msg = `Hebat! Benar sekali ✨ ${targetChar.name} ada di urutan nomor ${num} dari ${targetSide}.`;
-            feedbackDiv.innerText = msg + " 🎉🎉";
-            feedbackDiv.style.color = "#1f6d1a";
-            feedbackDiv.style.backgroundColor = "#e8f5e9";
-            speak(msg);
-        } else {
-            const msg = `Yah kurang tepat. ${targetChar.name} sebenarnya ada di urutan nomor ${targetPos} dari ${targetSide}. Ayo main lagi!`;
-            feedbackDiv.innerText = msg;
-            feedbackDiv.style.color = "#a5260c";
-            feedbackDiv.style.backgroundColor = "#fff0ed";
-            speak(msg);
-        }
-        
-        isAnswered = true;
-        
-        const retryBtn = document.getElementById('btn-retry');
-        if (retryBtn) retryBtn.style.display = "inline-block";
-        
-        setTimeout(() => {
-            if (retryBtn) retryBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
-    }
-    
-    // Fungsi penangan orientasi agar ketika HP diputar ke landscape, start screen tetap berfungsi
     function handleOrientationAndVisibility() {
         const isPortraitBlock = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches;
         const startScreen = document.getElementById('start-screen');
         const gameContainer = document.getElementById('game-container');
         const warningDiv = document.getElementById('landscape-warning');
         
-        // Jika kondisi portrait dan HP, maka pastikan start screen & game tertutup, warning muncul
         if (isPortraitBlock) {
             if (startScreen) startScreen.style.display = 'none';
             if (gameContainer) gameContainer.style.display = 'none';
             if (warningDiv) warningDiv.style.display = 'flex';
-            // Matikan game active biar tidak ada interaksi belakang
             currentGameActive = false;
             return;
         }
         
-        // Mode landscape atau desktop
         if (warningDiv) warningDiv.style.display = 'none';
         
-        // Cek apakah game container sedang menyala atau start screen
-        // Jika game container display flex dan tidak ada start screen, berarti game sedang berlangsung
         if (gameContainer && gameContainer.style.display === 'flex') {
-            // Game sedang aktif, jangan ganggu
             currentGameActive = true;
-            // pastikan row tetap horizontal (reflow)
             const charRow = document.getElementById('char-area');
-            if (charRow) {
-                charRow.style.flexWrap = 'nowrap';
-            }
+            if (charRow) charRow.style.flexWrap = 'nowrap';
         } else {
-            // Tampilkan start screen jika tidak sedang game
             if (startScreen && gameContainer) {
                 if (startScreen.style.display !== 'flex' && gameContainer.style.display !== 'flex') {
                     startScreen.style.display = 'flex';
                 } else if (startScreen.style.display === 'none' && gameContainer.style.display === 'none') {
-                    // kasus aneh: set ke start screen
                     startScreen.style.display = 'flex';
                 }
             }
         }
     }
     
-    // Event listener untuk orientasi & resize
-    window.addEventListener('resize', () => {
-        setTimeout(handleOrientationAndVisibility, 50);
-    });
-    window.addEventListener('orientationchange', () => {
-        setTimeout(handleOrientationAndVisibility, 80);
-    });
+    window.addEventListener('resize', () => setTimeout(handleOrientationAndVisibility, 50));
+    window.addEventListener('orientationchange', () => setTimeout(handleOrientationAndVisibility, 80));
     
-    // Ekspos fungsi global yang diperlukan HTML
-    window.initGame = initGame;
-    window.startGame = startGame;
-    window.checkAnswer = checkAnswer;
-    
-    // Pasang event listener untuk tombol MAIN secara manual (double safety)
     document.addEventListener('DOMContentLoaded', () => {
-        // Set initial state
         handleOrientationAndVisibility();
         
-        // Pastikan tombol MAIN terhubung
+        // Tombol MULAI
         const mainBtn = document.getElementById('mainButton');
         if (mainBtn) {
-            // Hapus listener bawaan jika ada duplikat, lalu pasang
             mainBtn.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // Cek lagi kondisi orientasi sebelum mulai
-                const isPortrait = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches;
-                if (isPortrait) {
-                    speak("Putar layar ke posisi landscape dulu ya!");
-                    // Tampilkan pesan singkat di feedback jika ada, atau biarkan warning muncul
-                    const warnDiv = document.getElementById('landscape-warning');
-                    if (warnDiv) warnDiv.style.display = 'flex';
-                    return;
-                }
                 initGame();
             };
         }
-        
-        // Pastikan tombol angka punya akses ke fungsi global
-        const numberBtns = document.querySelectorAll('.btn-number');
-        numberBtns.forEach(btn => {
-            btn.onclick = function() {
-                const val = parseInt(this.innerText);
-                if (!isNaN(val) && currentGameActive) checkAnswer(val);
-            };
+
+        // Tombol angka 1-5
+        document.querySelectorAll('.btn-number').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const val = parseInt(this.getAttribute('data-num'));
+                if (!isNaN(val)) checkAnswer(val);
+            });
         });
-    });
-    
-    // Fallback untuk mencegah error jika tombol-tombol dipanggil sebelum fungsi siap
-    window.checkAnswer = function(num) {
-        if (typeof checkAnswer === 'function') {
-            checkAnswer(num);
+
+        // Tombol Main Lagi
+        const retryBtn = document.getElementById('btn-retry');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', startGame);
         }
-    };
+    });
 </script>
 </body>
 </html>
