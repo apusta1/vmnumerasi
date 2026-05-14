@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kegiatan Pagi</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Arial", sans-serif;
+      background: linear-gradient(to bottom, #dff6ff, #ffffff);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 900px;
+      background: white;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #2c3e50;
+      font-size: clamp(24px, 4vw, 38px);
+    }
+
+    .instruction {
+      color: #555;
+      margin-bottom: 24px;
+      font-size: clamp(16px, 2vw, 20px);
+    }
+
+    .cards-container {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      width: 240px;
+      max-width: 90vw;
+      background: #fff;
+      border: 4px dashed #b5d8ff;
+      border-radius: 20px;
+      padding: 10px;
+      cursor: grab;
+      transition: transform 0.2s ease;
+      touch-action: none;
+    }
+
+    .card:active {
+      cursor: grabbing;
+      transform: scale(1.03);
+    }
+
+    .card img {
+      width: 100%;
+      aspect-ratio: 1 / 2;
+      object-fit: cover;
+      border-radius: 14px;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .card-label {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #2c3e50;
+      font-size: 18px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 22px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .check-btn {
+      background: #4caf50;
+      color: white;
+    }
+
+    .check-btn:hover {
+      background: #43a047;
+    }
+
+    .restart-btn {
+      background: #2196f3;
+      color: white;
+    }
+
+    .restart-btn:hover {
+      background: #1976d2;
+    }
+
+    .message {
+      margin-top: 22px;
+      font-size: 22px;
+      font-weight: bold;
+      min-height: 32px;
+    }
+
+    @media (max-width: 700px) {
+      .cards-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 320px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="game-container">
+    <h1>🌞 Urutkan Kegiatan Pagi 🌞</h1>
+
+    <div class="instruction">
+      Seret gambar agar urutannya benar!
+    </div>
+
+    <div class="cards-container" id="cardsContainer"></div>
+
+    <div class="buttons">
+      <button class="check-btn" onclick="checkAnswer()">Periksa Jawaban</button>
+      <button class="restart-btn" onclick="startGame()">Soal Baru</button>
+    </div>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    // =========================
+    // DATA GAMBAR
+    // =========================
+    // GANTI src DENGAN FILE PNG MILIKMU
+
+    const activities = [
+      {
+        id: 1,
+        label: "Bangun Pagi",
+        src: "images/vm17-bangun-pagi.png"
+      },
+      {
+        id: 2,
+        label: "Membereskan Tempat Tidur",
+        src: "images/vm17-membereskan-tempat-tidur.png"
+      },
+      {
+        id: 3,
+        label: "Beribadah Pagi",
+        src: "images/vm17-beribadah-pagi.png"
+      },
+      {
+        id: 4,
+        label: "Bersiap ke Sekolah",
+        src: "images/vm17-bersiap-ke-sekolah.png"
+      },
+      {
+        id: 5,
+        label: "Berangkat ke Sekolah",
+        src: "images/vm17-berangkat-ke-sekolah.png"
+      },
+      {
+        id: 6,
+        label: "Sampai di Sekolah Tepat Waktu",
+        src: "images/vm17-sampai-di-sekolah.png"
+      }
+    ];
+
+    let currentSet = [];
+    let draggedItem = null;
+
+    const container = document.getElementById("cardsContainer");
+    const message = document.getElementById("message");
+
+    // =========================
+    // MULAI GAME
+    // =========================
+
+    function startGame() {
+      message.textContent = "";
+
+      // Ambil 3 aktivitas berurutan
+      const startIndex = Math.floor(Math.random() * 4);
+      currentSet = activities.slice(startIndex, startIndex + 3);
+
+      // Acak urutan tampil
+      currentSet = shuffle([...currentSet]);
+
+      renderCards();
+    }
+
+    // =========================
+    // RENDER KARTU
+    // =========================
+
+    function renderCards() {
+      container.innerHTML = "";
+
+      currentSet.forEach((activity, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.draggable = true;
+        card.dataset.index = index;
+        card.dataset.id = activity.id;
+
+        card.innerHTML = `
+          <img src="${activity.src}" alt="${activity.label}">
+          <div class="card-label">${activity.label}</div>
+        `;
+
+        // Desktop drag
+        card.addEventListener("dragstart", dragStart);
+        card.addEventListener("dragover", dragOver);
+        card.addEventListener("drop", drop);
+
+        // Mobile touch
+        card.addEventListener("touchstart", touchStart, { passive: false });
+        card.addEventListener("touchmove", touchMove, { passive: false });
+        card.addEventListener("touchend", touchEnd);
+
+        container.appendChild(card);
+      });
+    }
+
+    // =========================
+    // DESKTOP DRAG
+    // =========================
+
+    function dragStart(e) {
+      draggedItem = this;
+    }
+
+    function dragOver(e) {
+      e.preventDefault();
+    }
+
+    function drop(e) {
+      e.preventDefault();
+
+      if (draggedItem === this) return;
+
+      swapCards(
+        Number(draggedItem.dataset.index),
+        Number(this.dataset.index)
+      );
+    }
+
+    // =========================
+    // MOBILE TOUCH
+    // =========================
+
+    let touchTarget = null;
+
+    function touchStart(e) {
+      touchTarget = this;
+    }
+
+    function touchMove(e) {
+      e.preventDefault();
+    }
+
+    function touchEnd(e) {
+      const touch = e.changedTouches[0];
+
+      const targetElement = document.elementFromPoint(
+        touch.clientX,
+        touch.clientY
+      );
+
+      const dropCard = targetElement?.closest(".card");
+
+      if (dropCard && dropCard !== touchTarget) {
+        swapCards(
+          Number(touchTarget.dataset.index),
+          Number(dropCard.dataset.index)
+        );
+      }
+    }
+
+    // =========================
+    // TUKAR POSISI
+    // =========================
+
+    function swapCards(index1, index2) {
+      [currentSet[index1], currentSet[index2]] =
+      [currentSet[index2], currentSet[index1]];
+
+      renderCards();
+    }
+
+    // =========================
+    // CEK JAWABAN
+    // =========================
+
+    function checkAnswer() {
+      const ids = currentSet.map(item => item.id);
+
+      const correct =
+        ids[0] < ids[1] &&
+        ids[1] < ids[2];
+
+      if (correct) {
+        message.innerHTML = "🎉 Hebat! Urutannya benar!";
+        message.style.color = "#2e7d32";
+      } else {
+        message.innerHTML = "❌ Coba lagi ya!";
+        message.style.color = "#d32f2f";
+      }
+    }
+
+    // =========================
+    // ACAK ARRAY
+    // =========================
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+
+      return array;
+    }
+
+    // Start pertama kali
+    startGame();
+
+  </script>
+
+</body>
+</html>
