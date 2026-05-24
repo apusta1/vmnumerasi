@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Koleksi Mesin Virtual Numerasi | Repositori Kegiatan Belajar</title>
+    <!-- Font & styling sederhana -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+            padding: 1.5rem 1rem 3rem;
+        }
+
+        /* Container utama */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* Header seperti repositori GitHub */
+        .repo-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .repo-icon {
+            background: #0f172a;
+            color: white;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.5rem;
+        }
+
+        h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .badge-stats {
+            background: #eef2ff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .repo-desc {
+            color: #475569;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Kontrol carousel + grid fallback */
+        .carousel-wrapper {
+            position: relative;
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: visible;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 0.5rem 0 1.5rem 0;
+            border-radius: 24px;
+        }
+
+        /* Sembunyikan scrollbar tapi tetap fungsional (opsional) */
+        .carousel-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+        .carousel-wrapper::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .carousel-wrapper::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 1.25rem;
+            scroll-snap-type: x mandatory;
+            width: max-content;
+            padding: 0.25rem 0.25rem 0.5rem;
+        }
+
+        /* Kartu VM */
+        .vm-card {
+            scroll-snap-align: start;
+            width: 280px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #eef2ff;
+        }
+
+        .vm-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);
+            border-color: #cbd5e1;
+        }
+
+        /* Gambar header screenshot (placeholder) */
+        .card-img {
+            width: 100%;
+            height: 150px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #64748b;
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-bottom: 1px solid #eef2ff;
+        }
+
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .img-placeholder-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .card-content {
+            padding: 1rem 1rem 1.2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vm-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .vm-number {
+            background: #e6f0ff;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        /* deskripsi field - DITATA ULANG AGAR RAPIH */
+        .vm-description {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: #475569;
+            margin: 0.5rem 0 1rem 0;
+            min-height: 65px;
+            text-align: left;
+            /* Hilangkan background & padding berlebih */
+            background: transparent;
+            padding: 0;
+        }
+
+        .btn-pilih {
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 0.6rem 0;
+            width: 100%;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: auto;
+            text-decoration: none;
+        }
+
+        .btn-pilih i {
+            font-size: 0.85rem;
+        }
+
+        .btn-pilih:hover {
+            background: #1e293b;
+            transform: scale(0.98);
+        }
+
+        /* grid fallback untuk desktop lebar (alternatif tetap rapih) */
+        @media (min-width: 900px) {
+            .carousel-wrapper {
+                overflow-x: visible;
+            }
+            .carousel-track {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1.5rem;
+                width: 100%;
+            }
+            .vm-card {
+                scroll-snap-align: unset;
+                width: auto;
+            }
+            body {
+                padding: 2rem 2rem;
+            }
+        }
+
+        /* tombol navigasi carousel manual untuk mobile (opsional) */
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .nav-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+            color: #1e293b;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-btn:active { background: #eef2ff; }
+
+        @media (min-width: 900px) {
+            .carousel-nav { display: none; }
+        }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1.5rem;
+        }
+
+        .empty-img-note {
+            background: #f8fafc;
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 0.4rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="repo-header">
+        <div class="title-section">
+            <div class="repo-icon">
+                <i class="fas fa-cubes"></i>
+            </div>
+            <div>
+                <h1>repositori-vm-numerasi</h1>
+                <div class="repo-desc">
+                    <i class="fas fa-database"></i> Mesin Virtual · Pembelajaran Numerasi
+                </div>
+            </div>
+        </div>
+        <div class="badge-stats">
+            <i class="fas fa-check-circle"></i> INOVASI | 2026
+        </div>
+    </div>
+
+    <!-- Carousel / Grid wrapper -->
+    <div class="carousel-wrapper" id="carouselWrapper">
+        <div class="carousel-track" id="vmTrack">
+            <!-- Di sini akan di generate kartu-kartu via JS agar rapi dan mudah diisi manual nanti -->
+        </div>
+    </div>
+
+    <!-- Tombol navigasi carousel (hanya untuk mobile) -->
+    <div class="carousel-nav">
+        <button class="nav-btn" id="scrollLeftBtn"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
+        <button class="nav-btn" id="scrollRightBtn">Selanjutnya <i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <footer>
+        <i class="fas fa-code-branch"></i> Repositori VM Numerasi — Setiap kartu mewakili lingkungan virtual siap akses.
+    </footer>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // DATA VM (N VM) - Silakan isi manual sesuai kebutuhan Anda
+    // Setiap objek berisi:
+    // - id: urutan 1-N
+    // - title: judul VM
+    // - description: deskripsi singkat (isi manual nanti)
+    // - imgFileName: nama file PNG screenshot (misal "vm1.png") atau null jika belum ada (akan tampil placeholder)
+    // - url: alamat VM (link tujuan saat tombol "Pilih" diklik) -> ganti dengan URL VM anda
+    // --------------------------------------------------------------
+    const vmList = [
+
+        {
+            id: 1,
+            title: "Cari Buah",
+	    fase: "FASE A",
+            description: "Dino lapar. Bantu Dino untuk mencari buah ya?!",
+            imgFileName: "assets/vm15.png",
+            url: "https://prpic.id/vmnumerasi/vm15_caribuah.html"
+        },
+        {
+            id: 2,
+            title: "Urutan Nama",
+	    fase: "FASE A",
+            description: "Eh, temanmu yang namanya ini itu yang mana sih? Coba tunjukkan dia berada di mana.",
+            imgFileName: "assets/vm16.png",
+            url: "https://prpic.id/vmnumerasi/vm16_urutannama.html"
+        },
+        {
+            id: 3,
+            title: "Kegiatan Pagi",
+	    fase: "FASE A",
+            description: "Pagi hari sebelum sekolah dimulai, kira-kira Kamu ngapain aja ya?",
+            imgFileName: "assets/vm17.png",
+            url: "https://prpic.id/vmnumerasi/vm17_kegiatanpagi.html"
+        },
+        {
+            id: 4,
+            title: "Tata Telur",
+	    fase: "FASE A",
+            description: "Kamu punya sekeranjang telur yang kamu beli dari warung sebelah. Saatnya menyimpan telur-telur itu di karton!",
+            imgFileName: "assets/vm18.png",
+            url: "https://prpic.id/vmnumerasi/vm18_tatatelur.html"
+        },
+        {
+            id: 5,
+            title: "Kelinci dan Wortel",
+	    fase: "FASE A",
+            description: "Bantu si Kelinci untuk berjalan menuju wortelnya. Coba hitung langkah dan berikan perintah yang tepat untuk si Kelinci.",
+            imgFileName: "assets/vm19.png",
+            url: "https://prpic.id/vmnumerasi/vm19_wortelkelinci.html"
+        },
+        {
+            id: 6,
+            title: "Mencari Benda",
+	    fase: "FASE A",
+            description: "Salah satu anggota keluargamu sedang mencari sesuatu yang mereka perlukan. Coba bantu dia menemukan benda yang dimaksud dengan memperhatikan percakapan mereka dengan teliti.",
+            imgFileName: "assets/vm20.png",
+            url: "https://prpic.id/vmnumerasi/vm20_mencaribenda.html"
+        },
+        {
+            id: 7,
+            title: "Paracetamol",
+	    fase: "FASE B",
+            description: "Adikmu sedang sakit. Tentukan dosis aman obat turun panas untuk adikmu!",
+            imgFileName: "assets/vm12.png",
+            url: "https://prpic.id/vmnumerasi/vm12_paracetamol_.html"
+        },
+        {
+            id: 8,
+            title: "Toko Swalayan",
+	    fase: "FASE B",
+            description: "Kamu diberi sejumlah uang, dan ditugaskan untuk membeli beberapa barang. Tentukan barang apa saja yang bisa kamu beli.",
+            imgFileName: "assets/vm1.png",
+            url: "https://prpic.id/vmnumerasi/vm1_belanja_.html"
+        },
+        {
+            id: 9,
+            title: "Label Minuman",
+	    fase: "FASE B",
+            description: "Ada gula tersembunyi dalam minuman kemasan. Yuk, cermati dengan teliti. Mana minuman yang aman diminum, dan mana yang kadar gulanya terlalu tinggi?",
+            imgFileName: "assets/vm4.png",
+            url: "https://prpic.id/vmnumerasi/vm4_labelminuman_.html"
+        },
+        {
+            id: 10,
+            title: "Pasang Keramik",
+	    fase: "FASE B",
+            description: "Saatnya memasang keramik! Hitung berapa banyak keramik yang diperlukan untuk jenis ruangan yang diberikan.",
+            imgFileName: "assets/vm6.png",
+            url: "https://prpic.id/vmnumerasi/vm6_pasangkeramik_.html"
+        },
+        {
+            id: 11,
+            title: "Denyut Jantung",
+	    fase: "FASE B",
+            description: "Pura-puranya kamu dokter yang memeriksa denyut jantung seorang anak. Coba periksa yang teliti!",
+            imgFileName: "assets/vm11.png",
+            url: "https://prpic.id/vmnumerasi/vm11_detakjantung_.html"
+        },
+        {
+            id: 12,
+            title: "Bank Sampah",
+	    fase: "FASE B",
+            description: "Ayo menabung di Bank Sampah! Supaya bisa membiayai keperluan sekolah, berapa banyak botol bekas yang masih perlu kita kumpulkan ya?",
+            imgFileName: "assets/vm14.png",
+            url: "https://prpic.id/vmnumerasi/vm14_botolbekas_.html"
+        },
+        {
+            id: 13,
+            title: "Ketua OSIS",
+	    fase: "FASE C",
+            description: "Pemilihan Ketua OSIS sudah direkapitulasi hasilnya! Siapa yang menang ya?",
+            imgFileName: "assets/vm13.png",
+            url: "https://prpic.id/vmnumerasi/vm13_ketuaosis_.html"
+        },
+        {
+            id: 14,
+            title: "Uang Saku",
+	    fase: "FASE C",
+            description: "Ceritanya kamu seorang anak SMP di sebuah Kota Besar yang mendapat uang saku mingguan. Yuk, alokasikan besaran uang sakumu sesuai persentase yang tersedia!",
+            imgFileName: "assets/vm9.png",
+            url: "https://prpic.id/vmnumerasi/vm9_uangsaku_.html"
+        },
+        {
+            id: 15,
+            title: "Cat Tembok",
+	    fase: "FASE C",
+            description: "Pilih rumah idamanmu. Dan, hitung berapa banyak kaleng cat dan biaya yang diperlukan untuk mengecat rumah itu!",
+            imgFileName: "assets/vm5.png",
+            url: "https://prpic.id/vmnumerasi/vm5_cattembok_.html"
+        },
+        {
+            id: 16,
+            title: "Telur Dadar",
+	    fase: "FASE C",
+            description: "Kamu punya resep telur dadar untuk 4 orang. Tapi ternyata yang ingin makan telur dadarmu tidak selalu hanya 4 orang. Bisakah kamu sesuaikan resepnya?",
+            imgFileName: "assets/vm3.png",
+            url: "https://prpic.id/vmnumerasi/vm3_telurdadar_.html"
+        },
+        {
+            id: 17,
+            title: "Butik Kemeja",
+	    fase: "FASE D",
+            description: "Ada promo diskon. Ada promo beli 1 gratis 1. Mana ya yang paling murah?",
+            imgFileName: "assets/vm2.png",
+            url: "https://prpic.id/vmnumerasi/vm2_diskon_.html"
+        },
+        {
+            id: 18,
+            title: "Jalan Darat",
+	    fase: "FASE D",
+            description: "Kalau kita harus sampai di tujuan pada jam tertentu, maksimal kita harus berangkat jam berapa? Ini tentu tergantung rute yang kita pilih.",
+            imgFileName: "assets/vm7.png",
+            url: "https://prpic.id/vmnumerasi/vm7_jalandarat_.html"
+        },
+        {
+            id: 19,
+            title: "Ketinggalan Kereta",
+	    fase: "FASE D",
+            description: "Aduh, kamu ketinggalan kereta! Enaknya tunggu jadwal kereta berikutnya atau naik ojek ya?",
+            imgFileName: "assets/vm8.png",
+            url: "https://prpic.id/vmnumerasi/vm8_ketinggalankereta_.html"
+        },
+        {
+            id: 20,
+            title: "Bagi Bayar",
+	    fase: "FASE D",
+            description: "Jajan di resto pizza memang seru! Apalagi kalau patungannya dibagi adil.",
+            imgFileName: "assets/vm10.png",
+            url: "https://prpic.id/vmnumerasi/vm10_bagibayar_.html"
+        }
+    ];
+
+    // Fungsi untuk merender semua kartu ke dalam track
+    function renderCards() {
+        const track = document.getElementById('vmTrack');
+        if (!track) return;
+        track.innerHTML = '';
+        
+        vmList.forEach(vm => {
+            const card = document.createElement('div');
+            card.className = 'vm-card';
+            
+            // Bagian gambar header screenshot
+            const imgDiv = document.createElement('div');
+            imgDiv.className = 'card-img';
+            
+            // Cek apakah imgFileName valid dan coba tampilkan gambar, jika gagal / tidak ada tampilkan placeholder
+            if (vm.imgFileName && vm.imgFileName.trim() !== "") {
+                const img = document.createElement('img');
+                img.src = vm.imgFileName;
+                img.alt = `Screenshot ${vm.title}`;
+                img.onerror = function() {
+                    // Jika gambar gagal load (file tidak ditemukan) maka ganti dengan placeholder
+                    this.onerror = null;
+                    this.style.display = 'none';
+                    const parent = this.parentElement;
+                    parent.innerHTML = '';
+                    const placeholderSpan = document.createElement('div');
+                    placeholderSpan.className = 'img-placeholder-text';
+                    placeholderSpan.innerHTML = `<i class="fas fa-image" style="font-size: 2rem; opacity:0.5"></i><span>📸 screenshot belum tersedia</span><span style="font-size:0.65rem">(letakkan ${vm.imgFileName})</span>`;
+                    parent.appendChild(placeholderSpan);
+                };
+                imgDiv.appendChild(img);
+            } else {
+                // tidak ada nama file -> placeholder
+                const placeholderSpan = document.createElement('div');
+                placeholderSpan.className = 'img-placeholder-text';
+                placeholderSpan.innerHTML = `<i class="fas fa-file-image" style="font-size: 2rem; opacity:0.4"></i><span>🖼️ Tidak ada screenshot</span><span style="font-size:0.65rem">(siapkan PNG)</span>`;
+                imgDiv.appendChild(placeholderSpan);
+            }
+            
+            // Konten kartu
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'card-content';
+            
+            const titleWrapper = document.createElement('div');
+            titleWrapper.className = 'vm-title';
+            titleWrapper.innerHTML = `<span>${escapeHtml(vm.title)}</span> <span class="vm-number">#${vm.id}</span>`;
+            
+	    const faseDiv = document.createElement('div');
+	    faseDiv.style.fontSize = '0.72rem';
+	    faseDiv.style.fontWeight = '600';
+	    faseDiv.style.color = '#7c3aed';
+	    faseDiv.style.marginBottom = '0.5rem';
+	    faseDiv.style.letterSpacing = '0.04em';
+	    faseDiv.textContent = vm.fase || "FASE X";
+
+            const descDiv = document.createElement('div');
+            descDiv.className = 'vm-description';
+            // Tampilkan deskripsi tanpa ikon apapun, langsung teks polos yang sudah di-justify
+            let descText = vm.description && vm.description.trim() !== "" ? vm.description : "📝 Deskripsi VM dapat diisi manual di bagian data.";
+            descDiv.textContent = descText;  // pakai textContent biar bersih tanpa HTML/ikon
+            
+            const btn = document.createElement('a');
+            btn.href = vm.url;
+            btn.target = "_blank";
+            btn.className = 'btn-pilih';
+            btn.innerHTML = `<i class="fas fa-external-link-alt"></i> Pilih VM`;
+            // untuk keamanan/validasi: jika url kosong beri alert
+            btn.addEventListener('click', function(e) {
+                if (!vm.url || vm.url === "#" || vm.url === "") {
+                    e.preventDefault();
+                    alert("🔧 Ganti alamat VM terlebih dahulu! Saat ini contoh URL. Edit di array vmList bagian 'url'.");
+                }
+            });
+            
+            contentDiv.appendChild(titleWrapper);
+	    contentDiv.appendChild(faseDiv);
+            contentDiv.appendChild(descDiv);
+            contentDiv.appendChild(btn);
+            
+            card.appendChild(imgDiv);
+            card.appendChild(contentDiv);
+            track.appendChild(card);
+        });
+    }
+    
+    // helper escape html untuk keamanan
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+    
+    // fungsi navigasi carousel geser (mobile)
+    function initCarouselScroll() {
+        const wrapper = document.getElementById('carouselWrapper');
+        const leftBtn = document.getElementById('scrollLeftBtn');
+        const rightBtn = document.getElementById('scrollRightBtn');
+        if (!wrapper || !leftBtn || !rightBtn) return;
+        
+        leftBtn.addEventListener('click', () => {
+            wrapper.scrollBy({ left: -300, behavior: 'smooth' });
+        });
+        rightBtn.addEventListener('click', () => {
+            wrapper.scrollBy({ left: 300, behavior: 'smooth' });
+        });
+    }
+    
+    // Jalankan render dan inisialisasi
+    renderCards();
+    initCarouselScroll();
+    
+    console.log("Halaman index VM Numerasi siap dengan kartu mesin virtual. Deskripsi sudah rapih tanpa indentation.");
+</script>
+</body>
+</html>
