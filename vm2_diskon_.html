@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <!-- viewport already present, keeping original but adding touch-friendly meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Belanja Pakaian: Diskon vs Beli 1 Gratis 1 | Kalkulator Numerasi</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1e3c2c 0%, #2a4a35 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* Container utama seperti kertas belanja */
+        .shopping-container {
+            max-width: 1100px;
+            width: 100%;
+            background: #fffef5;
+            border-radius: 48px;
+            box-shadow: 0 30px 40px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* Header toko */
+        .tokoku-header {
+            background: #2b2b1f;
+            padding: 20px 28px;
+            color: #ffefcf;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .tokoku-header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refresh-harga {
+            background: #e6b422;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #2b2b1f;
+            font-size: 0.9rem;
+            transition: 0.1s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .refresh-harga:active {
+            transform: scale(0.96);
+        }
+
+        /* area dua pilihan kemeja */
+        .dua-toko {
+            padding: 30px 25px 20px;
+        }
+
+        .instruksi {
+            background: #f2e8da;
+            border-radius: 60px;
+            padding: 12px 20px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            color: #3e2a1f;
+        }
+
+        .kartu-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .kartu-kemeja {
+            flex: 1;
+            min-width: 280px;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border: 1px solid #f0dec6;
+            transition: transform 0.2s;
+        }
+
+        .kartu-kemeja:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon-kemeja {
+            font-size: 4rem;
+            text-align: center;
+        }
+
+        .nama-kemeja {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 10px 0 5px;
+        }
+
+        .harga-asli {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #b45f2b;
+            background: #fff1e0;
+            border-radius: 50px;
+            padding: 12px;
+            margin: 15px 0;
+        }
+
+        .promo-badge {
+            background: #c4450c;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            border-radius: 30px;
+            font-weight: bold;
+            margin: 5px 0 15px;
+        }
+
+        .diskon-hijau {
+            background: #1f6e43;
+        }
+
+        .keterangan-harga {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6b5a44;
+            margin: 10px 0 0;
+            padding: 8px;
+            background: #f9f3e9;
+            border-radius: 30px;
+        }
+
+        /* tombol pilih siswa (hanya salah satu) */
+        .tombol-pilih-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 25px 0 10px;
+        }
+
+        .btn-pilih {
+            background: #2c5a2e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+            flex: 1;
+            min-width: 220px;
+            box-shadow: 0 4px 0 #1b3b1d;
+            transform: translateY(-2px);
+            /* touch improvements: larger hit area, no text selection */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-pilih:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #1b3b1d;
+        }
+
+        .btn-pilih.aktif {
+            background: #e6b422;
+            color: #2b2b1f;
+            box-shadow: 0 0 0 2px #ffefb0;
+        }
+
+        /* ========= FEEDBACK AREA ========= */
+        .feedback-area {
+            margin: 10px 25px 0;
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .feedback-benar {
+            background: #2a6b3c;
+            color: white;
+            border-left: 8px solid #fae67a;
+        }
+
+        .feedback-salah {
+            background: #a13e2d;
+            color: white;
+            border-left: 8px solid #ffb347;
+        }
+
+        /* ========= KALKULATOR SEDERHANA (Casio style) ========= */
+        .kalkulator-section {
+            background: #2d2a24;
+            margin: 15px 25px 30px;
+            border-radius: 48px;
+            padding: 20px;
+            box-shadow: inset 0 1px 4px rgba(255,255,200,0.1), 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .kalkulator-judul {
+            color: #fae67a;
+            font-weight: bold;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+
+        .layar-kalkulator {
+            background: #1e1b17;
+            padding: 20px 15px;
+            border-radius: 28px;
+            margin-bottom: 20px;
+            text-align: right;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #b8ffb0;
+            min-height: 80px;
+            word-break: break-all;
+            letter-spacing: 2px;
+            box-shadow: inset 0 0 0 2px #4a4238;
+        }
+
+        .tombol-kalkulator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .calc-btn {
+            background: #3d3830;
+            border: none;
+            padding: 18px 0;
+            font-size: 1.6rem;
+            font-weight: bold;
+            border-radius: 40px;
+            color: #faf0cf;
+            cursor: pointer;
+            transition: 0.05s linear;
+            box-shadow: 0 3px 0 #1f1c17;
+            font-family: monospace;
+            /* Touch enhancements: prevent double-tap zoom on buttons, improve active feedback */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .calc-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #1f1c17;
+        }
+
+        .calc-btn.operator {
+            background: #e6b422;
+            color: #2d2a1f;
+            font-size: 1.8rem;
+        }
+
+        .calc-btn.samadengan {
+            background: #1f6e43;
+            color: white;
+            font-size: 1.4rem;
+        }
+
+        .calc-btn.clear {
+            background: #aa5e2b;
+            color: white;
+        }
+
+        .footer-catatan {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 15px;
+            background: #f3ede1;
+            color: #6b5a44;
+            border-top: 1px solid #e2d4c2;
+        }
+
+        /* ----- ADDITIONAL MOBILE / TOUCH FRIENDLY STYLES (without changing original logic) ----- */
+        /* Improve spacing and tap targets on smaller screens */
+        @media (max-width: 680px) {
+            body {
+                padding: 12px;
+            }
+            .shopping-container {
+                border-radius: 32px;
+            }
+            .tokoku-header {
+                padding: 16px 20px;
+            }
+            .tokoku-header h1 {
+                font-size: 1.3rem;
+            }
+            .dua-toko {
+                padding: 20px 16px 16px;
+            }
+            .instruksi {
+                font-size: 0.95rem;
+                padding: 10px 16px;
+                margin-bottom: 20px;
+            }
+            .kartu-kemeja {
+                min-width: 240px;
+                padding: 16px;
+            }
+            .harga-asli {
+                font-size: 1.5rem;
+                padding: 8px;
+            }
+            .btn-pilih {
+                padding: 14px 16px;
+                font-size: 1rem;
+                min-width: 160px;
+            }
+            .kalkulator-section {
+                margin: 10px 16px 20px;
+                padding: 16px;
+            }
+            .layar-kalkulator {
+                font-size: 1.6rem;
+                padding: 14px 12px;
+                min-height: 70px;
+            }
+            .calc-btn {
+                padding: 14px 0;
+                font-size: 1.4rem;
+                border-radius: 32px;
+            }
+            .feedback-area {
+                margin: 8px 16px 0;
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+            .tombol-kalkulator {
+                gap: 10px;
+            }
+        }
+
+        /* Extra small devices: ensure buttons are fat and touch-friendly */
+        @media (max-width: 480px) {
+            .tombol-kalkulator {
+                gap: 8px;
+            }
+            .calc-btn {
+                padding: 12px 0;
+                font-size: 1.3rem;
+            }
+            .btn-pilih {
+                min-width: 140px;
+            }
+            .kartu-grid {
+                gap: 20px;
+            }
+        }
+
+        /* Remove :hover effects on mobile to avoid sticky states, but keep general */
+        @media (hover: hover) {
+            .calc-btn:hover {
+                background: #5e5546;
+            }
+            .btn-pilih:hover {
+                background: #3f7641;
+            }
+            .refresh-harga:hover {
+                background: #f0c43a;
+            }
+        }
+        
+        /* Prevent any accidental text selection on double taps */
+        .btn-pilih, .calc-btn, .refresh-harga {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Make the entire app feel responsive and no overflow */
+        img, svg {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="shopping-container">
+    <div class="tokoku-header">
+        <h1>🛍️ BUTIK KEMEJA 👕</h1>
+        <button class="refresh-harga" id="refreshHargaBtn">🔄 SOAL BARU</button>
+    </div>
+
+    <div class="dua-toko">
+        <div class="instruksi">
+            🧠 Aku harus membeli <strong>2 potong kemeja</strong>. Pilih promo mana yang lebih hemat?<br>
+            Gunakan kalkulator di bawah untuk menghitung total bayar masing-masing promo!
+        </div>
+
+        <div class="kartu-grid">
+            <!-- Kemeja A : Diskon Variabel -->
+            <div class="kartu-kemeja" id="kartuA">
+                <div class="icon-kemeja">👔✨</div>
+                <div class="nama-kemeja">Kemeja A</div>
+                <div class="harga-asli">Rp <span id="hargaASaatIni">---</span></div>
+                <div class="promo-badge diskon-hijau">🔥 DISKON <span id="persenDiskonSpan">30</span>% 🔥</div>
+                <div class="keterangan-harga">
+                    📝 Harga = Rp <span id="hargaAHelp">---</span> per kemeja (sebelum diskon)<br>
+                    🧮 Beli 2 kemeja → total = (harga setelah diskon) × 2
+                </div>
+            </div>
+
+            <!-- Kemeja B : Promo Beli 1 Gratis 1 -->
+            <div class="kartu-kemeja" id="kartuB">
+                <div class="icon-kemeja">👕🎁</div>
+                <div class="nama-kemeja">Kemeja B</div>
+                <div class="harga-asli">Rp <span id="hargaBSaatIni">---</span></div>
+                <div class="promo-badge" style="background:#9b5e2c;">🎉 BELI 1 GRATIS 1 🎉</div>
+                <div class="keterangan-harga">
+                    📝 Harga = Rp <span id="hargaBHelp">---</span> per kemeja (sebelum promo)<br>
+                    🧮 Beli 2 kemeja → total bayar = harga 1 kemeja
+                </div>
+            </div>
+        </div>
+
+        <!-- tombol pilih siswa (hanya salah satu) -->
+        <div class="tombol-pilih-area">
+            <button class="btn-pilih" data-pilih="A">📝 PILIH PROMO DISKON (Kemeja A)</button>
+            <button class="btn-pilih" data-pilih="B">📝 PILIH PROMO BELI 1 GRATIS 1 (Kemeja B)</button>
+        </div>
+    </div>
+
+    <!-- FEEDBACK AREA -->
+    <div id="feedbackArea" class="feedback-area" style="display: none;"></div>
+
+    <!-- KALKULATOR CASIO SEDERHANA ( + - x / ) -->
+    <div class="kalkulator-section">
+        <div class="kalkulator-judul">
+            🧮 KALKULATOR PEMBANTU ⟡ ( + , - , × , ÷ )
+        </div>
+        <div class="layar-kalkulator" id="calcScreen">0</div>
+        <div class="tombol-kalkulator">
+            <button class="calc-btn clear" data-action="clear">C</button>
+            <button class="calc-btn" data-op="/">÷</button>
+            <button class="calc-btn" data-op="*">×</button>
+            <button class="calc-btn" data-op="del">⌫</button>
+            
+            <button class="calc-btn" data-num="7">7</button>
+            <button class="calc-btn" data-num="8">8</button>
+            <button class="calc-btn" data-num="9">9</button>
+            <button class="calc-btn operator" data-op="-">-</button>
+            
+            <button class="calc-btn" data-num="4">4</button>
+            <button class="calc-btn" data-num="5">5</button>
+            <button class="calc-btn" data-num="6">6</button>
+            <button class="calc-btn operator" data-op="+">+</button>
+            
+            <button class="calc-btn" data-num="1">1</button>
+            <button class="calc-btn" data-num="2">2</button>
+            <button class="calc-btn" data-num="3">3</button>
+            <button class="calc-btn samadengan" data-action="=">=</button>
+            
+            <button class="calc-btn" data-num="0">0</button>
+            <button class="calc-btn" data-num="00">00</button>
+            <button class="calc-btn" data-num=".">.</button>
+            <div></div>
+        </div>
+    </div>
+
+    <div class="footer-catatan">
+        💡 <strong>Tips:</strong> Harga yang ditampilkan adalah <strong>harga sebelum diskon/promo</strong> (seperti di toko sungguhan).<br>
+        🧮 Hitung sendiri total bayar untuk 2 kemeja pakai kalkulator, lalu pilih promo yang lebih murah.<br>
+        ✅ Jika jawaban benar, kamu bisa klik "SOAL BARU" untuk latihan berikutnya. Jika salah, soal akan otomatis berganti.
+    </div>
+</div>
+
+<script>
+    // ======================= DATA DAN LOGIKA ========================
+    let hargaA = 300000;   // harga sebelum diskon (range 200.000 - 400.000)
+    let hargaB = 500000;   // harga sebelum promo (range = hargaA + sekitar 200.000, total 400.000 - 600.000)
+    let persenDiskon = 30;  // diskon variabel: 20, 25, 30, 35, atau 40
+    
+    let sudahJawab = false; // cegah jawaban ganda dalam satu soal
+
+    // Fungsi untuk mendapatkan diskon random (20%, 25%, 30%, 35%, 40%)
+    function getRandomDiskon() {
+        const diskonOptions = [20, 25, 30, 35, 40];
+        const randomIndex = Math.floor(Math.random() * diskonOptions.length);
+        return diskonOptions[randomIndex];
+    }
+
+    // Fungsi generate harga dengan ketentuan:
+    // - hargaA: random antara 200.000 - 400.000 (biar masuk akal)
+    // - hargaB: random antara hargaA + 180.000 sampai hargaA + 220.000, dipastikan lebih tinggi minimal 180k
+    // - rentang akhir B antara 380.000 sampai 620.000, tapi tidak melebihi 650.000
+    function generateHargaYangBenar() {
+        // hargaA antara 200.000 sampai 400.000 (kelipatan 1000)
+        let minA = 200000;
+        let maxA = 400000;
+        let randomA = Math.floor(Math.random() * (maxA - minA + 1000) / 1000) * 1000 + minA;
+        randomA = Math.min(maxA, Math.max(minA, randomA));
+        
+        // hargaB = randomA + 100.000 sampai + 200.000 
+        let selisihMin = 100000;
+        let selisihMax = 200000;
+        let selisih = Math.floor(Math.random() * (selisihMax - selisihMin + 1000) / 1000) * 1000 + selisihMin;
+        let randomB = randomA + selisih;
+        
+        // pastikan hargaB tetap masuk akal, maksimal 650.000, minimal 280.000
+        let maxB = 650000;
+        let minB = 280000;
+        if (randomB > maxB) randomB = maxB;
+        if (randomB < minB) randomB = minB;
+        
+        // pastikan hargaB > hargaA secara signifikan 
+        if (randomB - randomA < 100000) {
+            randomB = randomA + 100000;
+            if (randomB > maxB) randomB = maxB;
+        }
+        
+        // pembulatan ke ribuan
+        randomA = Math.round(randomA / 1000) * 1000;
+        randomB = Math.round(randomB / 1000) * 1000;
+        
+        return { hargaA: randomA, hargaB: randomB };
+    }
+
+    // Hitung mana promo yang lebih menguntungkan (harga per 2 kemeja)
+    // Return "A" jika diskon lebih murah, "B" jika promo beli 1 gratis 1 lebih murah
+    function hitungPromoLebihMurah(hargaAVal, hargaBVal, diskonPersen) {
+        // total bayar untuk diskon (beli 2)
+        let faktorDiskon = (100 - diskonPersen) / 100;
+        let hargaAfterDiskonPerKemeja = hargaAVal * faktorDiskon;
+        let totalA = hargaAfterDiskonPerKemeja * 2;
+        
+        // total bayar untuk promo beli 1 gratis 1 (beli 2, bayar 1)
+        let totalB = hargaBVal;
+        
+        if (totalA < totalB) {
+            return "A";
+        } else if (totalB < totalA) {
+            return "B";
+        } else {
+            // jika sama-sama hemat, pilih A sebagai default
+            return "A";
+        }
+    }
+
+    // update tampilan harga dan keterangan (tanpa feedback otomatis)
+    function updateTampilanHarga() {
+        // tampilkan harga asli (sebelum diskon/promo)
+        const hargaASpan = document.getElementById('hargaASaatIni');
+        const hargaBSpan = document.getElementById('hargaBSaatIni');
+        const hargaAHelpSpan = document.getElementById('hargaAHelp');
+        const hargaBHelpSpan = document.getElementById('hargaBHelp');
+        const hargaASetelahDiskonSpan = document.getElementById('hargaASetelahDiskon');
+        
+        // update persen diskon di UI
+        const persenDiskonSpans = document.querySelectorAll('#persenDiskonSpan, #persenDiskonKeterangan');
+        persenDiskonSpans.forEach(span => {
+            if (span) span.innerText = persenDiskon;
+        });
+        
+        if (hargaASpan) hargaASpan.innerText = hargaA.toLocaleString('id-ID');
+        if (hargaBSpan) hargaBSpan.innerText = hargaB.toLocaleString('id-ID');
+        if (hargaAHelpSpan) hargaAHelpSpan.innerText = hargaA.toLocaleString('id-ID');
+        if (hargaBHelpSpan) hargaBHelpSpan.innerText = hargaB.toLocaleString('id-ID');
+        
+        // hitung harga setelah diskon untuk kemeja A
+        let faktorDiskon = (100 - persenDiskon) / 100;
+        let hargaASetelahDiskon = hargaA * faktorDiskon;
+        if (hargaASetelahDiskonSpan) {
+            hargaASetelahDiskonSpan.innerHTML = `Rp ${Math.round(hargaASetelahDiskon).toLocaleString('id-ID')}`;
+        }
+    }
+
+    // memberi feedback benar atau salah
+    function tampilkanFeedback(jawabanUser) {
+        const jawabanBenar = hitungPromoLebihMurah(hargaA, hargaB, persenDiskon);
+        const feedbackDiv = document.getElementById('feedbackArea');
+        
+        if (jawabanUser === jawabanBenar) {
+            // JAWABAN BENAR
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.className = 'feedback-area feedback-benar';
+            feedbackDiv.innerHTML = '✅🎉 BENAR! Pilihanmu tepat! Promo yang kamu pilih memang lebih hemat. Klik tombol "SOAL BARU" untuk latihan berikutnya. 🎉✅';
+            sudahJawab = true;
+        } else {
+            // JAWABAN SALAH -> tampilkan pesan, lalu otomatis reset ke soal baru
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.className = 'feedback-area feedback-salah';
+            feedbackDiv.innerHTML = '❌ Maaf, jawaban kurang tepat. Coba hitung ulang dengan kalkulator! ❌<br> 🔄 Menyiapkan soal baru untukmu...';
+            sudahJawab = true;
+            
+            // disable dulu semua tombol pilih sementara biar tidak ngeklik lagi selama timeout
+            const allPilihBtns = document.querySelectorAll('.btn-pilih');
+            allPilihBtns.forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            // setelah 1.8 detik, reset soal (panggil refreshSoalBaru)
+            setTimeout(() => {
+                refreshSoalBaru(true); // true = dari kesalahan
+                // enable kembali tombol (dilakukan di dalam refresh)
+                allPilihBtns.forEach(btn => {
+                    btn.disabled = false;
+                });
+            }, 4000);
+        }
+    }
+    
+    // refresh soal baru (reset semua state, generate harga baru)
+    function refreshSoalBaru(dariKesalahan = false) {
+        // generate harga dengan ketentuan harga B lebih tinggi sekitar 200.000
+        const { hargaA: newHargaA, hargaB: newHargaB } = generateHargaYangBenar();
+        hargaA = newHargaA;
+        hargaB = newHargaB;
+        
+        // generate diskon random baru
+        persenDiskon = getRandomDiskon();
+        
+        // update tampilan
+        updateTampilanHarga();
+        
+        // reset status jawaban & highlight tombol
+        sudahJawab = false;
+        
+        // hapus highlight pada tombol pilih
+        document.querySelectorAll('.btn-pilih').forEach(btn => {
+            btn.classList.remove('aktif');
+            btn.disabled = false; // pastikan enable
+        });
+        
+        // sembunyikan / reset feedback area
+        const feedbackDiv = document.getElementById('feedbackArea');
+        feedbackDiv.style.display = 'none';
+        
+        // reset juga kalkulator (opsional biar bersih)
+        clearCalc();
+    }
+    
+    // Fungsi untuk memproses pilihan siswa
+    function prosesPilihan(pilihan) {
+        // jika sudah pernah menjawab di soal ini, cegah
+        if (sudahJawab) {
+            const feedbackDiv = document.getElementById('feedbackArea');
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.className = 'feedback-area feedback-salah';
+            feedbackDiv.innerHTML = '⏳ Kamu sudah menjawab soal ini. Klik "SOAL BARU" untuk latihan selanjutnya!';
+            setTimeout(() => {
+                if (feedbackDiv.style.display === 'block') {
+                    // biarkan tampil
+                }
+            }, 2000);
+            return;
+        }
+        
+        // highlight tombol yang dipilih
+        document.querySelectorAll('.btn-pilih').forEach(btn => {
+            btn.classList.remove('aktif');
+        });
+        if (pilihan === 'A') {
+            document.querySelector('.btn-pilih[data-pilih="A"]').classList.add('aktif');
+        } else {
+            document.querySelector('.btn-pilih[data-pilih="B"]').classList.add('aktif');
+        }
+        
+        // tampilkan feedback berdasarkan kebenaran
+        tampilkanFeedback(pilihan);
+    }
+    
+    // ================= KALKULATOR SEDERHANA (Casio style) ====================
+    let calcCurrentInput = "0";
+    let calcPreviousInput = "";
+    let calcOperator = null;
+    let resetScreenNext = false;
+
+    const calcScreen = document.getElementById('calcScreen');
+
+    function updateCalcScreen() {
+        calcScreen.innerText = calcCurrentInput.length > 18 ? calcCurrentInput.slice(0,16)+"..." : calcCurrentInput;
+    }
+
+    function inputNumber(numStr) {
+        if (resetScreenNext) {
+            calcCurrentInput = numStr;
+            resetScreenNext = false;
+        } else {
+            if (calcCurrentInput === "0" && numStr !== ".") {
+                calcCurrentInput = numStr;
+            } else {
+                calcCurrentInput += numStr;
+            }
+        }
+        if (calcCurrentInput.length > 16) calcCurrentInput = calcCurrentInput.slice(0,16);
+        updateCalcScreen();
+    }
+
+    function inputDecimal() {
+        if (resetScreenNext) {
+            calcCurrentInput = "0.";
+            resetScreenNext = false;
+            updateCalcScreen();
+            return;
+        }
+        if (!calcCurrentInput.includes(".")) {
+            calcCurrentInput += ".";
+        }
+        updateCalcScreen();
+    }
+
+    function clearCalc() {
+        calcCurrentInput = "0";
+        calcPreviousInput = "";
+        calcOperator = null;
+        resetScreenNext = false;
+        updateCalcScreen();
+    }
+
+    function backspace() {
+        if (resetScreenNext) {
+            clearCalc();
+            return;
+        }
+        if (calcCurrentInput.length === 1 || (calcCurrentInput.length === 2 && calcCurrentInput.startsWith("-"))) {
+            calcCurrentInput = "0";
+        } else {
+            calcCurrentInput = calcCurrentInput.slice(0, -1);
+            if (calcCurrentInput === "") calcCurrentInput = "0";
+        }
+        updateCalcScreen();
+    }
+
+    function hitungDuaAngka(prev, curr, op) {
+        let a = parseFloat(prev);
+        let b = parseFloat(curr);
+        if (isNaN(a) || isNaN(b)) return 0;
+        switch(op) {
+            case '+': return a + b;
+            case '-': return a - b;
+            case '*': return a * b;
+            case '/': return b === 0 ? 0 : a / b;
+            default: return 0;
+        }
+    }
+
+    function setOperator(op) {
+        if (calcOperator !== null && !resetScreenNext) {
+            let hasil = hitungDuaAngka(calcPreviousInput, calcCurrentInput, calcOperator);
+            calcCurrentInput = String(hasil);
+            updateCalcScreen();
+        }
+        calcPreviousInput = calcCurrentInput;
+        calcOperator = op;
+        resetScreenNext = true;
+    }
+
+    function hitungHasil() {
+        if (calcOperator === null || resetScreenNext) return;
+        let hasil = hitungDuaAngka(calcPreviousInput, calcCurrentInput, calcOperator);
+        calcCurrentInput = String(hasil);
+        calcOperator = null;
+        calcPreviousInput = "";
+        resetScreenNext = true;
+        updateCalcScreen();
+    }
+
+    function bindCalculator() {
+        document.querySelectorAll('.calc-btn[data-num]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                let num = btn.getAttribute('data-num');
+                if (num === ".") inputDecimal();
+                else inputNumber(num);
+            });
+        });
+        document.querySelectorAll('.calc-btn[data-op]').forEach(btn => {
+            let op = btn.getAttribute('data-op');
+            if (op === "del") {
+                btn.addEventListener('click', (e) => { e.preventDefault(); backspace(); });
+            } else if (op === "/" || op === "*" || op === "-" || op === "+") {
+                btn.addEventListener('click', (e) => { e.preventDefault(); setOperator(op); });
+            }
+        });
+        document.querySelector('.calc-btn[data-action="clear"]').addEventListener('click', (e) => { e.preventDefault(); clearCalc(); });
+        document.querySelector('.calc-btn[data-action="="]').addEventListener('click', (e) => { e.preventDefault(); hitungHasil(); });
+    }
+
+    // ============ TOMBOL SOAL BARU ============
+    function initRefreshButton() {
+        const refreshBtn = document.getElementById('refreshHargaBtn');
+        refreshBtn.addEventListener('click', () => {
+            refreshSoalBaru(false);
+            // jika ada feedback error sembunyikan
+            const feedbackDiv = document.getElementById('feedbackArea');
+            feedbackDiv.style.display = 'none';
+            sudahJawab = false;
+            document.querySelectorAll('.btn-pilih').forEach(btn => btn.disabled = false);
+        });
+    }
+
+    // Event listener tombol pilih strategi
+    function bindPilihButtons() {
+        document.querySelectorAll('.btn-pilih').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                let pilih = btn.getAttribute('data-pilih');
+                // jika sudah jawab dan bukan karena time-out, cegah
+                if (sudahJawab) {
+                    const feedbackDiv = document.getElementById('feedbackArea');
+                    feedbackDiv.style.display = 'block';
+                    feedbackDiv.className = 'feedback-area feedback-salah';
+                    feedbackDiv.innerHTML = '⏳ Kamu sudah menjawab soal ini. Klik "SOAL BARU" untuk latihan selanjutnya!';
+                    setTimeout(() => {
+                        if (feedbackDiv.style.display === 'block' && sudahJawab) {
+                            // biarkan tampil
+                        }
+                    }, 2000);
+                    return;
+                }
+                prosesPilihan(pilih);
+            });
+        });
+    }
+
+    // ============ INITIAL ============
+    (function init() {
+        const { hargaA: initA, hargaB: initB } = generateHargaYangBenar();
+        hargaA = initA;
+        hargaB = initB;
+        persenDiskon = getRandomDiskon();
+        updateTampilanHarga();
+        bindCalculator();
+        bindPilihButtons();
+        initRefreshButton();
+        clearCalc();
+        sudahJawab = false;
+        const feedbackDiv = document.getElementById('feedbackArea');
+        feedbackDiv.style.display = 'none';
+        
+        // Additional tiny fix: disable context menu on buttons for cleaner mobile UX
+        const allBtns = document.querySelectorAll('button');
+        allBtns.forEach(btn => {
+            btn.addEventListener('contextmenu', (e) => e.preventDefault());
+            btn.addEventListener('touchstart', (e) => {
+                // just to ensure fast feedback, nothing else
+            }, { passive: true });
+        });
+    })();
+</script>
+</body>
+</html>

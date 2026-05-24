@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mencari Benda</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
+
+    <script>
+   	 // Jalankan fungsinya setelah halaman selesai dimuat
+   	 window.addEventListener('DOMContentLoaded', () => {
+   	     imageMapResize();
+   	 });
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none; /* Mencegah teks terblok saat klik cepat */
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #2c3e50 0%, #1a2632 100%);
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Roboto', sans-serif;
+        }
+
+        /* Container utama untuk gambar dan overlay interaksi */
+        .interactive-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 28px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            background: #e9e4d8;
+            line-height: 0;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: filter 0.2s ease;
+        }
+
+        /* Panel instruksi interaktif + notifikasi */
+        .game-panel {
+            position: absolute;
+            top: 30px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 480px;
+            background: rgba(10, 20, 28, 0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 24px; 
+            padding: 16px 24px;
+            text-align: left; 
+            font-size: 1.1rem; 
+            line-height: 1.4;
+            color: #f9f3e2;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 215, 150, 0.5);
+            transition: all 0.2s;
+            z-index: 20;
+            pointer-events: none; /* biar klik tembus ke map */
+        }
+
+        /* feedback sementara (toast) */
+        .feedback-message {
+            position: absolute;
+            top: 250px; 
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e2a32e6;
+            backdrop-filter: blur(16px);
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #ffecb3;
+            border-left: 5px solid #ffb347;
+            border-right: 5px solid #ffb347;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 25;
+            white-space: nowrap;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Tombol main lagi yang muncul setelah benar */
+        .restart-btn {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #090b4f;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 12px 32px;
+            border-radius: 48px;
+            color: #ffffff;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 6px 0 #a45f1a;
+            transition: 0.07s linear;
+            z-index: 30;
+            letter-spacing: 1px;
+            backdrop-filter: blur(4px);
+            pointer-events: auto;
+            border: 1px solid #ffe1a0;
+        }
+
+        .restart-btn:active {
+            transform: translateX(-50%) translateY(3px);
+            box-shadow: 0 3px 0 #a45f1a;
+        }
+
+        /* animasi fade */
+        .fade-out {
+            opacity: 0;
+        }
+
+        /* area map tetap responsif */
+        map area {
+            cursor: pointer;
+        }
+
+        /* untuk layar kecil, panel instruksi lebih kecil */
+        @media (max-width: 680px) {
+            .game-panel {
+                font-size: 0.9rem;
+                padding: 12px 18px;
+                top: 15px;
+                width: 92%;
+            }
+            .feedback-message {
+                font-size: 1rem;
+                white-space: nowrap;
+                padding: 8px 18px;
+                top: 190px;
+            }
+            .restart-btn {
+                bottom: 30px;
+                font-size: 1.1rem;
+                padding: 8px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="interactive-container">
+    <img src="assets/zkamar_.png" usemap="#image-map" alt="Ruangan interaktif" id="roomImage">
+
+    <div class="game-panel" id="instructionPanel">
+        <span id="instructionText">Memuat petualangan...</span>
+    </div>
+
+    <div id="feedbackMsg" class="feedback-message" style="opacity:0; visibility: hidden;"></div>
+
+    <button id="playAgainBtn" class="restart-btn" style="display: none;">✨ MAIN LAGI ✨</button>
+</div>
+
+<map name="image-map" id="clickableMap">
+    <area id="areaToolbox"
+          shape="poly"
+          coords="100,658,180,678,329,637,332,566,339,546,240,530,247,524,228,404,220,403,100,408,79,409,68,418,78,551,90,555,98,562"
+          href="#"
+          alt=""
+          data-object="toolbox">
+
+    <area id="areaDrawer"
+          shape="poly"
+          coords="766,592,765,627,944,648,944,605"
+          href="#"
+          alt=""
+          data-object="drawer">
+
+    <area id="areaStationery"
+          shape="poly"
+          coords="1153,519,1153,535,1158,593,1277,610,1282,583,1288,573,1287,530,1289,519,1172,511"
+          href="#"
+          alt=""
+          data-object="stationery">
+</map>
+
+<script>
+    // ----- SKENARIO YANG TERSEDIA
+    const SCENARIOS = [
+        {
+            id: 1,
+            instruksi: "<b>Kakak:</b> Bapak, tahu obeng di mana tidak?<br><b>Bapak:</b> Di kotak perkakas, di bawah ventilasi.<br><b>Kakak:</b> Ventilasi?<br><b>Bapak:</b> Itu lho, lubang angin yang bentuknya segitiga.<br><br><center><em>Bantu Kakak mencari obeng. <br>Klik kotak perkakas yang dimaksud</center></em>",
+            targetObject: "toolbox",
+        },
+        {
+            id: 2,
+            instruksi: "<b>Adik:</b> Kakak, lipstik di mana? Aku mau pinjam<br><b>Kakak:</b> Itu di laci meja di bawah cermin.<br><b>Adik:</b> Cermin yang mana?<br><b>Kakak:</b> Yang lingkaran.<br><br><center><em>Bantu Adik mencari lipstik. <br>Klik laci meja yang dimaksud</center></em>",
+            targetObject: "drawer",
+        },
+        {
+            id: 3,
+            instruksi: "<b>Kakak:</b> Ibu, punya klip segitiga tidak?<br><b>Ibu:</b> Ada. Ibu simpan di kotak, di bawah rak buku.<br><b>Kakak:</b> Rak buku yang mana?<br><b>Ibu:</b> Rak buku yang persegi.<br><br><center><em>Bantu Kakak mencari klip segitiga. <br>Klik kotak alat tulis yang dimaksud</center></em>",
+            targetObject: "stationery",
+        }
+    ];
+
+    // State game global
+    let currentScenario = null;          
+    let gameActive = true;               
+    let feedbackTimeout = null;
+    
+    let instructionPanel = document.getElementById('instructionPanel');
+    let instructionTextSpan = document.getElementById('instructionText');
+    let feedbackDiv = document.getElementById('feedbackMsg');
+    let playAgainBtn = document.getElementById('playAgainBtn');
+    
+    function initEventListeners() {
+        const allAreas = document.querySelectorAll('area');
+
+        allAreas.forEach(area => {
+            area.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                if (!gameActive) return false;
+
+                const clickedObjectType = this.dataset.object;
+
+                if (currentScenario && clickedObjectType === currentScenario.targetObject) {
+                    gameActive = false;
+
+                    // Parameter terakhir true membuat feedback KAMU BENAR tidak hilang otomatis
+                    showFeedback(
+                        "✅ YAY! BERHASIL! ✅",
+                        "#b9f6ca",
+                        "#1e4a2f",
+                        true
+                    );
+
+                    playAgainBtn.style.display = "block";
+                    instructionPanel.style.opacity = "0.7";
+                } else {
+                    showFeedback(
+                        "❌ COBA CARI LAGI ❌",
+                        "#ffcdb2",
+                        "#a1301a"
+                    );
+
+                    instructionPanel.style.transform = "translateX(-50%) scale(1.02)";
+
+                    setTimeout(() => {
+                        instructionPanel.style.transform = "translateX(-50%) scale(1)";
+                    }, 180);
+                }
+
+                return false;
+            });
+        });
+    }
+    
+    // Fungsi menampilkan feedback (ditambahkan parameter keepVisible)
+    function showFeedback(message, bgColor, textColor, keepVisible = false) {
+        if (feedbackTimeout) clearTimeout(feedbackTimeout);
+        feedbackDiv.style.visibility = "visible";
+        feedbackDiv.style.opacity = "1";
+        feedbackDiv.style.backgroundColor = bgColor || "#1e2a32e6";
+        feedbackDiv.style.color = textColor || "#ffecb3";
+        feedbackDiv.innerText = message;
+        
+        // Jika keepVisible bernilai true (saat benar), langsung stop di sini tanpa timeout
+        if (keepVisible) return;
+        
+        // Auto hilang setelah 1.8 detik (hanya berlaku saat jawaban salah)
+        feedbackTimeout = setTimeout(() => {
+            feedbackDiv.style.opacity = "0";
+            setTimeout(() => {
+                if(feedbackDiv) feedbackDiv.style.visibility = "hidden";
+            }, 250);
+        }, 1800);
+    }
+    
+    // Memuat skenario baru
+    function loadRandomScenario(excludeScenarioId = null) {
+        let availableScenarios = [...SCENARIOS];
+        if (excludeScenarioId !== null && currentScenario) {
+            availableScenarios = SCENARIOS.filter(s => s.id !== currentScenario.id);
+        }
+        
+        if (availableScenarios.length === 0) availableScenarios = [...SCENARIOS];
+        const randomIndex = Math.floor(Math.random() * availableScenarios.length);
+        const newScenario = availableScenarios[randomIndex];
+        currentScenario = newScenario;
+        
+        if (instructionTextSpan) {
+            instructionTextSpan.innerHTML = currentScenario.instruksi;
+        }
+        
+        instructionPanel.title = `Petunjuk: ${currentScenario.hint}`;
+        instructionPanel.style.opacity = "1";
+        instructionPanel.style.transform = "translateX(-50%) scale(1)";
+        
+        gameActive = true;
+        playAgainBtn.style.display = "none";
+        
+        // Memastikan feedback benar langsung bersih ketika memuat skenario baru
+        if (feedbackTimeout) clearTimeout(feedbackTimeout);
+        feedbackDiv.style.opacity = "0";
+        feedbackDiv.style.visibility = "hidden";
+        
+        instructionPanel.style.transition = "0.1s";
+        instructionPanel.style.transform = "translateX(-50%) scale(1.02)";
+        setTimeout(() => {
+            if (instructionPanel) instructionPanel.style.transform = "translateX(-50%) scale(1)";
+        }, 200);
+    }
+    
+    // Event untuk tombol main lagi
+    function setupPlayAgain() {
+        playAgainBtn.addEventListener('click', () => {
+            if (currentScenario) {
+                loadRandomScenario(currentScenario.id);
+            } else {
+                loadRandomScenario();
+            }
+            showFeedback("🎲 Skenario baru! Ikuti skenario 🎲", "#c7e9fb", "#1e466e");
+        });
+    }
+    
+    // Memulai permainan pertama kali
+    function initGame() {
+        initEventListeners();
+        setupPlayAgain();
+        loadRandomScenario();
+        
+        instructionPanel.style.transition = "all 0.2s ease";
+        instructionPanel.addEventListener('mouseenter', () => {
+            if(gameActive) {
+                instructionPanel.style.background = "rgba(20, 40, 55, 0.95)";
+                instructionPanel.style.border = "1px solid #ffcf7a";
+                instructionPanel.style.boxShadow = "0 10px 22px rgba(0,0,0,0.5)";
+            }
+        });
+        instructionPanel.addEventListener('mouseleave', () => {
+            instructionPanel.style.background = "rgba(10, 20, 28, 0.9)";
+            instructionPanel.style.border = "1px solid rgba(255, 215, 150, 0.5)";
+        });
+    }
+    
+    // Menangani event jika terjadi klik gambar di luar area
+    function addBackgroundClickHint() {
+        const imgElement = document.getElementById('roomImage');
+        if (imgElement) {
+            imgElement.addEventListener('click', (e) => {
+                let path = e.composedPath();
+                let clickedOnArea = false;
+                for(let el of path) {
+                    if(el && el.nodeName === 'AREA') {
+                        clickedOnArea = true;
+                        break;
+                    }
+                }
+                if (!clickedOnArea && gameActive) {
+                    showFeedback("🔍 Baca skenario dengan teliti 🔍", "#ffe0b5", "#a35c00");
+                    instructionPanel.style.transform = "translateX(-50%) translateY(2px)";
+                    setTimeout(() => {
+                        if(instructionPanel) instructionPanel.style.transform = "translateX(-50%) translateY(0)";
+                    }, 200);
+                }
+            });
+        }
+    }
+    
+    window.addEventListener('DOMContentLoaded', () => {
+        initGame();
+        addBackgroundClickHint();
+        
+        const style = document.createElement('style');
+        style.textContent = `area { outline: none; cursor: pointer; } img { user-select: none; -webkit-tap-highlight-color: transparent; }`;
+        document.head.appendChild(style);
+    });
+    
+    window.addEventListener('error', (e) => {
+        if(e.target && e.target.tagName === 'IMG') {
+            console.warn('Pastikan file gambar "zkamar_.png" tersedia di folder yang sama dengan file HTML');
+            const panel = document.getElementById('instructionPanel');
+            if(panel) panel.innerHTML = "⚠️ Gambar tidak ditemukan: zkamar_.png ⚠️";
+        }
+    });
+</script>
+</body>
+</html>

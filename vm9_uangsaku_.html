@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Uang Saku</title>
+    <!-- Chart.js + Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #eef2f8;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding: 12px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Kartu utama - mobile first */
+        .card {
+            max-width: 550px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* Header dengan soal */
+        .hero {
+            background: linear-gradient(135deg, #1a2f3f 0%, #1f3b4c 100%);
+            padding: 20px 18px;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            letter-spacing: -0.3px;
+        }
+
+        .soal-box {
+            background: #ffefcf;
+            color: #2d3e50;
+            border-radius: 28px;
+            padding: 12px 18px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .soal-text {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .soal-text span {
+            background: #1f3b4c;
+            color: #ffcd7e;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .btn-soal-baru {
+            background: #ff9f4a;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: #1e2f2f;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+        }
+
+        .btn-soal-baru:active {
+            transform: scale(0.96);
+            background: #ff8c2a;
+        }
+
+        /* dua kolom -> mobile: column */
+        .dua-kolom {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 20px 16px;
+        }
+
+        /* Panel kiri: chart */
+        .panel-chart {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chart-container {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 8px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-width: 280px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .proporsi-ringkasan {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 10px 12px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #2c3e50;
+            border: 1px solid #e2edf2;
+            margin-top: 12px;
+        }
+
+        /* Panel kanan: form */
+        .panel-form {
+            background: #fffaf3;
+            border-radius: 28px;
+            padding: 18px 16px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            border-left: 5px solid #ff914d;
+            padding-left: 12px;
+            color: #1f3b4c;
+        }
+
+        .field-group {
+            margin-bottom: 14px;
+        }
+
+        .field-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+
+        .field-group input {
+            width: 100%;
+            padding: 14px 14px;
+            font-size: 1rem;
+            border: 2px solid #e0e9f0;
+            border-radius: 24px;
+            background: white;
+            font-weight: 500;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .field-group input:focus {
+            border-color: #ff914d;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 145, 77, 0.2);
+        }
+
+        .btn-cek {
+            background: #1f3b4c;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 40px;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-cek:active {
+            transform: scale(0.97);
+            background: #ff7a2f;
+        }
+
+        .feedback {
+            margin-top: 16px;
+            background: #eef3fa;
+            border-radius: 20px;
+            padding: 12px;
+            font-size: 0.85rem;
+            text-align: center;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .feedback.success {
+            background: #d9f0e1;
+            color: #1a7042;
+            border-left: 5px solid #2ecc71;
+        }
+
+        .feedback.warning {
+            background: #ffe3d0;
+            color: #c25d00;
+            border-left: 5px solid #ff914d;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #5c6f87;
+            padding: 12px 16px 18px;
+            border-top: 1px solid #edf2f7;
+        }
+
+        /* Perbaikan untuk touch */
+        button, input {
+            touch-action: manipulation;
+        }
+
+        /* layar sangat kecil */
+        @media (max-width: 450px) {
+            body {
+                padding: 8px;
+            }
+            .hero h1 {
+                font-size: 1.3rem;
+            }
+            .soal-text {
+                font-size: 0.9rem;
+            }
+            .soal-text span {
+                font-size: 1rem;
+            }
+            .btn-soal-baru {
+                font-size: 0.75rem;
+                padding: 6px 14px;
+            }
+            .form-title {
+                font-size: 1.1rem;
+            }
+            .field-group input {
+                padding: 12px 12px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="hero">
+        <h1>💰 Kelola Uang Saku</h1>
+        <div class="soal-box">
+            <div class="soal-text">
+                🟡 Uang Saku Mingguan :
+                <span id="uangSakuNominal">Rp 0</span>
+            </div>
+            <button class="btn-soal-baru" id="btnSoalBaru">🎲 Soal Baru</button>
+        </div>
+        <p style="margin-top: 10px; font-size: 0.75rem; opacity:0.9;">📍 Skenario: Kamu adalah seorang siswa SMP di sebuah Kota Besar</p>
+    </div>
+
+    <div class="dua-kolom">
+        <!-- Kiri: Pie chart dengan label melekat -->
+        <div class="panel-chart">
+            <div class="chart-container">
+                <canvas id="pieChartCanvas" width="400" height="400"></canvas>
+            </div>
+            <div class="proporsi-ringkasan">
+                📊 Alokasi Uang Saku-mu.
+            </div>
+        </div>
+
+        <!-- Kanan: Form input jawaban -->
+        <div class="panel-form">
+            <div class="form-title">✏️ Isi nominal ke amplop (Rp)</div>
+            <div class="field-group">
+                <label>🍔 Jajan (60% dari Uang Saku)</label>
+                <input type="number" id="jajanInput" placeholder="Masukkan nominal rupiah" inputmode="numeric" pattern="[0-9]*">
+            </div>
+            <div class="field-group">
+                <label>🚌 Transportasi (25% dari Uang Saku)</label>
+                <input type="number" id="transportInput" placeholder="Masukkan nominal rupiah" inputmode="numeric">
+            </div>
+            <div class="field-group">
+                <label>🏦 Tabungan (10% dari Uang Saku)</label>
+                <input type="number" id="tabunganInput" placeholder="Masukkan nominal rupiah" inputmode="numeric">
+            </div>
+            <div class="field-group">
+                <label>🤝 Dana Sosial (5% dari Uang Saku)</label>
+                <input type="number" id="sosialInput" placeholder="Masukkan nominal rupiah" inputmode="numeric">
+            </div>
+            <button class="btn-cek" id="cekBtn">✅ Cek Jawaban</button>
+            <div id="feedbackBox" class="feedback">
+                💡 Tekan "Soal Baru" untuk latihan nominal berbeda.<br>
+                Isi rupiah sesuai proporsi!
+            </div>
+        </div>
+    </div>
+    <footer>
+        📱 Uang saku acak (Rp200.000 - Rp250.000)<br>
+        🧮 Hitung besaran uang di tiap amplop berdasarkan persentase alokasi uang saku-mu.
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // Proporsi tetap
+        const PERSEN = {
+            jajan: 60,
+            transport: 25,
+            tabungan: 10,
+            sosial: 5
+        };
+
+        // State
+        let currentUangSaku = 100000;  // dalam rupiah
+
+        // DOM elements
+        const uangSakuSpan = document.getElementById('uangSakuNominal');
+        const btnSoalBaru = document.getElementById('btnSoalBaru');
+        const jajanInput = document.getElementById('jajanInput');
+        const transportInput = document.getElementById('transportInput');
+        const tabunganInput = document.getElementById('tabunganInput');
+        const sosialInput = document.getElementById('sosialInput');
+        const cekBtn = document.getElementById('cekBtn');
+        const feedbackDiv = document.getElementById('feedbackBox');
+
+        // Chart reference
+        let pieChart = null;
+
+        // Helper: generate acak uang saku
+        function generateRandomUangSaku() {
+            const options = [200, 210, 220, 230, 240, 250];
+            const randomIndex = Math.floor(Math.random() * options.length);
+            return options[randomIndex] * 1000;
+        }
+
+        // Hitung nominal sesuai persen
+        function hitungNominal(persen, total) {
+            return Math.round((persen / 100) * total);
+        }
+
+        // Dapatkan object jawaban benar
+        function getCorrectAnswers() {
+            return {
+                jajan: hitungNominal(PERSEN.jajan, currentUangSaku),
+                transport: hitungNominal(PERSEN.transport, currentUangSaku),
+                tabungan: hitungNominal(PERSEN.tabungan, currentUangSaku),
+                sosial: hitungNominal(PERSEN.sosial, currentUangSaku),
+                total: currentUangSaku
+            };
+        }
+
+        // Update placeholder (tanpa petunjuk jawaban, hanya teks umum)
+        function updatePlaceholders() {
+            // Hanya placeholder umum, tidak memberikan contoh jawaban
+            jajanInput.placeholder = "Masukkan nominal rupiah";
+            transportInput.placeholder = "Masukkan nominal rupiah";
+            tabunganInput.placeholder = "Masukkan nominal rupiah";
+            sosialInput.placeholder = "Masukkan nominal rupiah";
+        }
+
+        // Update tampilan nominal di hero
+        function updateUangSakuDisplay() {
+            uangSakuSpan.innerText = `Rp ${currentUangSaku.toLocaleString('id-ID')}`;
+            updatePlaceholders();
+        }
+
+        // Render / re-render pie chart dengan plugin datalabels (label melekat)
+        function renderPieChart() {
+            const dataPersen = [PERSEN.jajan, PERSEN.transport, PERSEN.tabungan, PERSEN.sosial];
+            const labels = ['🍔 Jajan', '🚌 Transport', '🏦 Tabungan', '🤝 Sosial'];
+            const colors = ['#F94144', '#F9C74F', '#577590', '#90BE6D'];
+
+            const ctx = document.getElementById('pieChartCanvas').getContext('2d');
+            
+            if (pieChart) {
+                pieChart.data.datasets[0].data = dataPersen;
+                pieChart.data.labels = labels;
+                pieChart.update();
+            } else {
+                pieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: dataPersen,
+                            backgroundColor: colors,
+                            borderWidth: 0,
+                            hoverOffset: 8,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        layout: {
+                            padding: 8
+                        },
+                        plugins: {
+                            datalabels: {
+                                backgroundColor: 'rgba(0,0,0,0.65)',
+                                borderRadius: 20,
+                                color: 'white',
+                                font: {
+                                    weight: 'bold',
+                                    size: 12
+                                },
+                                padding: {
+                                    left: 6,
+                                    right: 6,
+                                    top: 4,
+                                    bottom: 4
+                                },
+                                formatter: (value, context) => {
+                                    const label = context.chart.data.labels[context.dataIndex];
+                                    // Bersihkan emoji untuk tampilan rapi
+                                    let shortLabel = label.replace(/[🍔🚌🏦🤝]/g, '').trim();
+                                    return `${shortLabel}\n${value}%`;
+                                },
+                                textAlign: 'center',
+                                offset: 6,
+                                align: 'center',
+                                anchor: 'center',
+                            },
+                            legend: {
+                                display: false,   // Label sudah melekat, legend tidak perlu
+                            },
+                            tooltip: {
+                                // Tooltip hanya menampilkan persentase saja (tidak double label)
+                                callbacks: {
+                                    label: (tooltipItem) => {
+                                        // Hanya tampilkan: "60%" tanpa label berulang
+                                        return `${tooltipItem.raw}%`;
+                                    }
+                                }
+                            }
+                        },
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            }
+        }
+
+        // Reset form dan feedback ketika soal baru
+        function resetFormAndFeedback() {
+            jajanInput.value = '';
+            transportInput.value = '';
+            tabunganInput.value = '';
+            sosialInput.value = '';
+            feedbackDiv.innerHTML = `✨ Uang saku Rp ${currentUangSaku.toLocaleString('id-ID')}. Isi keempat nominal amplop.`;
+            feedbackDiv.className = "feedback";
+            updatePlaceholders();
+        }
+
+        // Load soal baru (acak)
+        function loadNewQuestion() {
+            currentUangSaku = generateRandomUangSaku();
+            updateUangSakuDisplay();
+            renderPieChart();       // data persen tetap, tapi panggil untuk konsistensi
+            resetFormAndFeedback();
+        }
+
+        // Cek jawaban user - TIDAK MEMBOCORKAN JAWABAN BENAR
+        function cekJawaban() {
+            const correct = getCorrectAnswers();
+            
+            const userJajan = parseInt(jajanInput.value, 10);
+            const userTransport = parseInt(transportInput.value, 10);
+            const userTabungan = parseInt(tabunganInput.value, 10);
+            const userSosial = parseInt(sosialInput.value, 10);
+            
+            // Validasi isian kosong / bukan angka
+            if (isNaN(userJajan) || isNaN(userTransport) || isNaN(userTabungan) || isNaN(userSosial)) {
+                feedbackDiv.innerHTML = "⚠️ Semua kolom harus diisi dengan angka!";
+                feedbackDiv.className = "feedback warning";
+                return;
+            }
+            
+            // Cek negatif
+            if (userJajan < 0 || userTransport < 0 || userTabungan < 0 || userSosial < 0) {
+                feedbackDiv.innerHTML = "⚠️ Nominal tidak boleh negatif. Isi dengan angka positif.";
+                feedbackDiv.className = "feedback warning";
+                return;
+            }
+            
+            const benarJajan = (userJajan === correct.jajan);
+            const benarTransport = (userTransport === correct.transport);
+            const benarTabungan = (userTabungan === correct.tabungan);
+            const benarSosial = (userSosial === correct.sosial);
+            const semuaBenar = benarJajan && benarTransport && benarTabungan && benarSosial;
+            
+            if (semuaBenar) {
+                feedbackDiv.innerHTML = `🎉 Selamat! Jawaban tepat! Uang saku Rp ${correct.total.toLocaleString('id-ID')} terbagi sempurna. ✅ Hebat!`;
+                feedbackDiv.className = "feedback success";
+            } else {
+                // Membuat daftar amplop yang sudah benar dan yang masih salah (tanpa menyebut angka benar)
+                let statusList = [];
+                if (benarJajan) {
+                    statusList.push("✅ Jajan & Makan sudah benar");
+                } else {
+                    statusList.push("❌ Jajan & Makan masih salah");
+                }
+                if (benarTransport) {
+                    statusList.push("✅ Transportasi sudah benar");
+                } else {
+                    statusList.push("❌ Transportasi masih salah");
+                }
+                if (benarTabungan) {
+                    statusList.push("✅ Tabungan sudah benar");
+                } else {
+                    statusList.push("❌ Tabungan masih salah");
+                }
+                if (benarSosial) {
+                    statusList.push("✅ Dana Sosial sudah benar");
+                } else {
+                    statusList.push("❌ Dana Sosial masih salah");
+                }
+                
+                let pesan = `📝 Periksa kembali hitunganmu:<br><br> ${statusList.join('<br> ')}<br><br>💡 Hitung dengan teliti: (persentase × total uang saku) ÷ 100`;
+                feedbackDiv.innerHTML = pesan;
+                feedbackDiv.className = "feedback warning";
+            }
+        }
+        
+        // Sanitasi input number untuk mobile (hindari huruf & negatif)
+        function sanitizeNumberField(inputElement) {
+            inputElement.addEventListener('input', function(e) {
+                let val = parseInt(this.value, 10);
+                if (this.value === '-') {
+                    this.value = '';
+                } else if (!isNaN(val) && val < 0) {
+                    this.value = 0;
+                } else if (isNaN(val) && this.value !== '') {
+                    // jika terdeteksi huruf atau input tidak valid, kosongkan
+                    if (this.value.length > 0 && /[^0-9]/.test(this.value)) {
+                        this.value = '';
+                    }
+                }
+            });
+        }
+        
+        // Inisialisasi event dan state
+        function init() {
+            // pertama generate random uang saku (tidak selalu 100k)
+            currentUangSaku = generateRandomUangSaku();
+            updateUangSakuDisplay();
+            renderPieChart();
+            resetFormAndFeedback();   // set placeholder & kosongkan input
+            
+            // Event listeners
+            btnSoalBaru.addEventListener('click', () => {
+                loadNewQuestion();
+            });
+            
+            cekBtn.addEventListener('click', cekJawaban);
+            
+            // Sanitasi input
+            sanitizeNumberField(jajanInput);
+            sanitizeNumberField(transportInput);
+            sanitizeNumberField(tabunganInput);
+            sanitizeNumberField(sosialInput);
+            
+            // Dukungan tekan Enter untuk cek jawaban (mobile friendly)
+            const inputs = [jajanInput, transportInput, tabunganInput, sosialInput];
+            inputs.forEach(inp => {
+                inp.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        cekJawaban();
+                    }
+                });
+            });
+            
+            // Agar tidak ada zoom berlebih pada input number di iOS (opsi)
+            const style = document.createElement('style');
+            style.textContent = 'input[type="number"] { font-size: 16px !important; }';
+            document.head.appendChild(style);
+        }
+        
+        init();
+    })();
+</script>
+</body>
+</html>

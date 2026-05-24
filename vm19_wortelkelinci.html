@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<title>Kelinci dan Wortel</title>
+
+<style>
+    *{
+        box-sizing:border-box;
+        margin:0;
+        padding:0;
+    }
+
+    body{
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        background:
+            linear-gradient(to bottom,#dff6ff 0%, #dff6ff 55%, #d9f7be 55%, #d9f7be 100%);
+        min-height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        padding:20px;
+        overflow:auto;
+    }
+
+    @media(max-width:600px){
+        body{
+            padding:10px;
+        }
+        .board{
+            gap:6px;
+            padding:8px;
+            border-radius:20px;
+        }
+        .cmd-btn{
+            padding:20px 10px;
+            font-size:20px;
+        }
+        .program-area{
+            height:160px;
+        }
+        .status{
+            word-break:break-word;
+        }
+        .tile{
+            border-radius:14px;
+        }
+    }
+
+    .game{
+        width:min(1000px,100%);
+        display:grid;
+        grid-template-columns: 1fr 320px;
+        gap:24px;
+        align-items:start;
+    }
+
+    @media(max-width:850px){
+        .game{
+            grid-template-columns:1fr;
+        }
+    }
+
+    @media(max-width:700px){
+        .block-item{
+            cursor:default;
+        }
+    }
+
+    .board-wrapper{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+
+    .board{
+        width:min(90vw,520px);
+        aspect-ratio:1;
+        display:grid;
+        grid-template-columns:repeat(5,1fr);
+        grid-template-rows:repeat(5,1fr);
+        gap:10px;
+        padding:14px;
+        background:#8ed16f;
+        border-radius:30px;
+        box-shadow:
+            inset 0 4px 0 rgba(255,255,255,0.5),
+            0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .tile{
+        background:#b9ec91;
+        border-radius:22px;
+        position:relative;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        overflow:hidden;
+        box-shadow:
+            inset 0 5px 0 rgba(255,255,255,0.45),
+            inset 0 -5px 0 rgba(0,0,0,0.05);
+    }
+
+    .tile::after{
+        content:"";
+        position:absolute;
+        width:30%;
+        height:30%;
+        background:rgba(255,255,255,0.2);
+        border-radius:50%;
+        top:12%;
+        left:14%;
+        pointer-events: none;
+    }
+
+    .rabbit-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .rabbit{
+        font-size: clamp(34px,5vw,48px);
+        transition: transform .2s ease;
+        filter: drop-shadow(0 3px 2px rgba(0,0,0,.15));
+        animation:bounce .8s infinite alternate;
+        display: inline-block;
+    }
+
+    .direction-indicator {
+        font-size: 20px;
+        position: absolute;
+        bottom: -10px;
+        right: -12px;
+        background: rgba(0,0,0,0.6);
+        border-radius: 30px;
+        padding: 2px 6px;
+        color: white;
+        font-weight: bold;
+        line-height: 1;
+        backdrop-filter: blur(4px);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        pointer-events: none;
+    }
+
+    @keyframes bounce{
+        from{ transform:translateY(0px); }
+        to{ transform:translateY(-4px); }
+    }
+
+    .carrot{
+        font-size: clamp(28px,4vw,40px);
+        animation:wiggle 1s infinite ease-in-out;
+        cursor: default;
+    }
+
+    @keyframes wiggle{
+        0%{ transform:rotate(-5deg);}
+        50%{ transform:rotate(5deg);}
+        100%{ transform:rotate(-5deg);}
+    }
+
+    .panel{
+        background:white;
+        border-radius:28px;
+        padding:22px;
+        box-shadow:0 10px 30px rgba(0,0,0,0.12);
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    h1{
+        font-size:30px;
+        color:#5b3d1f;
+        margin-bottom:8px;
+    }
+
+    .subtitle{
+        color:#666;
+        margin-bottom:22px;
+        line-height:1.4;
+    }
+
+    .buttons{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:12px;
+        margin-bottom:24px;
+    }
+
+    .cmd-btn{
+        border:none;
+        border-radius:18px;
+        padding:16px 10px;
+        font-size:16px;
+        font-weight:bold;
+        cursor:pointer;
+        transition:.2s;
+        color:white;
+        box-shadow:0 5px 0 rgba(0,0,0,.12);
+    }
+
+    .cmd-btn:hover{
+        transform:translateY(-2px);
+    }
+
+    .cmd-btn:active{
+        transform:translateY(3px);
+        box-shadow:none;
+    }
+
+    .forward{ background:#5cb85c; }
+    .left{ background:#f0ad4e; }
+    .right{ background:#e67e22; }
+
+    .program-area{
+        background:#f7f7f7;
+        border-radius:20px;
+        padding:14px;
+        margin-bottom:18px;
+        border:3px dashed #ddd;
+        display: flex;
+        flex-direction: column;
+        height: 200px;
+        overflow-y: auto;
+    }
+
+    .program-title{
+        font-weight:bold;
+        margin-bottom:10px;
+        color:#666;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .clear-all-btn {
+        background: #dc3545;
+        border: none;
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .clear-all-btn:hover {
+        background: #bb2d3b;
+        transform: scale(0.97);
+    }
+
+    .program-list{
+        display:flex;
+        flex-direction: column;
+        gap:10px;
+        min-height: 60px;
+    }
+
+    .block-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #e9ecef;
+        border-radius: 16px;
+        padding: 5px 8px 5px 12px;
+        cursor: grab;
+        transition: 0.1s;
+        user-select: none;
+    }
+
+    .block-item:active {
+        cursor: grabbing;
+    }
+
+    .block-item.dragging {
+        opacity: 0.4;
+    }
+
+    .block {
+        padding: 8px 14px;
+        border-radius: 14px;
+        color: white;
+        font-weight: bold;
+        flex: 1;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .block.forward { background:#5cb85c; }
+    .block.left { background:#f0ad4e; }
+    .block.right { background:#e67e22; }
+
+    .delete-block {
+        background: #dc3545;
+        border: none;
+        color: white;
+        font-weight: bold;
+        border-radius: 30px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .delete-block:hover {
+        background: #a71d2a;
+        transform: scale(1.05);
+    }
+	
+    .move-btn{
+        border:none;
+        background:#d0d7de;
+        border-radius:10px;
+        width:30px;
+        height:30px;
+        cursor:pointer;
+        font-size:14px;
+        font-weight:bold;
+        flex-shrink:0;
+        transition:0.15s;
+    }
+	
+    .move-btn:hover{
+        background:#bfc8d1;
+    }
+	
+    .move-btn:active{
+        transform:scale(0.92);
+    }
+
+    .controls{
+        display:flex;
+        gap:12px;
+        margin-top: 8px;
+    }
+
+    .action-btn{
+        flex:1;
+        border:none;
+        border-radius:18px;
+        padding:14px;
+        font-size:16px;
+        font-weight:bold;
+        cursor:pointer;
+        transition:.2s;
+    }
+
+    .run{
+        background:#4da3ff;
+        color:white;
+    }
+
+    .reset{
+        background:#eee;
+    }
+
+    .status{
+        margin-top:18px;
+        text-align:center;
+        font-size:18px;
+        font-weight:bold;
+        color:#5b3d1f;
+        min-height:30px;
+    }
+
+    .tile.highlight{
+        animation:flash .4s;
+    }
+
+    @keyframes flash{
+        from{
+            transform:scale(1);
+            background:#fff4a8;
+        }
+        to{
+            transform:scale(1);
+        }
+    }
+
+    .sort-hint {
+        font-size: 11px;
+        color: #999;
+        margin-top: 8px;
+        text-align: center;
+        border-top: 1px solid #ddd;
+        padding-top: 8px;
+    }
+</style>
+</head>
+<body>
+
+<div class="game">
+
+    <div class="board-wrapper">
+        <div class="board" id="board"></div>
+    </div>
+
+    <div class="panel">
+
+        <h1>🐰 Wortel!</h1>
+
+        <div class="subtitle">
+            Susun perintah agar kelinci mencapai wortel.
+	    Tombol perintah:
+        </div>
+
+        <div class="buttons">
+            <button class="cmd-btn forward" id="btnForward" title="Maju">⬆</button>
+            <button class="cmd-btn left" id="btnLeft" title="Kiri">↺</button>
+            <button class="cmd-btn right" id="btnRight" title="Kanan">↻</button>
+        </div>
+
+        <div class="program-area">
+            <div class="program-title">
+                <span>📋 Perintah:</span>
+                <button class="clear-all-btn" id="clearAllBtn">Hapus Semua</button>
+            </div>
+            <div class="program-list" id="programList"></div>
+        </div>
+
+        <div class="subtitle">
+            ✨ Seret blok atau gunakan ⬆⬇ untuk ubah urutan | Klik ❌ hapus perintah
+	</div>
+
+        <div class="controls">
+            <button class="action-btn run" id="runBtn">▶ JALAN</button>
+            <button class="action-btn reset" id="resetBtn">🔄 BARU</button>
+        </div>
+
+        <div class="status" id="status"></div>
+
+    </div>
+
+</div>
+
+<script>
+
+const boardEl = document.getElementById("board");
+const programListEl = document.getElementById("programList");
+const statusText = document.getElementById("status");
+
+const SIZE = 5;
+
+let rabbit = {
+    row: Math.floor(Math.random() * SIZE),
+    col: Math.floor(Math.random() * SIZE),
+    dir: Math.floor(Math.random() * 4)      // 0:atas,1:kanan,2:bawah,3:kiri
+};
+
+let carrot = {
+    row: 0,
+    col: 0
+};
+
+let program = [];      // array of commands "forward","left","right"
+
+// Direction vectors
+const directions = [
+    {r:-1,c:0},  // 0 up
+    {r:0,c:1},   // 1 right
+    {r:1,c:0},   // 2 down
+    {r:0,c:-1}   // 3 left
+];
+
+// Emoji kelinci biasa tapi arah disesuaikan dengan rotasi & panah
+function getArrowForDir(dir) {
+    switch(dir) {
+        case 0: return "⬆️";
+        case 1: return "➡️";
+        case 2: return "⬇️";
+        case 3: return "⬅️";
+        default: return "➡️";
+    }
+}
+
+// Buat board lengkap dengan kelinci berindikator arah
+function createBoard() {
+    boardEl.innerHTML = "";
+
+    for(let r = 0; r < SIZE; r++) {
+        for(let c = 0; c < SIZE; c++) {
+            const tile = document.createElement("div");
+            tile.className = "tile";
+            tile.id = `tile-${r}-${c}`;
+
+            // Wortel?
+            if(r === carrot.row && c === carrot.col) {
+                const carrotDiv = document.createElement("div");
+                carrotDiv.className = "carrot";
+                carrotDiv.innerHTML = "🥕";
+                tile.appendChild(carrotDiv);
+            }
+
+            // Kelinci?
+            if(r === rabbit.row && c === rabbit.col) {
+                const container = document.createElement("div");
+                container.className = "rabbit-container";
+                
+                const rabbitDiv = document.createElement("div");
+                rabbitDiv.className = "rabbit";
+                // rotasi berdasarkan arah (0:up, 1:right, 2:down, 3:left)
+                let rotation = rabbit.dir * 90;
+                rabbitDiv.style.transform = `rotate(${rotation}deg)`;
+                rabbitDiv.innerHTML = "🐰";
+                
+                const indicatorSpan = document.createElement("div");
+                indicatorSpan.className = "direction-indicator";
+                indicatorSpan.innerHTML = getArrowForDir(rabbit.dir);
+                
+                container.appendChild(rabbitDiv);
+                container.appendChild(indicatorSpan);
+                tile.appendChild(container);
+            }
+
+            boardEl.appendChild(tile);
+        }
+    }
+}
+
+// Random posisi wortel (tidak bertabrakan dengan kelinci)
+function randomCarrot() {
+    do {
+        carrot.row = Math.floor(Math.random() * SIZE);
+        carrot.col = Math.floor(Math.random() * SIZE);
+    } while(carrot.row === rabbit.row && carrot.col === rabbit.col);
+}
+
+// render ulang daftar program dengan drag & drop + tombol hapus
+let draggedIndex = null;
+
+function renderProgram() {
+    programListEl.innerHTML = "";
+
+    program.forEach((cmd, idx) => {
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "block-item";
+        itemDiv.setAttribute("data-index", idx);
+	itemDiv.draggable = window.innerWidth > 700;
+        
+	// Blok perintah
+        const blockSpan = document.createElement("div");
+        blockSpan.className = `block ${cmd}`;
+        if(cmd === "forward") blockSpan.innerHTML = "⬆ MAJU";
+        if(cmd === "left") blockSpan.innerHTML = "↺ KIRI";
+        if(cmd === "right") blockSpan.innerHTML = "↻ KANAN";
+
+        // Tombol hapus
+        const delBtn = document.createElement("button");
+        delBtn.className = "delete-block";
+        delBtn.innerHTML = "✖";
+        delBtn.title = "Hapus perintah";
+        delBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            deleteCommandAtIndex(idx);
+        });
+
+	const upBtn = document.createElement("button");
+	upBtn.className = "move-btn";
+	upBtn.innerHTML = "⬆";
+
+	upBtn.addEventListener("click", () => {
+	    moveCommandUp(idx);
+	});
+
+	const downBtn = document.createElement("button");
+	downBtn.className = "move-btn";
+	downBtn.innerHTML = "⬇";
+
+	downBtn.addEventListener("click", () => {
+	    moveCommandDown(idx);
+	});
+
+	itemDiv.appendChild(blockSpan);
+	itemDiv.appendChild(upBtn);
+	itemDiv.appendChild(downBtn);
+	itemDiv.appendChild(delBtn);
+
+        // Drag & drop events
+        itemDiv.addEventListener("dragstart", (e) => {
+            draggedIndex = idx;
+            e.dataTransfer.effectAllowed = "move";
+            itemDiv.classList.add("dragging");
+        });
+        itemDiv.addEventListener("dragend", (e) => {
+            itemDiv.classList.remove("dragging");
+            draggedIndex = null;
+        });
+        itemDiv.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+        });
+        itemDiv.addEventListener("drop", (e) => {
+            e.preventDefault();
+            if(draggedIndex !== null && draggedIndex !== idx) {
+                reorderProgram(draggedIndex, idx);
+            }
+            draggedIndex = null;
+        });
+
+        programListEl.appendChild(itemDiv);
+    });
+
+    // Jika program kosong, tampilkan pesan kecil
+    if(program.length === 0) {
+        const emptyMsg = document.createElement("div");
+        emptyMsg.style.padding = "16px";
+        emptyMsg.style.textAlign = "center";
+        emptyMsg.style.color = "#aaa";
+        emptyMsg.style.fontStyle = "italic";
+        emptyMsg.innerText = "✨ Klik tombol perintah untuk menambah";
+        programListEl.appendChild(emptyMsg);
+    }
+}
+
+// Hapus command berdasarkan index
+function deleteCommandAtIndex(index) {
+    if(index >= 0 && index < program.length) {
+        program.splice(index, 1);
+        renderProgram();
+    }
+}
+
+// mengubah urutan program: dari oldIndex ke newIndex
+function reorderProgram(oldIndex, newIndex) {
+    if(oldIndex === newIndex) return;
+    const [movedItem] = program.splice(oldIndex, 1);
+    program.splice(newIndex, 0, movedItem);
+    renderProgram();
+}
+
+function moveCommandUp(index) {
+    if(index <= 0) return;
+
+    [program[index - 1], program[index]] =
+    [program[index], program[index - 1]];
+
+    renderProgram();
+}
+
+function moveCommandDown(index) {
+    if(index >= program.length - 1) return;
+
+    [program[index + 1], program[index]] =
+    [program[index], program[index + 1]];
+
+    renderProgram();
+}
+
+// hapus semua perintah
+function clearAllProgram() {
+    program = [];
+    renderProgram();
+}
+
+function addCommand(cmd) {
+    program.push(cmd);
+    renderProgram();
+}
+
+function resetProgram() {
+    program = [];
+    rabbit = {
+       row: Math.floor(Math.random() * SIZE),
+       col: Math.floor(Math.random() * SIZE),
+       dir: Math.floor(Math.random() * 4)      
+    };
+    randomCarrot();
+    renderProgram();
+    createBoard();
+    statusText.innerHTML = "";
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+let isRunning = false;  // mencegah multiple run bersamaan
+
+async function runProgram() {
+
+    if(isRunning) {
+        statusText.innerHTML = "⏳ Program sedang berjalan, tunggu...";
+        return;
+    }
+    if(program.length === 0) {
+        statusText.innerHTML = "🐰 Belum ada perintah! Tambahkan MAJU/KIRI/KANAN";
+        return;
+    }
+    isRunning = true;
+    statusText.innerHTML = "🐰 Menjalankan perintah... ";
+
+    // backup awal untuk jika gagal? tidak perlu, tapi kita simpan posisi kelinci sebelum eksekusi jika ingin reset saat gagal? 
+    // lebih bagus: eksekusi langkah demi langkah
+    let currentRabbit = { ...rabbit };
+    let currentCarrot = { ...carrot };
+
+    for(let i = 0; i < program.length; i++) {
+        const cmd = program[i];
+        await delay(480);
+
+        // eksekusi command
+        if(cmd === "left") {
+            currentRabbit.dir = (currentRabbit.dir + 3) % 4;
+        } else if(cmd === "right") {
+            currentRabbit.dir = (currentRabbit.dir + 1) % 4;
+        } else if(cmd === "forward") {
+            let nextRow = currentRabbit.row + directions[currentRabbit.dir].r;
+            let nextCol = currentRabbit.col + directions[currentRabbit.dir].c;
+            if(nextRow >= 0 && nextRow < SIZE && nextCol >= 0 && nextCol < SIZE) {
+                currentRabbit.row = nextRow;
+                currentRabbit.col = nextCol;
+            }
+        }
+
+        // update state sementara
+        rabbit = { ...currentRabbit };
+        createBoard();
+
+        // highlight tile kelinci baru
+        const activeTile = document.getElementById(`tile-${rabbit.row}-${rabbit.col}`);
+        if(activeTile) activeTile.classList.add("highlight");
+        await delay(100);
+        if(activeTile) activeTile.classList.remove("highlight");
+
+        // cek apakah mendapatkan wortel
+        if(rabbit.row === currentCarrot.row && rabbit.col === currentCarrot.col) {
+            // --- PERBAIKAN BUG: Hapus semua perintah setelah menang ---
+            statusText.innerHTML = "🎉 Wortel didapat! Kelinci senang! Wortel baru akan muncul. 🥕🎉";
+            await delay(5000); // tampilkan pesan 3 detik
+            
+            // Reset program (kosongkan daftar perintah)
+            program = [];
+            renderProgram();
+            
+            // Reset posisi kelinci dan wortel
+            rabbit = {
+                row: Math.floor(Math.random() * SIZE),
+                col: Math.floor(Math.random() * SIZE),
+                dir: Math.floor(Math.random() * 4)      
+            };
+            currentRabbit = { ...rabbit };
+            randomCarrot();  // ini akan mengisi carrot dengan posisi baru yang tidak sama dengan rabbit
+            currentCarrot = { ...carrot };
+            createBoard();
+            
+            statusText.innerHTML = "🥕 Wortel baru muncul! Buat perintah baru! 🥕";
+            isRunning = false;
+            return;
+        }
+    }
+
+    // program selesai tanpa menemukan wortel
+    statusText.innerHTML = "😔 Kelinci belum menemukan wortel. Coba beri perintah lain!";
+    isRunning = false;
+}
+
+// event binding untuk tombol dan interaksi
+document.getElementById("btnForward").addEventListener("click", () => addCommand("forward"));
+document.getElementById("btnLeft").addEventListener("click", () => addCommand("left"));
+document.getElementById("btnRight").addEventListener("click", () => addCommand("right"));
+document.getElementById("runBtn").addEventListener("click", runProgram);
+document.getElementById("resetBtn").addEventListener("click", resetProgram);
+document.getElementById("clearAllBtn").addEventListener("click", clearAllProgram);
+
+// inisialisasi game
+function initGame() {
+    rabbit = { row: Math.floor(Math.random() * SIZE), col: Math.floor(Math.random() * SIZE), dir: Math.floor(Math.random() * 4) };
+    randomCarrot();
+    program = [];
+    renderProgram();
+    createBoard();
+    statusText.innerHTML = "";
+}
+
+initGame();
+
+// tambahan: pastikan board tetap responsif dan tidak ada konflik drag bawaan browser
+window.addEventListener("dragstart", (e) => {
+    if(!e.target.closest(".block-item")) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+</script>
+</body>
+</html>

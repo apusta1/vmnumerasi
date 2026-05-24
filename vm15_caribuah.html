@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Dino Mencari Buah!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #0f261d;
+            overflow: hidden;
+            font-family: 'Quicksand', sans-serif;
+            touch-action: none;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            background: #5a3b1f;
+        }
+
+        .ui-panel {
+            position: fixed;
+            top: 20px;
+            /* FIX 1: Fruit counter appears on left on mobile, centered on PC.
+               We use media query to change 'left' positioning */
+            left: 20px;
+            transform: none;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 10px 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 100;
+            border: 3px solid #ffcc33;
+        }
+        
+        /* PC view: center the ui-panel exactly like original (centered horizontally) */
+        @media (min-width: 769px) {
+            .ui-panel {
+                left: 50%;
+                transform: translateX(-50%);
+                right: auto;
+            }
+        }
+        
+        /* Mobile view (max-width: 768px) keeps left:20px, transform:none => appears on left */
+        @media (max-width: 768px) {
+            .ui-panel {
+                left: 20px;
+                transform: none;
+                right: auto;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 38, 29, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+        }
+
+        .modal {
+            background: #2d5a3f;
+            padding: 30px 50px;
+            border-radius: 30px;
+            border: 4px solid #ffcc33;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            max-width: 90%;
+        }
+
+        .modal h1 { color: #ffcc33; margin-bottom: 15px; }
+        .modal p { font-size: 1.1rem; margin-bottom: 25px; line-height: 1.5; }
+
+        .btn-start {
+            background: #ffcc33;
+            color: #1a3d2c;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-start:hover { transform: scale(1.05); }
+        .hidden { display: none !important; }
+
+        .fruit-counter {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #333;
+        }
+
+        .instruction-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="startOverlay" class="overlay">
+    <div class="modal">
+        <h1>🦖 Cari Buah!</h1>
+	<p>Kumpulkan buah yang tersebar di peta.<br>
+           Lihat peta kecil di pojok kanan untuk mencari lokasi buah.<br>
+	   Klik layar untuk membuat Dino bergerak.</p>
+        <button class="btn-start" onclick="startGame()">Mulai Petualangan</button>
+    </div>
+</div>
+
+<div id="winOverlay" class="overlay hidden">
+    <div class="modal">
+        <h1>🎉 Hebat!</h1>
+        <p id="winMessage"></p>
+        <button class="btn-start" onclick="resetGame()">Main Lagi</button>
+    </div>
+</div>
+
+<div class="game-container">
+    <canvas id="gameCanvas"></canvas>
+</div>
+
+<div class="ui-panel">
+    <div class="fruit-counter">🍒 <span id="fruitCount">0</span> / <span id="totalFruits">0</span></div>
+</div>
+
+<div class="instruction-toast">Klik/Tap untuk jalan</div>
+
+<script>
+    (function(){
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // FUNGSI BARU: Membilang dalam Bahasa Indonesia
+        let speechAllowed = false;
+        
+        function speakNumber(num) {
+            if (!speechAllowed) return;
+            
+            // Batalkan suara sebelumnya hanya jika masih ada yang berlangsung
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(num.toString());
+            utterance.lang = 'id-ID';
+            utterance.rate = 1.2;
+            utterance.pitch = 1.2;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        const WORLD_SIZE = 3200;
+        const MOVE_SPEED = 320;
+        let dpr = window.devicePixelRatio || 1;
+        
+        let width, height;
+        let character = { x: WORLD_SIZE/2, y: WORLD_SIZE/2 };
+        let targetPos = { x: character.x, y: character.y };
+        let camera = { x: 0, y: 0 };
+        
+        let fruits = [];
+        let collected = 0;
+        let isMoving = false;
+        
+        // Track current facing direction for dinosaur (true = facing right, false = facing left)
+        let facingRight = true;
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+        }
+
+        // Fungsi untuk mengecek jarak antar buah dan jarak dengan start posisi dino
+        function isTooClose(newX, newY, existingFruits, minDistance = 70, startPos = null) {
+            for (let fruit of existingFruits) {
+                if (Math.hypot(newX - fruit.x, newY - fruit.y) < minDistance) {
+                    return true;
+                }
+            }
+            if (startPos && Math.hypot(newX - startPos.x, newY - startPos.y) < minDistance * 1.5) {
+                return true;
+            }
+            return false;
+        }
+
+        function init() {
+            resize();
+            const fruitIcons = ['🍎', '🍊', '🍓', '🍍', '🍇', '🍉'];
+            const totalBuah = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+            
+            fruits = []; 
+            const startPos = { x: WORLD_SIZE/2, y: WORLD_SIZE/2 };
+            const maxAttempts = 3000;
+            
+            for(let i=0; i<totalBuah; i++) {
+                let placed = false;
+                let attempts = 0;
+                
+                while (!placed && attempts < maxAttempts) {
+                    const newX = Math.random() * (WORLD_SIZE - 400) + 200;
+                    const newY = Math.random() * (WORLD_SIZE - 400) + 200;
+                    
+                    if (!isTooClose(newX, newY, fruits, 70, startPos)) {
+                        fruits.push({
+                            x: newX,
+                            y: newY,
+                            icon: fruitIcons[Math.floor(Math.random() * fruitIcons.length)],
+                            collected: false
+                        });
+                        placed = true;
+                    }
+                    attempts++;
+                }
+                
+                // Jika gagal menemukan posisi, taruh di posisi acak yang jauh dari area dino
+                if (!placed) {
+                    let fallbackX, fallbackY;
+                    do {
+                        fallbackX = Math.random() * (WORLD_SIZE - 400) + 200;
+                        fallbackY = Math.random() * (WORLD_SIZE - 400) + 200;
+                    } while (Math.hypot(fallbackX - startPos.x, fallbackY - startPos.y) < 120);
+                    fruits.push({
+                        x: fallbackX,
+                        y: fallbackY,
+                        icon: fruitIcons[Math.floor(Math.random() * fruitIcons.length)],
+                        collected: false
+                    });
+                }
+            }
+            
+            document.getElementById('totalFruits').innerText = fruits.length;
+            document.getElementById('fruitCount').innerText = "0";
+            
+            camera.x = character.x - width/2;
+            camera.y = character.y - height/2;
+            
+            // Reset facing direction to right initially
+            facingRight = true;
+        }
+
+        // FIX 2: Dinosaur faces direction based on movement (right when click on right side, left when click on left side)
+        function drawDino(x, y) {
+            const sx = x - camera.x;
+            const sy = y - camera.y;
+        
+            ctx.save();
+            ctx.translate(sx, sy);
+            
+            // Apply horizontal flip based on facing direction
+            // If facing left, flip the dino horizontally (scale(-1,1))
+            if (!facingRight) {
+                ctx.scale(-1, 1);
+            }
+        
+            // Bayangan (shadow)
+            ctx.fillStyle = 'rgba(0,0,0,0.15)';
+            ctx.beginPath();
+            ctx.ellipse(0, 18, 16, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+        
+            // Emoji Dino
+            ctx.font = '52px serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+        
+            ctx.shadowColor = 'rgba(0,0,0,0.45)';
+            ctx.shadowBlur = 2;
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 2;
+        
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#1b1b1b';
+            ctx.strokeText('🦖', 0, 0);
+        
+            ctx.fillText('🦖', 0, 0);
+        
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+        
+            ctx.restore();
+        }
+
+        function draw() {
+            ctx.fillStyle = '#4a2f19';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            for(let x = -camera.x % 100; x < width; x += 100) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+            }
+            for(let y = -camera.y % 100; y < height; y += 100) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+            }
+
+            ctx.font = '42px serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(255,255,255,0.3)';
+            fruits.forEach(f => {
+                if(!f.collected) {
+                    ctx.fillText(f.icon, f.x - camera.x, f.y - camera.y);
+                }
+            });
+            ctx.shadowBlur = 0;
+
+            drawDino(character.x, character.y);
+
+            const mapSize = 150;
+            const margin = 20;
+            ctx.save();
+            ctx.translate(width - mapSize - margin, margin);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            // roundRect helper if not defined
+            if (!CanvasRenderingContext2D.prototype.roundRect) {
+                CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                    if (w < 2 * r) r = w / 2;
+                    if (h < 2 * r) r = h / 2;
+                    this.moveTo(x+r, y);
+                    this.lineTo(x+w-r, y);
+                    this.quadraticCurveTo(x+w, y, x+w, y+r);
+                    this.lineTo(x+w, y+h-r);
+                    this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+                    this.lineTo(x+r, y+h);
+                    this.quadraticCurveTo(x, y+h, x, y+h-r);
+                    this.lineTo(x, y+r);
+                    this.quadraticCurveTo(x, y, x+r, y);
+                    return this;
+                };
+            }
+            ctx.beginPath();
+            ctx.roundRect(0, 0, mapSize, mapSize, 10);
+            ctx.fill(); 
+            ctx.stroke();
+
+            const worldToMap = (pos) => (pos / WORLD_SIZE) * mapSize;
+            ctx.fillStyle = '#ffcc33';
+            fruits.forEach(f => {
+                if (!f.collected) {
+                    ctx.beginPath();
+                    ctx.arc(worldToMap(f.x), worldToMap(f.y), 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            ctx.fillStyle = '#72cc5e';
+            ctx.beginPath();
+            ctx.arc(worldToMap(character.x), worldToMap(character.y), 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        window.startGame = function() {
+            document.getElementById('startOverlay').classList.add('hidden');
+            isMoving = false;
+            collected = 0;
+            character.x = WORLD_SIZE/2;
+            character.y = WORLD_SIZE/2;
+            targetPos.x = character.x;
+            targetPos.y = character.y;
+            facingRight = true;
+            init();
+            
+            // Izinkan speech setelah user klik tombol start
+            speechAllowed = true;
+            
+            // Panggil speakNumber untuk angka 0 terlebih dulu untuk memanaskan TTS
+            // Agar saat angka 1 langsung terdengar
+            window.speechSynthesis.cancel();
+            const warmUtterance = new SpeechSynthesisUtterance("");
+            warmUtterance.lang = 'id-ID';
+            warmUtterance.onend = function() {
+                speakNumber(0);
+            };
+            window.speechSynthesis.speak(warmUtterance);
+        };
+        
+        window.resetGame = function() {
+            document.getElementById('winOverlay').classList.add('hidden');
+            collected = 0;
+            character.x = WORLD_SIZE/2;
+            character.y = WORLD_SIZE/2;
+            targetPos.x = character.x;
+            targetPos.y = character.y;
+            isMoving = false;
+            facingRight = true;
+            init(); 
+            document.getElementById('fruitCount').innerText = "0";
+            speechAllowed = true;
+            window.speechSynthesis.cancel();
+            const warmUtterance = new SpeechSynthesisUtterance("");
+            warmUtterance.lang = 'id-ID';
+            warmUtterance.onend = function() {
+                speakNumber(0);
+            };
+            window.speechSynthesis.speak(warmUtterance);
+        };
+
+        function showWinPopup() {
+            document.getElementById('winMessage').innerText = `Luar biasa! Kamu sudah berhasil mengumpulkan ${collected} buah!`;
+            document.getElementById('winOverlay').classList.remove('hidden');
+        }
+
+        function update(dt) {
+            if (isMoving) {
+                const dx = targetPos.x - character.x;
+                const dy = targetPos.y - character.y;
+                const dist = Math.hypot(dx, dy);
+                
+                // Update facing direction based on movement direction (dx positive = moving right, negative = moving left)
+                if (Math.abs(dx) > 0.1) {
+                    facingRight = (dx < 0);
+                }
+
+                if (dist < 5) {
+                    isMoving = false;
+                } else {
+                    const angle = Math.atan2(dy, dx);
+                    character.x += Math.cos(angle) * MOVE_SPEED * dt;
+                    character.y += Math.sin(angle) * MOVE_SPEED * dt;
+                }
+
+                fruits.forEach(f => {
+                    if(!f.collected && Math.hypot(character.x - f.x, character.y - f.y) < 40) {
+                        f.collected = true;
+                        collected++;
+                        // PANGGIL SUARA MEMBILANG (1,2,3,...)
+                        speakNumber(collected);
+                        
+                        document.getElementById('fruitCount').innerText = collected;
+                        if (collected === fruits.length) showWinPopup();
+                    }
+                });
+            }
+            
+            const centerX = character.x - width/2;
+            const centerY = character.y - height/2;
+            camera.x += (centerX - camera.x) * 0.1;
+            camera.y += (centerY - camera.y) * 0.1;
+        }
+
+        function handleInput(e) {
+            if (!document.getElementById('startOverlay').classList.contains('hidden')) return;
+            const p = e.touches ? e.touches[0] : e;
+            targetPos.x = p.clientX + camera.x;
+            targetPos.y = p.clientY + camera.y;
+            isMoving = true;
+        }
+
+        canvas.addEventListener('mousedown', handleInput);
+        canvas.addEventListener('touchstart', handleInput, {passive: false});
+        window.addEventListener('resize', resize);
+
+        function loop(t) {
+            update(1/60);
+            draw();
+            requestAnimationFrame(loop);
+        }
+        
+        // Ensure roundRect is defined before first draw
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.moveTo(x+r, y);
+                this.lineTo(x+w-r, y);
+                this.quadraticCurveTo(x+w, y, x+w, y+r);
+                this.lineTo(x+w, y+h-r);
+                this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+                this.lineTo(x+r, y+h);
+                this.quadraticCurveTo(x, y+h, x, y+h-r);
+                this.lineTo(x, y+r);
+                this.quadraticCurveTo(x, y, x+r, y);
+                return this;
+            };
+        }
+        
+        init();
+        loop();
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Ketinggalan Kereta</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* hilangkan highlight abu-abu di tap mobile */
+        }
+
+        body {
+            background: linear-gradient(145deg, #d4e0f0 0%, #b8cce6 100%);
+            margin: 0;
+            padding: 16px;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* kartu utama — touch friendly */
+        .card {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.1s ease;
+        }
+
+        /* header */
+        .header {
+            background: #0f2b38;
+            background: linear-gradient(120deg, #0a1c28, #1a3f4f);
+            padding: 1.4rem 1.2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.65rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .header h1 span {
+            font-size: 1.9rem;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            margin: 0.5rem 0 0;
+            opacity: 0.9;
+        }
+
+        /* area skenario */
+        .scenario-card {
+            background: #fffaf0;
+            padding: 1.2rem 1.2rem 1rem;
+            border-bottom: 1px solid #ffdfb5;
+        }
+
+        /* Container video responsif di atas kartu skenario */
+        .video-container {
+            width: 100%;
+            margin-bottom: 1rem;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: #00000010;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-container video {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            aspect-ratio: 16 / 9; /* Rasio umum untuk video landscape */
+            background: #1a1a2e;
+        }
+
+        .narasi {
+            background: #ffffffd9;
+            border-radius: 1.8rem;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+
+        .jam-highlight {
+            display: inline-block;
+            background: #ffecb3;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 1.25rem;
+            margin: 0 0.2rem;
+        }
+
+        .info-perjalanan {
+            background: #eef2fa;
+            border-radius: 1.5rem;
+            padding: 0.8rem 1.2rem;
+            margin: 0.8rem 0 0;
+            font-size: 0.9rem;
+            border-left: 5px solid #f4a261;
+        }
+
+        .info-perjalanan p {
+            margin: 0.4rem 0;
+        }
+
+        .badge-waktu {
+            background: #1e466e20;
+            border-radius: 2rem;
+            padding: 0.2rem 0.7rem;
+            font-weight: 500;
+        }
+
+        /* tombol besar ramah sentuhan */
+        .btn-touch-group {
+            display: flex;
+            gap: 16px;
+            padding: 1rem 1.2rem 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-touch {
+            flex: 1;
+            min-width: 140px;
+            padding: 1rem 0.5rem;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            border: none;
+            background: white;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.1s linear;
+            touch-action: manipulation;
+        }
+
+        .btn-touch:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn-kereta-mobile {
+            background: #1e466e;
+            color: white;
+            border-bottom: 3px solid #0c2d48;
+        }
+
+        .btn-ojek-mobile {
+            background: #f4a261;
+            color: #2c2b26;
+            border-bottom: 3px solid #e76f51;
+        }
+
+        /* feedback area dengan font readable */
+        .feedback-panel {
+            background: #f8f9fc;
+            margin: 0.8rem 1.2rem 1rem;
+            padding: 1.2rem;
+            border-radius: 1.8rem;
+            border-left: 6px solid #ffb74d;
+            font-size: 0.96rem;
+            line-height: 1.45;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        /* skenario baru button */
+        .btn-skenario-baru {
+            background: #2c3e50;
+            border: none;
+            width: calc(100% - 2.4rem);
+            margin: 0.2rem 1.2rem 1.2rem 1.2rem;
+            padding: 0.9rem;
+            border-radius: 3rem;
+            color: white;
+            font-weight: bold;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            touch-action: manipulation;
+        }
+
+        .btn-skenario-baru:active {
+            transform: scale(0.97);
+            background: #1a2a36;
+        }
+
+        .catatan-mobile {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 0.8rem 1rem 1.2rem;
+            color: #3a5a78;
+            border-top: 1px solid #e2e8f0;
+            background: #fefcf7;
+        }
+
+        /* utilitas */
+        .text-accent {
+            font-weight: 700;
+            color: #c4450c;
+        }
+
+        hr {
+            margin: 8px 0;
+        }
+
+        /* Touch target minimal 44x44 sudah terpenuhi pada tombol */
+        @media (max-width: 500px) {
+            .btn-touch-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .btn-touch {
+                padding: 0.85rem;
+            }
+            .header h1 {
+                font-size: 1.45rem;
+            }
+            .scenario-card {
+                padding: 1rem;
+            }
+        }
+
+	/* Optional: optimasi rendering mobile */
+	img, video {
+	    max-width: 100%;
+	    height: auto;
+	    content-visibility: auto; /* hanya jika banyak konten di luar layar */
+	}
+
+    </style>
+
+</head>
+<body>
+<div class="card" id="appMobile">
+    <div class="header">
+        <h1>
+            <span>🚆⏰</span> Ketinggalan Kereta?!
+        </h1>
+        <p>Berangkat ke sekolah | Pilih transportasi agar tidak terlambat</p>
+    </div>
+
+    <div class="scenario-card" id="scenarioContainer">
+        <!-- ========= TAMBAHAN VIDEO MP4 DI ATAS SKENARIO ========= -->
+        <div class="video-container" id="videoContainer">
+            <video id="pembukaVideo" playsinline autoplay muted>
+                <source src="assets/animasi_kereta.mp4" type="video/mp4">
+                Browser Anda tidak mendukung tag video.
+            </video>
+        </div>
+        <!-- ========= AKHIR TAMBAHAN VIDEO ========= -->
+        
+        <!-- konten dinamis via js -->
+        <div class="narasi" id="dynamicNarasi">
+            Memuat skenario...
+        </div>
+    </div>
+
+    <div class="btn-touch-group">
+        <button class="btn-touch btn-kereta-mobile" id="btnKereta">🚆  Kereta (Rp5rb)</button>
+        <button class="btn-touch btn-ojek-mobile" id="btnOjek">🛵  Ojek (Rp50rb)</button>
+    </div>
+
+    <div class="feedback-panel" id="feedbackPanel">
+        <div class="feedback-title">
+            💡 Evaluasi Keputusan
+        </div>
+        <div id="feedbackMessageMobile">Klik tombol Kereta atau Ojek untuk mengevaluasi keputusanmu.</div>
+    </div>
+
+    <button class="btn-skenario-baru" id="skenarioBaruMobile">
+        🔄  Skenario Baru
+    </button>
+    <div class="catatan-mobile">
+        🏫 Batas akhir tiba sekolah: <strong>07.15</strong> • Keputusan tepat = tidak terlambat + efisien
+    </div>
+</div>
+
+<script>
+    (function(){
+        // ---------- KONSTANTA ----------
+        const BATAS_TERLAMBAT_MENIT = 7 * 60 + 15;      // 07:15 = 435 menit
+        const DURASI_KERETA = 40;       // menit
+        const DURASI_OJEK = 25;         // menit
+        const BIAYA_KERETA = 5000;
+        const BIAYA_OJEK = 50000;
+
+        // Variabel global state (diperbaharui setiap skenario)
+        let state = {
+            waktuInisialStr: "",        // "06:25"
+            waktuInisialMenit: 0,
+            jedaKeretaMenit: 0,         // 5,10,15
+            keretaBerikutStr: "",
+            keretaBerikutMenit: 0
+        };
+
+        // Elemen DOM
+        const dynamicNarasiDiv = document.getElementById("dynamicNarasi");
+        const feedbackDiv = document.getElementById("feedbackMessageMobile");
+        const btnKereta = document.getElementById("btnKereta");
+        const btnOjek = document.getElementById("btnOjek");
+        const btnSkenario = document.getElementById("skenarioBaruMobile");
+        const videoElement = document.getElementById("pembukaVideo");
+
+        // Helper: format menit ke HH:MM (string)
+        function formatMenitKeJam(totalMenit) {
+            let jam = Math.floor(totalMenit / 60);
+            let menit = totalMenit % 60;
+            jam = jam % 24;
+            return `${String(jam).padStart(2,'0')}:${String(menit).padStart(2,'0')}`;
+        }
+
+        // Helper: string "HH:MM" -> menit
+        function timeStrToMenit(timeStr) {
+            let [jam, menit] = timeStr.split(":").map(Number);
+            return jam * 60 + menit;
+        }
+
+        // Acak waktu inisial antara 06:15 (375) hingga 06:40 (400) inklusif
+        function acakWaktuInisial() {
+            const minMenit = 6 * 60 + 15; // 375
+            const maxMenit = 6 * 60 + 40; // 400
+            const acak = Math.floor(Math.random() * (maxMenit - minMenit + 1)) + minMenit;
+            return {
+                string: formatMenitKeJam(acak),
+                menit: acak
+            };
+        }
+
+        // Acak jeda: 5, 10, 15
+        function acakJedaKereta() {
+            const pilihan = [5, 10, 15];
+            return pilihan[Math.floor(Math.random() * pilihan.length)];
+        }
+
+        // generate seluruh skenario dan update state
+        function generateSkenarioBaru() {
+            // 1. waktu inisial random
+            const inisial = acakWaktuInisial();
+            // 2. jeda random
+            const jeda = acakJedaKereta();
+            // 3. waktu kereta berikutnya = inisial + jeda
+            const keretaMenit = inisial.menit + jeda;
+            const keretaStr = formatMenitKeJam(keretaMenit);
+
+            // update state
+            state.waktuInisialStr = inisial.string;
+            state.waktuInisialMenit = inisial.menit;
+            state.jedaKeretaMenit = jeda;
+            state.keretaBerikutStr = keretaStr;
+            state.keretaBerikutMenit = keretaMenit;
+
+            // render tampilan skenario
+            renderSkenarioKeUI();
+            // reset feedback ketika skenario baru
+            feedbackDiv.innerHTML = "✨ Pilih transportasi: Kereta atau Ojek.";
+        }
+
+        // Menampilkan narasi dengan tampilan mobile yang rapi
+        function renderSkenarioKeUI() {
+            if (!dynamicNarasiDiv) return;
+            dynamicNarasiDiv.innerHTML = `
+                <div style="margin-bottom: 8px; font-weight: 700; font-size: 1rem;">📖 Skenario Hari Ini:</div>
+                <div style="font-size: 1rem; line-height: 1.4;">
+                    🚉 Kamu <strong>ketinggalan kereta komuter pukul <span class="jam-highlight">${state.waktuInisialStr}</span></strong>. 
+                    Kereta berikutnya yang bisa kamu kejar adalah pukul 
+                    <strong><span class="jam-highlight">${state.keretaBerikutStr}</span></strong> 
+                    (terlambat <strong>${state.jedaKeretaMenit} menit</strong> dari jadwal awal).
+                </div>
+                <div class="info-perjalanan">
+                    <p>🕒 <strong>Pertimbangan:</strong><br>
+                    🚆 Kereta: waktu tempuh <strong>40 menit</strong> | biaya <strong>Rp ${BIAYA_KERETA.toLocaleString()}</strong><br>
+                    🛵 Ojek: waktu tempuh <strong>25 menit</strong> | biaya <strong>Rp ${BIAYA_OJEK.toLocaleString()}</strong><br>
+                    🏫 Batas waktu tiba di sekolah: <strong>07.15</strong>.
+                    </p>
+                    <p class="badge-waktu">⏱️ Keputusan tepat = tidak melebihi jam 07.15 dan bijak secara finansial.</p>
+                </div>
+            `;
+        }
+
+        // Fungsi evaluasi pilihan: return object feedback lengkap (dengan perbandingan numerasi)
+        function hitungKeputusan(pilihan) {
+            let waktuBerangkatMenit, durasi, biaya, moda, keberangkatanStr;
+            if (pilihan === "kereta") {
+                waktuBerangkatMenit = state.keretaBerikutMenit;
+                durasi = DURASI_KERETA;
+                biaya = BIAYA_KERETA;
+                moda = "Kereta";
+                keberangkatanStr = `${state.keretaBerikutStr} (setelah menunggu ${state.jedaKeretaMenit} menit)`;
+            } else { // ojek
+                waktuBerangkatMenit = state.waktuInisialMenit;
+                durasi = DURASI_OJEK;
+                biaya = BIAYA_OJEK;
+                moda = "Ojek";
+                keberangkatanStr = `${state.waktuInisialStr} (langsung berangkat)`;
+            }
+
+            const waktuTibaMenit = waktuBerangkatMenit + durasi;
+            const waktuTibaStr = formatMenitKeJam(waktuTibaMenit);
+            const isTepatWaktu = waktuTibaMenit <= BATAS_TERLAMBAT_MENIT;
+            const selisih = waktuTibaMenit - BATAS_TERLAMBAT_MENIT;
+            let statusWaktu = "";
+            if (isTepatWaktu) {
+                if (selisih === 0) statusWaktu = "tepat waktu pukul 07.15";
+                else if (selisih < 0) statusWaktu = `lebih awal ${Math.abs(selisih)} menit dari batas`;
+                else statusWaktu = `tepat waktu (sampai pukul ${waktuTibaStr})`;
+            } else {
+                statusWaktu = `TERLAMBAT ${Math.abs(selisih)} menit (melewati batas 07.15)`;
+            }
+            
+            // Analisis tambahan perbandingan dengan moda lain (nilai edukasi)
+            // Hitung waktu tiba jika mengambil moda alternatif
+            const alternatif = (pilihan === "kereta") ? "ojek" : "kereta";
+            let alternatifKet = "";
+            if (alternatif === "ojek") {
+                const tibaOjekMenit = state.waktuInisialMenit + DURASI_OJEK;
+                const tibaOjekStr = formatMenitKeJam(tibaOjekMenit);
+                const ojekOnTime = tibaOjekMenit <= BATAS_TERLAMBAT_MENIT;
+                alternatifKet = `Jika pakai Ojek, tiba pukul ${tibaOjekStr} (${ojekOnTime ? "🟢 ON TIME" : "🔴 TERLAMBAT"}) dengan biaya Rp50.000. `;
+            } else {
+                const tibaKeretaMenit = state.keretaBerikutMenit + DURASI_KERETA;
+                const tibaKeretaStr = formatMenitKeJam(tibaKeretaMenit);
+                const keretaOnTime = tibaKeretaMenit <= BATAS_TERLAMBAT_MENIT;
+                alternatifKet = `Sebaliknya, jika memilih Kereta, tiba pukul ${tibaKeretaStr} (${keretaOnTime ? "🟢 ON TIME" : "🔴 TERLAMBAT"}) dengan biaya Rp5.000. `;
+            }
+
+            // Rekomendasi berdasarkan hasil
+            let rekomendasi = "";
+            if (pilihan === "kereta") {
+                if (isTepatWaktu) {
+                    rekomendasi = "✅ KEPUTUSAN TEPAT! Kamu tidak terlambat dan menghemat biaya (lebih murah). Pilihan ini efisien.";
+                } else {
+                    rekomendasi = "❌ KEPUTUSAN KURANG TEPAT. Dengan Kereta kamu terlambat ke sekolah. Padahal ada Ojek yang lebih cepat (meskipun mahal) agar tidak terlambat. Pertimbangkan waktu tempuh.";
+                }
+            } else { // ojek
+                if (isTepatWaktu) {
+                    rekomendasi = "✅ KEPUTUSAN BAIK! Kamu selamat dari keterlambatan. Memang biaya lebih mahal, tetapi prioritas utama adalah tepat waktu. Bandingkan dengan kereta yang lebih murah namun mungkin terlambat.";
+                } else {
+                    // secara teknis sangat kecil kemungkinan karena range 06:15-06:40 +25 = 07:05 maks, tapi jika batasan bergeser? dijamin aman, 
+                    // namun tetap kode logis untuk jaga-jaga
+                    rekomendasi = "⚠️ Wah, meskipun naik Ojek ternyata masih terlambat? Cek kembali waktu inisial. (Skenario ekstrem) Pastikan menggunakan perhitungan waktu.";
+                }
+            }
+            
+            // Buat narasi lengkap
+            let narasiLengkap = `
+                🚉 <strong>Keputusan: ${moda}</strong><br>
+                • Keberangkatan: pukul ${keberangkatanStr}<br>
+                • Durasi perjalanan: ${durasi} menit<br>
+                • Waktu tiba di sekolah: <strong>${waktuTibaStr}</strong> → ${statusWaktu}<br>
+                • Biaya yang dikeluarkan: Rp ${biaya.toLocaleString()}<br><br>
+                📊 <strong>Analisis Numerasi & Perbandingan:</strong> ${alternatifKet}<br>
+                <br>🧠 <strong>Kesimpulan:</strong> ${rekomendasi}
+            `;
+            
+            // tambahan insight edukasi jika menggunakan kereta dan ternyata telat berikan rekomendasi jelas
+            if (pilihan === "kereta" && !isTepatWaktu) {
+                narasiLengkap += `<br><br><span style="background:#fff0c0; padding:2px 6px; border-radius:12px;">💡 Insight: Kereta berikutnya tiba pukul ${state.keretaBerikutStr} + perjalanan 40 menit = ${waktuTibaStr}. Melebihi 07:15. Ojek lebih awal ${state.waktuInisialStr}+25 = ${formatMenitKeJam(state.waktuInisialMenit + DURASI_OJEK)} → ON TIME.</span>`;
+            }
+            if (pilihan === "ojek" && isTepatWaktu) {
+                const waktuTibaKeretaAlternatif = state.keretaBerikutMenit + DURASI_KERETA;
+                const statusKeretaAlt = (waktuTibaKeretaAlternatif <= BATAS_TERLAMBAT_MENIT) ? "tepat waktu" : "terlambat";
+                narasiLengkap += `<br><span style="background:#e0f2fe; padding:2px 8px; border-radius:12px;"><br>🧮 Perbandingan biaya-waktu: Jika pilih kereta hanya Rp5.000 tapi tiba ${formatMenitKeJam(waktuTibaKeretaAlternatif)} (${statusKeretaAlt}), mungkin lebih hemat namun resiko. </span>`;
+            }
+            
+            return { feedbackHtml: narasiLengkap, tepat: isTepatWaktu };
+        }
+
+        // Handler pilihan dengan sentuhan (mobile optimized)
+        function pilihModa(moda) {
+            if (!state.waktuInisialStr) {
+                feedbackDiv.innerHTML = "⚠️ Skenario belum tersedia, tekan 'Skenario Baru' terlebih dahulu.";
+                return;
+            }
+            const result = hitungKeputusan(moda);
+            feedbackDiv.innerHTML = result.feedbackHtml;
+            // optional: sedikit efek haptic feedback? tidak semua support tapi biarkan
+            // scroll ke feedback agar mudah dilihat
+            const feedbackElem = document.getElementById("feedbackPanel");
+            if (feedbackElem) {
+                feedbackElem.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+        }
+
+        /* TAMBAHAN: Mengatur video agar autoplay dan tidak looping, dengan fallback */
+        function initVideo() {
+            if (!videoElement) return;
+            // Matikan looping (default tidak looping, perkuat)
+            videoElement.loop = false;
+            // Pastikan tidak ada atribut loop
+            videoElement.removeAttribute('loop');
+            // Untuk mendukung autoplay di mobile (wajib ada muted untuk kebanyakan browser)
+            videoElement.muted = true;
+            // Coba play otomatis, tangani jika promise gagal (misal user interaction required)
+            const playPromise = videoElement.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // Autoplay gagal karena kebijakan browser, kita bisa coba trigger saat user pertama kali interaksi
+                    console.log("Autoplay tidak diizinkan oleh browser:", error);
+                    // Tambahkan satu kali event listener 'click' global pada dokumen untuk memulai video
+                    const startVideoOnInteraction = () => {
+                        videoElement.play().then(() => {
+                            console.log("Video berhasil diputar setelah interaksi pengguna.");
+                        }).catch(e => console.warn("Gagal putar video:", e));
+                        document.removeEventListener('click', startVideoOnInteraction);
+                        document.removeEventListener('touchstart', startVideoOnInteraction);
+                    };
+                    document.addEventListener('click', startVideoOnInteraction);
+                    document.addEventListener('touchstart', startVideoOnInteraction);
+                });
+            }
+        }
+
+        // Inisialisasi event dengan touch support
+        function bindEvents() {
+            // Untuk memastikan responsif di mobile, kita gunakan pointer event / click biasa.
+            // tapi karena sudah ada :active, tombol responsif.
+            btnKereta.addEventListener("click", (e) => {
+                e.preventDefault();
+                pilihModa("kereta");
+            });
+            btnOjek.addEventListener("click", (e) => {
+                e.preventDefault();
+                pilihModa("ojek");
+            });
+            btnSkenario.addEventListener("click", (e) => {
+                e.preventDefault();
+                generateSkenarioBaru();
+                // setelah skenario baru, gulir ke atas biar nyaman
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+            // support touchstart untuk mencegah 300ms delay? browser modern sudah handle, biarkan aman.
+        }
+
+        // Jalankan inisiasi pertama
+        generateSkenarioBaru();
+        bindEvents();
+        initVideo(); // memanggil inisialisasi video (autoplay, no loop, responsif)
+    })();
+</script>
+</body>
+</html>

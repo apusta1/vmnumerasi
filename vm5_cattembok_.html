@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Cat Tembok</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #f0f7f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px rgba(0, 32, 0, 0.1);
+            padding: 20px 24px 32px;
+            transition: all 0.2s;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin: 0 0 8px 0;
+            color: #1e3a2f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sub {
+            color: #2d6a4f;
+            border-left: 4px solid #52b788;
+            padding-left: 16px;
+            margin: 8px 0 20px 0;
+            font-weight: 500;
+        }
+        .carousel-section {
+            background: #fef9e6;
+            border-radius: 28px;
+            padding: 16px 12px;
+            margin-bottom: 30px;
+        }
+        .carousel-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            color: #7f4f24;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+        .carousel-frame {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .carousel-btn {
+            background: #a7c957;
+            border: none;
+            font-size: 2rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #283618;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .carousel-btn:hover {
+            background: #6a994e;
+            color: white;
+            transform: scale(1.02);
+        }
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 12px 20px;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: 0.2s;
+        }
+        .card img {
+            width: 100%;
+            border-radius: 20px;
+            object-fit: cover;
+            height: 150px;
+            background: #e9ecef;
+            display: block;
+        }
+        .card h3 {
+            margin: 12px 0 4px;
+        }
+        .luas {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #2b593e;
+        }
+        .indikator {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+        }
+        .cat-panel {
+            background: #e6f4ea;
+            border-radius: 28px;
+            padding: 18px 20px;
+            margin: 20px 0 24px;
+        }
+        .cat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            background: white;
+            padding: 10px 18px;
+            margin: 12px 0;
+            border-radius: 60px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .label-kaleng {
+            font-weight: bold;
+            min-width: 100px;
+        }
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 5px 12px;
+            border-radius: 40px;
+        }
+        .stepper button {
+            background: #dad7cd;
+            border: none;
+            font-size: 1.5rem;
+            width: 38px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .stepper button:active {
+            background: #bcb8a7;
+        }
+        .stepper span {
+            font-weight: bold;
+            font-size: 1.3rem;
+            min-width: 36px;
+            text-align: center;
+        }
+        .info-cat {
+            font-size: 0.9rem;
+            color: #2b593e;
+            background: #d8f3dc;
+            padding: 8px 16px;
+            border-radius: 28px;
+            margin: 12px 0;
+            text-align: center;
+        }
+        .tombol-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 20px 0 16px;
+            justify-content: center;
+        }
+        button.cek {
+            background: #2c6e49;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        button.cek:hover {
+            background: #1f5438;
+            transform: scale(0.98);
+        }
+        .feedback {
+            background: #fff3cd;
+            padding: 12px 20px;
+            border-radius: 24px;
+            margin: 12px 0;
+            font-weight: 500;
+            border-left: 6px solid #ffb703;
+        }
+        .feedback.benar {
+            background: #c9e9d2;
+            border-left-color: #2e7d32;
+            color: #1e3a2f;
+        }
+        .feedback.kelebihan {
+            background: #cfe3ff;
+            border-left-color: #1e6091;
+            color: #0a2f44;
+        }
+        .feedback.salah {
+            background: #ffe0db;
+            border-left-color: #d00000;
+        }
+        .tugas2-area {
+            background: #f1faee;
+            border-radius: 24px;
+            padding: 12px 20px;
+            margin-top: 16px;
+        }
+        input {
+            padding: 12px 16px;
+            border-radius: 60px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            width: 180px;
+            margin: 6px 8px 6px 0;
+        }
+        hr {
+            margin: 24px 0 8px;
+            border-color: #cfe3cf;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 16px;
+            }
+            .cat-item {
+                flex-direction: column;
+                gap: 8px;
+                border-radius: 28px;
+            }
+        }
+        .card img {
+            background: #d9d9b6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+	/* TAMBAHAN UNTUK MOBILE TOUCH */
+	button, .stepper button, .carousel-btn, .cek {
+	    touch-action: manipulation;
+	    -webkit-tap-highlight-color: transparent;
+	}
+	
+	.stepper button:active, .carousel-btn:active, .cek:active {
+	    transform: scale(0.96);
+	    transition: transform 0.05s ease;
+	}
+	
+	/* Perbaikan ukuran touch target */
+	.stepper button {
+	    min-width: 48px;
+	    min-height: 48px;
+	    display: inline-flex;
+	    align-items: center;
+	    justify-content: center;
+	}
+
+	.carousel-btn {
+	    min-width: 52px;
+	    min-height: 52px;
+	}
+
+	@media (max-width: 700px) {
+	    .stepper {
+	        gap: 20px;
+	        padding: 8px 16px;
+	    }
+	    .stepper button {
+	        width: 48px;
+	        height: 48px;
+	        font-size: 1.8rem;
+	    }
+	    .cek {
+	        padding: 14px 24px;
+	        font-size: 1rem;
+	        min-width: 200px;
+	    }
+	    input {
+	        padding: 14px 16px;
+	        font-size: 1rem;
+	    }
+	}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎨 Menghitung Cat Tembok</h1>
+    <div class="sub">📐 1 liter cat dapat dipakai untuk mengecat 10 m² | 💰 Harga = Rp90.000 / liter</div>
+
+    <!-- CAROUSEL DESAIN -->
+    <div class="carousel-section">
+        <div class="carousel-title">
+            🏠 Pilih Desain Arsitektur
+        </div>
+        <div class="carousel-frame">
+            <button class="carousel-btn" id="prevDesainBtn">◀</button>
+            <div id="desainCard" class="card">
+                <img id="desainImg" alt="Desain rumah">
+                <h3 id="desainNama">Rumah Mungil</h3>
+                <div class="luas"><span id="desainLuas">75</span> m²</div>
+                <div style="font-size:0.75rem;">luas tembok total</div>
+            </div>
+            <button class="carousel-btn" id="nextDesainBtn">▶</button>
+        </div>
+        <div class="indikator" id="carouselDot">● ○ ○ ○ ○</div>
+    </div>
+
+    <!-- PILIHAN KALENG CAT -->
+    <div class="cat-panel">
+        <div style="font-weight: bold; margin-bottom: 8px;">🛒 Tugas 1: Tentukan jumlah kaleng cat yang tepat!</div>
+        <div class="cat-item">
+            <span class="label-kaleng">🥫 Kaleng Cat 1 Liter</span>
+            <div class="stepper">
+                <button class="min" data-jenis="liter1">−</button>
+                <span id="valLiter1">0</span>
+                <button class="plus" data-jenis="liter1">+</button>
+            </div>
+            <span>→ <span id="liter1Total">0</span> liter</span>
+        </div>
+        <div class="cat-item">
+            <span class="label-kaleng">📦 Kaleng Cat 2.5 Liter</span>
+            <div class="stepper">
+                <button class="min" data-jenis="liter2_5">−</button>
+                <span id="valLiter2_5">0</span>
+                <button class="plus" data-jenis="liter2_5">+</button>
+            </div>
+            <span>→ <span id="liter2_5Total">0.0</span> liter</span>
+        </div>
+        <div class="cat-item">
+            <span class="label-kaleng">🛢️ Kaleng Cat 5 Liter</span>
+            <div class="stepper">
+                <button class="min" data-jenis="liter5">−</button>
+                <span id="valLiter5">0</span>
+                <button class="plus" data-jenis="liter5">+</button>
+            </div>
+            <span>→ <span id="liter5Total">0</span> liter</span>
+        </div>
+        <div class="info-cat">
+            🧮 Hitung total cat yang dibeli dan perhitungkan luas (m²) yang dapat dicat
+        </div>
+    </div>
+
+    <!-- TUGAS 1 -->
+    <div class="tombol-area">
+        <button class="cek" id="cekKebutuhanBtn">🔍 CEK JAWABAN (Tugas 1)</button>
+    </div>
+    <div id="feedbackTugas1" class="feedback">
+        ⏳ Klik tombol untuk mengecek kecukupan cat.
+    </div>
+
+    <!-- TUGAS 2 -->
+    <div class="tugas2-area">
+        <div style="font-weight: bold; margin-bottom: 8px;">💰 Tugas 2: Hitung total biaya pembelian cat</div>
+        <div class="flex-row">
+            <span>Total biaya = Rp </span>
+            <input type="number" id="inputBiaya" placeholder="contoh: 2700000" step="5000">
+            <button class="cek" id="cekBiayaBtn" style="background:#1e6091;">🔍 CEK JAWABAN (Tugas 2)</button>
+        </div>
+        <div id="feedbackTugas2" class="feedback" style="margin-top:12px;">
+            ✏️ Masukkan perkiraan harga total (Rp) lalu klik cek.
+        </div>
+    </div>
+    <hr>
+    <div style="font-size: 0.75rem; text-align: center; color: #5e6e66;">Petunjuk: Tugas 1 pastikan cat cukup untuk luas tembok pilihan. Tugas 2 hitung harga = total liter × 90.000</div>
+</div>
+
+<script>
+    // DATA DESAIN ARSITEKTUR
+    const desainList = [
+        { nama: "🏡 Rumah Mungil", luas: 75, fileGambar: "assets/rumah_mungil.png" },
+        { nama: "🏘️ Vila Keluarga", luas: 210, fileGambar: "assets/rumah_vila_keluarga.png" },
+        { nama: "🏢 Ruko 2 Lantai", luas: 480, fileGambar: "assets/rumah_ruko_2lantai.png" },
+        { nama: "🏛️ Balai Serbaguna", luas: 850, fileGambar: "assets/rumah_balai_serbaguna.png" },
+        { nama: "🏠 Rumah Tropis", luas: 125, fileGambar: "assets/rumah_tropis.png" }
+    ];
+    
+    let currentIndex = 0;
+    let liter1Unit = 0, liter2_5Unit = 0, liter5Unit = 0;
+
+    // DOM elements
+    const desainImg = document.getElementById('desainImg');
+    const desainNama = document.getElementById('desainNama');
+    const desainLuasSpan = document.getElementById('desainLuas');
+    const carouselDot = document.getElementById('carouselDot');
+    const valLiter1Span = document.getElementById('valLiter1');
+    const valLiter2_5Span = document.getElementById('valLiter2_5');
+    const valLiter5Span = document.getElementById('valLiter5');
+    const liter1TotalSpan = document.getElementById('liter1Total');
+    const liter2_5TotalSpan = document.getElementById('liter2_5Total');
+    const liter5TotalSpan = document.getElementById('liter5Total');
+    const feedbackT1 = document.getElementById('feedbackTugas1');
+    const feedbackT2 = document.getElementById('feedbackTugas2');
+    const inputBiaya = document.getElementById('inputBiaya');
+
+    // Hitung total liter tanpa menampilkan ke user (hanya untuk kalkulasi internal)
+    function hitungTotalLiter() {
+        return (liter1Unit * 1) + (liter2_5Unit * 2.5) + (liter5Unit * 5);
+    }
+
+    // Update tampilan jumlah unit dan total liter per jenis kaleng
+    function refreshStepperUI() {
+        valLiter1Span.innerText = liter1Unit;
+        valLiter2_5Span.innerText = liter2_5Unit;
+        valLiter5Span.innerText = liter5Unit;
+        liter1TotalSpan.innerText = (liter1Unit * 1).toFixed(1);
+        liter2_5TotalSpan.innerText = (liter2_5Unit * 2.5).toFixed(1);
+        liter5TotalSpan.innerText = (liter5Unit * 5).toFixed(1);
+    }
+
+    function tambah(jenis) {
+        if (jenis === 'liter1' && liter1Unit < 10) liter1Unit++;
+        else if (jenis === 'liter2_5' && liter2_5Unit < 10) liter2_5Unit++;
+        else if (jenis === 'liter5' && liter5Unit < 10) liter5Unit++;
+        refreshStepperUI();
+    }
+    
+    function kurangi(jenis) {
+        if (jenis === 'liter1' && liter1Unit > 0) liter1Unit--;
+        else if (jenis === 'liter2_5' && liter2_5Unit > 0) liter2_5Unit--;
+        else if (jenis === 'liter5' && liter5Unit > 0) liter5Unit--;
+        refreshStepperUI();
+    }
+
+    function updateCarousel() {
+        const data = desainList[currentIndex];
+        desainNama.innerText = data.nama;
+        desainLuasSpan.innerText = data.luas;
+        desainImg.src = data.fileGambar;
+        desainImg.onerror = function() {
+            this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23d4c9a8'/%3E%3Ctext x='15' y='45' fill='%235a4a2a' font-size='9'%3EGambar tidak ditemukan%3C/text%3E%3C/svg%3E";
+        };
+        let dots = "";
+        for (let i = 0; i < desainList.length; i++) {
+            dots += (i === currentIndex) ? "● " : "○ ";
+        }
+        carouselDot.innerText = dots.trim();
+    }
+
+    // TUGAS 1
+    function cekKecukupan() {
+        const luasTembok = desainList[currentIndex].luas;
+        const totalLiter = hitungTotalLiter();
+        const mampuM2 = totalLiter * 10;
+        const neededLiter = luasTembok / 10;
+        
+        if (mampuM2 >= luasTembok) {
+            const kelebihanLiter = totalLiter - neededLiter;
+            const kelebihanM2 = mampuM2 - luasTembok;
+            if (kelebihanLiter > 0) {
+                feedbackT1.innerHTML = `✅ Tugas 1: Cat yang dibeli BERLEBIHAN! <br> 
+                📌 Luas tembok = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). <br>
+                🛢️ Total cat dibeli = ${totalLiter.toFixed(2)} liter (mampu mengecat ${mampuM2} m²). <br>
+                ✨ Kelebihan cat = ${kelebihanLiter.toFixed(2)} liter (bisa mengecat +${kelebihanM2} m² lagi). <br>
+                💡 Anda bisa mengurangi pembelian cat agar lebih hemat.`;
+                feedbackT1.className = "feedback kelebihan";
+            } else {
+                feedbackT1.innerHTML = `✅ Tugas 1: BENAR PAS! Total cat yang dibeli = ${totalLiter.toFixed(2)} liter (mampu cat ${mampuM2} m²). <br> Luas tembok pilihan = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). Cat pas dan efisien.`;
+                feedbackT1.className = "feedback benar";
+            }
+        } else {
+            const kekuranganLiter = neededLiter - totalLiter;
+            const kekuranganM2 = luasTembok - mampuM2;
+            feedbackT1.innerHTML = `❌ Tugas 1: Cat masih KURANG. <br> 
+            📌 Luas tembok = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). <br>
+            🛢️ Total cat dibeli = ${totalLiter.toFixed(2)} liter (hanya mampu ${mampuM2} m²). <br>
+            ⚠️ Kurang cat = ${kekuranganLiter.toFixed(2)} liter (masih kurang untuk ${kekuranganM2} m²). <br>
+            ➕ Silakan ubah jumlah kaleng.`;
+            feedbackT1.className = "feedback salah";
+        }
+    }
+
+    // TUGAS 2
+    function cekBiaya() {
+        const totalLiter = hitungTotalLiter();
+        const hargaPerLiter = 90000;
+        const biayaSebenarnya = totalLiter * hargaPerLiter;
+        let jawabanUser = parseFloat(inputBiaya.value);
+        
+        if (isNaN(jawabanUser)) {
+            feedbackT2.innerHTML = "⚠️ Masukkan angka nominal biaya (contoh: 2700000)";
+            feedbackT2.className = "feedback salah";
+            return;
+        }
+        
+        const selisih = Math.abs(jawabanUser - biayaSebenarnya);
+        if (selisih < 500 || jawabanUser === biayaSebenarnya) { 
+            feedbackT2.innerHTML = `✅ Tugas 2: BENAR! Total cat = ${totalLiter.toFixed(2)} liter × Rp${hargaPerLiter.toLocaleString('id-ID')} = Rp ${biayaSebenarnya.toLocaleString('id-ID')}. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Selamat!`;
+            feedbackT2.className = "feedback benar";
+        } else {
+            feedbackT2.innerHTML = `❌ Tugas 2: Kurang tepat. Harga total cat yang diperlukan = ${totalLiter.toFixed(2)} liter × 90.000. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Coba hitung ulang.`;
+            feedbackT2.className = "feedback salah";
+        }
+    }
+
+    // Event listeners
+    document.querySelectorAll('.min').forEach(btn => {
+        const jenis = btn.getAttribute('data-jenis');
+        if (jenis) btn.addEventListener('click', (e) => { e.preventDefault(); kurangi(jenis); });
+    });
+    document.querySelectorAll('.plus').forEach(btn => {
+        const jenis = btn.getAttribute('data-jenis');
+        if (jenis) btn.addEventListener('click', (e) => { e.preventDefault(); tambah(jenis); });
+    });
+
+    document.getElementById('prevDesainBtn').addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + desainList.length) % desainList.length;
+        updateCarousel();
+        feedbackT1.innerHTML = "⏳ Pilihan desain berubah. Klik Cek Jawaban (Tugas 1) untuk mengecek ulang.";
+        feedbackT1.className = "feedback";
+    });
+    document.getElementById('nextDesainBtn').addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % desainList.length;
+        updateCarousel();
+        feedbackT1.innerHTML = "⏳ Pilihan desain berubah. Klik Cek Jawaban (Tugas 1) untuk mengecek ulang.";
+        feedbackT1.className = "feedback";
+    });
+
+    document.getElementById('cekKebutuhanBtn').addEventListener('click', cekKecukupan);
+    document.getElementById('cekBiayaBtn').addEventListener('click', cekBiaya);
+
+	// TAMBAHAN UNTUK TOUCH MOBILE - Mencegah zoom berlebihan saat tap dua kali
+	document.querySelectorAll('button, .stepper button, .carousel-btn, .cek').forEach(btn => {
+	    btn.addEventListener('touchstart', function(e) {
+	        // Hanya untuk memberikan feedback sentuhan tanpa mengganggu klik
+	        this.style.opacity = '0.7';
+	    });
+	    btn.addEventListener('touchend', function(e) {
+	        this.style.opacity = '1';
+	    });
+	    btn.addEventListener('touchcancel', function(e) {
+	        this.style.opacity = '1';
+	    });
+	});
+
+    // Inisialisasi
+    updateCarousel();
+    refreshStepperUI();
+</script>
+</body>
+</html>

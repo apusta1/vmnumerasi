@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="theme-color" content="#c13b1b">
+  <title>Bagi Bayar di Resto Pizza</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f5f0e7 0%, #e8dfd3 100%);
+      font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      padding: 20px 16px 40px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .card {
+      max-width: 550px;
+      width: 100%;
+      margin: 0 auto;
+      background: #fffef7;
+      border-radius: 48px 32px 48px 32px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .hero {
+      background: #c13b1b;
+      background-image: radial-gradient(circle at 10% 30%, rgba(255,180,100,0.3) 2%, transparent 2.5%);
+      background-size: 28px 28px;
+      padding: 24px 20px 20px;
+      text-align: center;
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .hero h1 span {
+      font-size: 2rem;
+    }
+
+    .hero p {
+      margin-top: 8px;
+      opacity: 0.9;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    /* ilustrasi pizza - menempel di bawah header (merah bata) */
+    .ilustrasi-pizza {
+      width: 100%;
+      background: #fffef7;
+      text-align: center;
+      padding: 12px 16px 8px 16px;
+      border-bottom: 1px solid #ffe0c4;
+    }
+
+    .ilustrasi-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 24px;
+      display: block;
+      margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .content {
+      padding: 24px 22px 28px;
+    }
+
+    .soal {
+      background: #fef3e2;
+      padding: 20px 18px;
+      border-radius: 28px;
+      margin-bottom: 28px;
+      border: 1px solid #ffdec2;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+    }
+
+    .soal p {
+      font-size: 1rem;
+      line-height: 1.45;
+      color: #2d2418;
+      margin-bottom: 12px;
+    }
+
+    .tagihan-nilai {
+      font-weight: 800;
+      font-size: 1.3rem;
+      background: #fff0e0;
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 60px;
+      color: #b1421f;
+    }
+
+    .parameter {
+      background: #e9e0d3;
+      padding: 10px 14px;
+      border-radius: 40px;
+      display: inline-flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-weight: 500;
+      margin: 10px 0 4px;
+    }
+
+    .input-jawaban {
+      margin: 20px 0 18px;
+    }
+
+    .input-jawaban label {
+      font-weight: 600;
+      color: #4b2e1a;
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .jawaban-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .jawaban-row input {
+      flex: 2;
+      min-width: 150px;
+      padding: 14px 18px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border: 2px solid #e2cfb5;
+      border-radius: 60px;
+      background: white;
+      font-family: system-ui, 'Segoe UI', monospace;
+      letter-spacing: 0.5px;
+      outline: none;
+      transition: 0.2s;
+      -moz-appearance: textfield;
+    }
+
+    .jawaban-row input:focus {
+      border-color: #c13b1b;
+      box-shadow: 0 0 0 3px rgba(193,59,27,0.2);
+    }
+
+    /* Hilangkan spinner number di mobile */
+    .jawaban-row input::-webkit-inner-spin-button,
+    .jawaban-row input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin: 18px 0 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      background: #2c2b28;
+      padding: 12px 20px;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.15s;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      flex: 1;
+      box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .btn-cek {
+      background: #1f7a5a;
+    }
+    .btn-cek:hover {
+      background: #146b4e;
+    }
+    .btn-baru {
+      background: #cd7b3b;
+    }
+    .btn-baru:hover {
+      background: #b65f27;
+    }
+
+    .feedback {
+      margin: 15px 0 0;
+      padding: 12px 16px;
+      border-radius: 40px;
+      font-weight: 600;
+      text-align: center;
+      background: #f0ede8;
+      color: #2c3e2f;
+      transition: 0.1s;
+    }
+
+    .feedback.benar {
+      background: #cbe5cf;
+      color: #1c582c;
+      border-left: 6px solid #2b7840;
+    }
+    .feedback.salah {
+      background: #ffe0db;
+      color: #b13b2a;
+      border-left: 6px solid #c13b1b;
+    }
+
+    .calculator {
+      background: #2f2e2c;
+      border-radius: 34px;
+      padding: 16px 14px 18px;
+      margin-top: 24px;
+      box-shadow: 0 8px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .calc-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      color: #ddd9ce;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .calc-screen {
+      background: #d9e0cf;
+      padding: 12px 16px;
+      border-radius: 24px;
+      margin-bottom: 16px;
+      text-align: right;
+      font-size: 1.9rem;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #1f2f1a;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .calc-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .calc-btn {
+      background: #46433e;
+      border: none;
+      font-size: 1.3rem;
+      font-weight: 600;
+      padding: 12px 0;
+      border-radius: 40px;
+      color: white;
+      box-shadow: 0 3px 0 #1f1c18;
+      transition: 0.05s linear;
+      cursor: pointer;
+    }
+    .calc-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #1f1c18;
+    }
+    .calc-op {
+      background: #e08e3a;
+      box-shadow: 0 3px 0 #9b4f1a;
+    }
+    .calc-clear {
+      background: #6c5b4b;
+      box-shadow: 0 3px 0 #4a3c2f;
+    }
+    .calc-equal {
+      background: #3f765b;
+      box-shadow: 0 3px 0 #23553e;
+    }
+
+    footer {
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 12px 10px 18px;
+      color: #9b8c7a;
+    }
+
+    /* OPTIMASI MOBILE */
+    @media (max-width: 480px) {
+      .content {
+        padding: 16px 18px 22px;
+      }
+      button {
+        padding: 10px 14px;
+      }
+      .jawaban-row input {
+        padding: 12px 16px;
+        font-size: 1rem;
+      }
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+      .calc-btn {
+        font-size: 1.1rem;
+        padding: 10px 0;
+      }
+      .calc-screen {
+        font-size: 1.5rem;
+        padding: 10px 12px;
+      }
+      .soal {
+        padding: 16px 14px;
+      }
+      .parameter {
+        font-size: 0.85rem;
+        gap: 10px;
+      }
+      .tagihan-nilai {
+        font-size: 1.1rem;
+      }
+      .ilustrasi-pizza {
+        padding: 8px 16px 6px 16px;
+      }
+    }
+
+    /* Untuk touch target lebih baik */
+    button, .calc-btn {
+      touch-action: manipulation;
+      min-height: 44px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="hero">
+    <h1>
+      <span>🍕</span> Bagi Bayar <span>🍕</span>
+    </h1>
+    <p>Jajan pizza bareng teman, hitung bagi bayar yang adil!</p>
+  </div>
+
+  <!-- GAMBAR ILUSTRASI PIZZA - menempel di bawah header bata merah -->
+  <div class="ilustrasi-pizza">
+    <img id="ilustrasiImg" class="ilustrasi-img" src="assets/ilustrasi-pizza.png" alt="Ilustrasi Pizza Resto" onerror="this.onerror=null; this.style.display='none'; document.getElementById('imgPlaceholder').style.display='flex';">
+    <div id="imgPlaceholder" style="display: none; justify-content: center; align-items: center; background: #f7ede1; border-radius: 24px; padding: 24px 12px; width: 100%; color: #b97f54; font-size: 0.85rem; text-align: center; gap: 6px; flex-direction: column;">
+      <span>🍕📸</span>
+      <span>Ilustrasi pizza tidak tersedia<br>(letakkan file ilustrasi-pizza.png)</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="soal" id="soalContainer">
+      <div id="dynamicSoal"></div>
+    </div>
+
+    <div class="input-jawaban">
+      <label>💰 Berapa rupiah per orang? (bulatkan ke atas ke ribuan terdekat)</label>
+      <div class="jawaban-row">
+        <input type="number" id="jawabanUser" placeholder="Contoh: 152000" step="1000" inputmode="numeric">
+        <button class="btn-cek" id="cekBtn">✅ Cek Jawaban</button>
+      </div>
+      <div class="button-group">
+        <button class="btn-baru" id="soalBaruBtn">🔄 Soal Baru</button>
+      </div>
+      <div id="feedbackArea" class="feedback"></div>
+    </div>
+
+    <!-- Kalkulator sederhana gaya CASIO -->
+    <div class="calculator">
+      <div class="calc-header">
+        <span>🧮 Kalkulator</span>
+      </div>
+      <div class="calc-screen" id="calcScreen">0</div>
+      <div class="calc-buttons">
+        <button class="calc-btn" data-value="7">7</button>
+        <button class="calc-btn" data-value="8">8</button>
+        <button class="calc-btn" data-value="9">9</button>
+        <button class="calc-op calc-btn" data-op="/">÷</button>
+        
+        <button class="calc-btn" data-value="4">4</button>
+        <button class="calc-btn" data-value="5">5</button>
+        <button class="calc-btn" data-value="6">6</button>
+        <button class="calc-op calc-btn" data-op="*">×</button>
+        
+        <button class="calc-btn" data-value="1">1</button>
+        <button class="calc-btn" data-value="2">2</button>
+        <button class="calc-btn" data-value="3">3</button>
+        <button class="calc-op calc-btn" data-op="-">-</button>
+        
+        <button class="calc-btn" data-value="0">0</button>
+        <button class="calc-btn" data-value=".">.</button>
+        <button class="calc-clear calc-btn" id="calcClear">C</button>
+        <button class="calc-op calc-btn" data-op="+">+</button>
+        
+        <button class="calc-equal calc-btn" id="calcEqual">=</button>
+        <button class="calc-btn" id="calcBack" style="background:#5b5144;">⌫</button>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+    <footer>✓ Gunakan kalkulator jika perlu.</footer>
+  </div>
+</div>
+
+<script>
+  // --- Variabel dinamis ---
+  let currentBiayaAwal = 350000;     // range 300-600rb increment 50rb
+  let currentJumlahOrang = 4;        // total orang termasuk diri sendiri (teman lain + 1)
+  let currentJawabanBenar = 0;       // hasil pembulatan ke atas ribuan
+
+  // Helper: pembulatan ke atas ke ribuan terdekat
+  function roundUpToNearestThousand(value) {
+    if (value <= 0) return 1000;
+    return Math.ceil(value / 1000) * 1000;
+  }
+
+  // Hitung ulang jawaban benar berdasarkan biaya awal dan jumlah orang (total termasuk user)
+  // PPN + service charge 15% diterapkan secara internal (tidak ditampilkan)
+  function recalculate() {
+    const pajakService = currentBiayaAwal * 0.15;
+    const totalTagihan = currentBiayaAwal + pajakService;
+    const bagiRata = totalTagihan / currentJumlahOrang;
+    currentJawabanBenar = roundUpToNearestThousand(bagiRata);
+  }
+
+  // Generate random / acak parameter baru
+  function generateRandomParams() {
+    // biaya awal: 300rb, 350rb, 400rb, 450rb, 500rb, 550rb, 600rb
+    const steps = [300000, 350000, 400000, 450000, 500000, 550000, 600000];
+    const randomIndex = Math.floor(Math.random() * steps.length);
+    const newBiaya = steps[randomIndex];
+    
+    // jumlah teman lain: 1 sampai 7
+    const temanLain = Math.floor(Math.random() * 7) + 1; // 1 .. 7
+    const totalOrg = temanLain + 1; // termasuk user sendiri
+    
+    currentBiayaAwal = newBiaya;
+    currentJumlahOrang = totalOrg;
+    recalculate();
+  }
+
+  // Perbarui tampilan soal (hanya info tagihan awal & jumlah orang)
+  function updateUI() {
+    const temanLain = currentJumlahOrang - 1;
+    const soalHtml = `
+      <p>🍕 <strong>Tagihan awal restoran pizza:</strong> <span class="tagihan-nilai">Rp ${currentBiayaAwal.toLocaleString('id-ID')}</span></p>
+      <div class="parameter">
+        <span>👤 Kamu makan bersama <strong>${temanLain}</strong> ${temanLain === 1 ? 'orang teman' : 'orang teman'}</span>
+        <span>👥 Total yang berbagi: <strong>${currentJumlahOrang} orang</strong></span>
+      </div>
+      <p><br>💸 Tagihan akhir akan termasuk PPN dan biaya jasa pelayanan sebesar 15% (ditambahkan ke tagihan awal).<br>
+      <br>Jika total <strong>tagihan akhir dibagi rata</strong>, berapa masing-masing orang harus membayar? <br><br>
+      </p>
+    `;
+    document.getElementById('dynamicSoal').innerHTML = soalHtml;
+    
+    // reset feedback & input
+    const feedbackDiv = document.getElementById('feedbackArea');
+    feedbackDiv.innerHTML = '';
+    feedbackDiv.className = 'feedback';
+    const inputField = document.getElementById('jawabanUser');
+    inputField.value = '';
+    // inputField.focus();
+  }
+
+  // Inisialisasi / halaman baru
+  function initNewProblem() {
+    generateRandomParams();
+    updateUI();
+  }
+
+  // Tombol Soal Baru
+  function buatSoalBaru() {
+    initNewProblem();
+  }
+
+  // Fungsi cek jawaban + tutup keyboard mobile (biar lebih nyaman)
+  function cekJawabanDanTurunkanKeyboard() {
+    let inputVal = document.getElementById('jawabanUser').value;
+    if (inputVal === null || inputVal === "") {
+      tampilkanFeedback("Masukkan jawaban terlebih dahulu!", false);
+      document.activeElement.blur();
+      return;
+    }
+    // Bersihkan dari pemisah ribuan
+    const cleaned = String(inputVal).replace(/\./g, '').replace(/,/g, '').trim();
+    let angkaUser = parseInt(cleaned, 10);
+    if (isNaN(angkaUser)) {
+      tampilkanFeedback("Masukkan angka yang valid (contoh: 152000)", false);
+      document.activeElement.blur();
+      return;
+    }
+    if (angkaUser === currentJawabanBenar) {
+      tampilkanFeedback("✅ Benar! Jawaban tepat.", true);
+    } else {
+      tampilkanFeedback("❌ Salah. Coba hitung ulang dengan kalkulator, periksa pembulatan ke atas!", false);
+    }
+    document.activeElement.blur(); // tutup keyboard mobile setelah cek
+  }
+
+  function tampilkanFeedback(pesan, isBenar) {
+    const fb = document.getElementById('feedbackArea');
+    fb.innerHTML = pesan;
+    fb.classList.remove('benar', 'salah');
+    if (isBenar) {
+      fb.classList.add('benar');
+    } else {
+      fb.classList.add('salah');
+    }
+  }
+
+  // ========== KALKULATOR SEDERHANA (CASIO style) ==========
+  let calcExpression = "0";
+  const screenElem = document.getElementById('calcScreen');
+  
+  function updateCalcScreen() {
+    if (calcExpression === "" || calcExpression === undefined) calcExpression = "0";
+    screenElem.innerText = calcExpression;
+  }
+  
+  function handleNumber(value) {
+    if (calcExpression === "0" && value !== ".") {
+      calcExpression = value;
+    } else {
+      calcExpression += value;
+    }
+    updateCalcScreen();
+  }
+  
+  function handleOperator(op) {
+    const lastChar = calcExpression.slice(-1);
+    if (['+', '-', '*', '/', '×', '÷'].some(c => c === lastChar)) {
+      calcExpression = calcExpression.slice(0, -1) + op;
+    } else {
+      calcExpression += op;
+    }
+    updateCalcScreen();
+  }
+  
+  function evaluateExpression() {
+    try {
+      let expr = calcExpression.replace(/×/g, '*').replace(/÷/g, '/');
+      let result = Function('"use strict";return (' + expr + ')')();
+      if (isNaN(result) || !isFinite(result)) {
+        calcExpression = "Error";
+      } else {
+        let rounded = parseFloat(result.toFixed(8)).toString();
+        calcExpression = rounded;
+      }
+    } catch(e) {
+      calcExpression = "Error";
+    }
+    updateCalcScreen();
+  }
+  
+  function clearCalculator() {
+    calcExpression = "0";
+    updateCalcScreen();
+  }
+  
+  function backspaceCalc() {
+    if (calcExpression === "Error") {
+      calcExpression = "0";
+    } else if (calcExpression.length === 1) {
+      calcExpression = "0";
+    } else {
+      calcExpression = calcExpression.slice(0, -1);
+      if (calcExpression === "") calcExpression = "0";
+    }
+    updateCalcScreen();
+  }
+  
+  function bindCalculator() {
+    const btns = document.querySelectorAll('.calc-btn[data-value]');
+    btns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = btn.getAttribute('data-value');
+        if (val !== null) handleNumber(val);
+      });
+    });
+    const opBtns = document.querySelectorAll('.calc-op[data-op]');
+    opBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        let op = btn.getAttribute('data-op');
+        if (op === '*') op = '×';
+        if (op === '/') op = '÷';
+        handleOperator(op);
+      });
+    });
+    document.getElementById('calcEqual').addEventListener('click', () => evaluateExpression());
+    document.getElementById('calcClear').addEventListener('click', () => clearCalculator());
+    document.getElementById('calcBack').addEventListener('click', () => backspaceCalc());
+  }
+  
+  // Mencegah enter di input jawaban, tutup keyboard & cek jawaban
+  function preventEnterSubmit() {
+    const inputField = document.getElementById('jawabanUser');
+    inputField.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        cekJawabanDanTurunkanKeyboard();
+      }
+    });
+    // Tutup keyboard jika klik di luar (optional) - tap area lain tidak terlalu mengganggu
+    document.addEventListener('touchstart', function(e) {
+      if (e.target !== inputField && inputField === document.activeElement) {
+        // jangan paksa blur biar tidak mengganggu navigasi kalkulator, hanya blur jika tap di luar
+        if (!e.target.closest('.calculator') && !e.target.closest('.btn-cek') && !e.target.closest('.btn-baru')) {
+          inputField.blur();
+        }
+      }
+    });
+  }
+  
+  // Inisialisasi halaman dan event
+  document.addEventListener('DOMContentLoaded', () => {
+    generateRandomParams();
+    updateUI();
+    bindCalculator();
+    preventEnterSubmit();
+    
+    document.getElementById('cekBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      cekJawabanDanTurunkanKeyboard();
+    });
+    document.getElementById('soalBaruBtn').addEventListener('click', () => {
+      buatSoalBaru();
+      document.activeElement.blur(); // tutup keyboard jika terbuka
+    });
+    
+    clearCalculator();
+  });
+</script>
+</body>
+</html>

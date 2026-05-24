@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Dosis Paracetamol - Gelas Takar</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: #eef5fa;
+            margin: 0;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            padding: 20px 18px 28px;
+            transition: all 0.2s;
+            margin: auto;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            margin: 0 0 6px 0;
+            color: #0b3b5f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* Area ilustrasi gambar - mobile optimized */
+        .ilustrasi-container {
+            margin: 12px 0 8px 0;
+            text-align: center;
+            background: #f9fafc;
+            border-radius: 28px;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ilustrasi-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 20px;
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .sub {
+            color: #2c6e9e;
+            border-left: 4px solid #f4b942;
+            padding-left: 14px;
+            margin: 8px 0 16px 0;
+            font-weight: 500;
+            background: #fef6e0;
+            border-radius: 20px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fefdf8;
+            font-size: 0.75rem;
+            min-width: 320px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #ddd8c8;
+            padding: 10px 8px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #e9f0f5;
+            font-weight: 700;
+            color: #1e4a6e;
+        }
+
+        .berat-badan-dynamic {
+            background: #fff1cf;
+            padding: 10px 14px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 16px 0 12px;
+            border: 1px solid #f7d98c;
+        }
+
+        .question {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 16px 0 14px;
+            background: #eef3fc;
+            padding: 12px 14px;
+            border-radius: 24px;
+            line-height: 1.4;
+        }
+
+        .syringe-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0 20px;
+            background: #f9fafc;
+            border-radius: 40px;
+            padding: 16px 12px;
+        }
+
+        .measuring-cup {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            width: 100%;
+        }
+
+        .cup-graphic {
+            position: relative;
+            width: 120px;
+            height: 240px;
+            background: linear-gradient(145deg, #f3f9ff, #e0eaf5);
+            border: 3px solid #22668d;
+            border-radius: 0 0 32px 32px;
+            border-top: 6px solid #b0c4de;
+            box-shadow: inset 0 0 0 2px rgba(255,255,240,0.8), 0 4px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .liquid-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #4f9fcf;
+            transition: height 0.05s linear;
+            border-radius: 0 0 28px 28px;
+            opacity: 0.85;
+            z-index: 1;
+        }
+
+        .strip-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .strip {
+            position: absolute;
+            left: 0;
+            width: 50%;
+            height: 2px;
+            background-color: #1f3b4c;
+            opacity: 0.7;
+            border-bottom: 1px solid rgba(255,255,200,0.6);
+            pointer-events: none;
+        }
+
+        .vertical-slider-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 70px;
+        }
+
+        input[type=range][orient=vertical] {
+            writing-mode: vertical-lr;
+            direction: rtl;
+            width: 40px;
+            height: 240px;
+            vertical-align: middle;
+            accent-color: #2c7da0;
+            touch-action: pan-y pinch-zoom;
+            margin: 0;
+        }
+
+        .vertical-slider {
+            -webkit-appearance: slider-vertical;
+        }
+
+        .slider-value {
+            font-weight: bold;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 60px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            margin: 20px 0 14px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #22668d;
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            flex: 0 1 auto;
+            min-width: 130px;
+            touch-action: manipulation;
+        }
+
+        button:active {
+            transform: scale(0.96);
+            background: #1a5575;
+        }
+
+        .btn-secondary {
+            background: #f4b942;
+            color: #1f3b4c;
+        }
+        .btn-secondary:active {
+            background: #e0a62e;
+        }
+
+        .feedback {
+            text-align: center;
+            font-weight: 600;
+            margin-top: 14px;
+            padding: 12px 12px;
+            border-radius: 40px;
+            background: #ebf4e8;
+            color: #1f543e;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .feedback.wrong-under {
+            background: #fff0db;
+            color: #c25d00;
+        }
+        .feedback.wrong-over {
+            background: #ffe0e0;
+            color: #b13e2d;
+        }
+
+        hr {
+            margin: 16px 0 8px;
+            border: 0.5px solid #e2e8f0;
+        }
+
+        .small-note {
+            font-size: 10px;
+            text-align: center;
+            color: #5f7f9a;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>💊 Paracetamol <span style="font-size: 0.85rem;">Sirup 160mg/5mL</span></h1>
+    
+    <!-- TEMPAT GAMBAR ILUSTRASI: gunakan nama file ilustrasi.png (bisa diganti nanti) -->
+    <div class="ilustrasi-container">
+        <img id="ilustrasiImg" class="ilustrasi-img" src="assets/paracetamol.png" alt="Ilustrasi Obat Sirup" onerror="this.onerror=null; this.style.display='none'; document.getElementById('imgPlaceholder').style.display='flex';">
+        <div id="imgPlaceholder" style="display: none; justify-content: center; align-items: center; background: #e9f0f5; border-radius: 20px; padding: 20px; width: 100%; color: #5f7f9a; font-size: 0.8rem; text-align: center;">
+            📸 Ilustrasi tidak tersedia<br>(letakkan file ilustrasi.png di folder yang sama)
+        </div>
+    </div>
+    
+    <div><center>Skenario: Adikmu sedang sakit demam.</center>
+    </div>
+
+    <div class="sub">
+        📘 Panduan Dosis: 
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>Berat Badan</th><th>Dosis per Minum</th><th>Volume Sirup</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>11–16 kg</td><td>~160 mg</td><td>5 mL</td></tr>
+                <tr><td>16–22 kg</td><td>~240 mg</td><td>7,5 mL</td></tr>
+                <tr><td>22–27 kg</td><td>~320 mg</td><td>10 mL</td></tr>
+                <tr><td>27–32 kg</td><td>~400 mg</td><td>12,5 mL</td></tr>
+                <tr><td>33–43 kg</td><td>~480 mg</td><td>15 mL</td></tr>
+                <tr><td>> 43 kg</td><td>~640 mg</td><td>20 mL</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="beratDisplay" class="berat-badan-dynamic">
+        ⚖️ Berat badan adik: <strong id="beratValue">26</strong> kg
+    </div>
+
+    <div class="question">
+        💊 Dokter menganjurkan minum setiap 8 jam (3x sehari).<br>
+        <strong>Berapa mL Obat Turun Panas Sirup yang harus kamu minumkan <u>setiap kali</u> minum obat?</strong>
+    </div>
+
+    <div class="syringe-container">
+        <div style="font-weight:500; margin-bottom:8px; font-size:0.85rem;">📏 Geser slider untuk menentukan volume (mL)</div>
+        <div class="measuring-cup">
+            <div class="cup-graphic" id="cupGraphic">
+                <div class="liquid-fill" id="liquidFill" style="height: 0%;"></div>
+                <div class="strip-lines" id="stripLinesContainer"></div>
+            </div>
+
+            <div class="vertical-slider-area">
+                <input type="range" id="volumeSlider" orient="vertical" min="0" max="26" step="0.5" value="0" class="vertical-slider">
+                <div class="slider-value">
+                    <span id="sliderMl">0.0</span> mL
+                </div>
+                <div style="font-size:10px; color:#22668d;">⬆️ geser ⬇️</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button id="cekBtn">✅ Cek Jawaban</button>
+        <button id="soalBaruBtn" class="btn-secondary">🔄 Soal Baru</button>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">
+        ◆ Geser ke volume sesuai hitunganmu, lalu tekan "Cek Jawaban"
+    </div>
+    <hr>
+    <div class="small-note">
+        * Berat badan berubah setiap <em>refresh</em>/soal baru.
+    </div>
+</div>
+
+<script>
+    // Data panduan sesuai tabel (batas bawah inklusif, batas atas eksklusif kecuali >43)
+    const dosisTable = [
+        { minKg: 11, maxKg: 16, dosisMg: 160, volumeMl: 5 },
+        { minKg: 16, maxKg: 22, dosisMg: 240, volumeMl: 7.5 },
+        { minKg: 22, maxKg: 27, dosisMg: 320, volumeMl: 10 },
+        { minKg: 27, maxKg: 32, dosisMg: 400, volumeMl: 12.5 },
+        { minKg: 33, maxKg: 43, dosisMg: 480, volumeMl: 15 },
+        { minKg: 43, maxKg: 999, dosisMg: 640, volumeMl: 20 }
+    ];
+
+    let currentBerat = 26;
+    let correctVolumeMl = 10;
+
+    function updateCorrectVolumeByWeight(berat) {
+        for (let row of dosisTable) {
+            if (berat >= row.minKg && berat < row.maxKg) {
+                correctVolumeMl = row.volumeMl;
+                return row.volumeMl;
+            }
+        }
+        correctVolumeMl = 20;
+        return 20;
+    }
+
+    function generateRandomBerat() {
+        return Math.floor(Math.random() * (45 - 15 + 1)) + 15;
+    }
+
+    function updateSliderAndCup(volumeMl) {
+        const slider = document.getElementById("volumeSlider");
+        if (Math.abs(slider.value - volumeMl) > 0.01) slider.value = volumeMl;
+        document.getElementById("sliderMl").innerText = volumeMl.toFixed(1);
+        
+        let maxVolForFull = 26;
+        let percent = (volumeMl / maxVolForFull) * 100;
+        if (percent > 100) percent = 100;
+        if (percent < 0) percent = 0;
+        document.getElementById("liquidFill").style.height = percent + "%";
+    }
+
+    function buildStripLines() {
+        const container = document.getElementById("stripLinesContainer");
+        if (!container) return;
+        container.innerHTML = "";
+        const totalStrips = 8;
+        const cupHeight = 240;
+        
+        for (let i = 1; i <= totalStrips; i++) {
+            let yPos = cupHeight - (i / totalStrips) * cupHeight;
+            let stripDiv = document.createElement("div");
+            stripDiv.className = "strip";
+            stripDiv.style.top = yPos + "px";
+            container.appendChild(stripDiv);
+        }
+    }
+
+    function refreshSoalBaru() {
+        let newBerat = generateRandomBerat();
+        currentBerat = newBerat;
+        document.getElementById("beratValue").innerText = currentBerat;
+        updateCorrectVolumeByWeight(currentBerat);
+        
+        const slider = document.getElementById("volumeSlider");
+        slider.value = "0";
+        updateSliderAndCup(0);
+        
+        const feedbackDiv = document.getElementById("feedbackMsg");
+        feedbackDiv.innerHTML = `✨ Soal baru! Berat adik ${currentBerat} kg. Tentukan dosis dalam mL, lalu geser slider dan cek. ✨`;
+        feedbackDiv.classList.remove("wrong-under", "wrong-over");
+        feedbackDiv.style.background = "#ebf4e8";
+        
+        if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
+    }
+    
+    // CEK JAWABAN dengan REVISI: bedakan kurang / overdosis
+    function cekJawaban() {
+        const slider = document.getElementById("volumeSlider");
+        let userVolume = parseFloat(slider.value);
+        if (isNaN(userVolume)) userVolume = 0;
+        
+        // pembulatan 0.5mL, toleransi 0.2mL
+        let diff = Math.abs(userVolume - correctVolumeMl);
+        const feedbackDiv = document.getElementById("feedbackMsg");
+        
+        // Jika tepat (dalam toleransi)
+        if (diff < 0.2) {
+            feedbackDiv.innerHTML = `✅ Benar! Untuk berat ${currentBerat} kg, volume yang tepat adalah ${correctVolumeMl} mL setiap kali minum. Hebat! 🎉`;
+            feedbackDiv.classList.remove("wrong-under", "wrong-over");
+            feedbackDiv.style.background = "#d9f0da";
+            if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
+            return;
+        }
+        
+        // JIKA SALAH: bedakan kurang atau lebih (overdosis)
+        if (userVolume < correctVolumeMl) {
+            // DOSIS KURANG
+            feedbackDiv.innerHTML = `⚠️ Dosis KURANG! Volume ${userVolume} mL terlalu kecil untuk berat ${currentBerat} kg. <br> ➕ Tambahkan dosis agar efek terapi optimal. Coba tentukan ulang berdasarkan tabel.`;
+            feedbackDiv.classList.remove("wrong-over");
+            feedbackDiv.classList.add("wrong-under");
+            feedbackDiv.style.background = "#fff0db";
+        } 
+        else if (userVolume > correctVolumeMl) {
+            // OVERDOSIS (bahaya)
+            feedbackDiv.innerHTML = `🚨 OVERDOSIS! Volume ${userVolume} mL melebihi dosis aman untuk berat ${currentBerat} kg. <br> ⚠️ Overdosis paracetamol berbahaya bagi organ hati/<em>hepar</em>! Kurangi volume sesuai panduan.`;
+            feedbackDiv.classList.remove("wrong-under");
+            feedbackDiv.classList.add("wrong-over");
+            feedbackDiv.style.background = "#ffe0e0";
+        }
+        
+        if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(30);
+    }
+    
+    function initSliderEvents() {
+        const slider = document.getElementById("volumeSlider");
+        slider.addEventListener("input", function(e) {
+            let val = parseFloat(e.target.value);
+            if (isNaN(val)) val = 0;
+            updateSliderAndCup(val);
+            const fb = document.getElementById("feedbackMsg");
+            if (fb.innerHTML.includes("Benar") || fb.innerHTML.includes("KURANG") || fb.innerHTML.includes("OVERDOSIS") || fb.innerHTML.includes("Belum tepat")) {
+                fb.innerHTML = "⚡ Slider digeser. Silakan tekan 'Cek Jawaban' untuk mengecek volume pilihanmu.";
+                fb.classList.remove("wrong-under", "wrong-over");
+                fb.style.background = "#ebf4e8";
+            }
+        });
+    }
+    
+    function initPage() {
+        let initialBerat = generateRandomBerat();
+        currentBerat = initialBerat;
+        document.getElementById("beratValue").innerText = currentBerat;
+        updateCorrectVolumeByWeight(currentBerat);
+        const slider = document.getElementById("volumeSlider");
+        slider.value = "0";
+        updateSliderAndCup(0);
+        buildStripLines();
+        initSliderEvents();
+        
+        const feedbackDiv = document.getElementById("feedbackMsg");
+        feedbackDiv.innerHTML = `🔍 Berat adik: ${currentBerat} kg. Tentukan volume sirup yang tepat (dalam mL) lalu geser slider & cek.`;
+        feedbackDiv.classList.remove("wrong-under", "wrong-over");
+        
+        // handle gambar ilustrasi jika gagal load
+        const img = document.getElementById("ilustrasiImg");
+        if (img) {
+            img.onerror = function() {
+                this.style.display = 'none';
+                const placeholder = document.getElementById("imgPlaceholder");
+                if (placeholder) placeholder.style.display = 'flex';
+            };
+            // jika gambar sukses dimuat, sembunyikan placeholder
+            img.onload = function() {
+                const placeholder = document.getElementById("imgPlaceholder");
+                if (placeholder) placeholder.style.display = 'none';
+                this.style.display = 'block';
+            };
+            // cek juga jika gambar sudah cached dan onload tidak terpicu? 
+            if (img.complete && img.naturalHeight !== 0) {
+                const placeholder = document.getElementById("imgPlaceholder");
+                if (placeholder) placeholder.style.display = 'none';
+                img.style.display = 'block';
+            } else if (img.complete && img.naturalHeight === 0) {
+                img.onerror();
+            }
+        }
+    }
+    
+    document.getElementById("cekBtn").addEventListener("click", cekJawaban);
+    document.getElementById("soalBaruBtn").addEventListener("click", () => {
+        refreshSoalBaru();
+        buildStripLines();
+    });
+    
+    window.addEventListener("resize", () => {
+        setTimeout(() => buildStripLines(), 30);
+    });
+    window.addEventListener("orientationchange", () => {
+        setTimeout(() => buildStripLines(), 50);
+    });
+    
+    initPage();
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        buildStripLines();
+    });
+</script>
+</body>
+</html>

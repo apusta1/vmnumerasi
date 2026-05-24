@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Botol Bekas - Bank Sampah</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Poppins', 'Roboto', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(145deg, #c8e8e9 0%, #b0d4d8 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            margin: 0;
+        }
+
+        /* Container untuk ilustrasi sebelum kartu */
+        .illustration-container {
+            max-width: 700px;
+            width: 100%;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .illustration-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 32px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background: #fef9e6;
+            border-radius: 48px 36px 48px 36px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2), 0 8px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .hero {
+            background: #2c5a2e;
+            padding: 20px 20px 14px 20px;
+            color: #f9e7b3;
+            text-align: center;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 1.9rem;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hero h1 span {
+            background: #f4b942;
+            padding: 0 14px;
+            border-radius: 60px;
+            font-size: 1.7rem;
+            color: #2a471f;
+        }
+
+        .hero p {
+            margin: 8px 0 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .content {
+            padding: 20px 18px 28px;
+        }
+
+        .soal-box {
+            background: #eef3e2;
+            border-left: 10px solid #4c8b3c;
+            border-radius: 28px;
+            padding: 16px 18px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .soal-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: #1f3b1a;
+            font-weight: 500;
+        }
+
+        .soal-text strong {
+            background: #f9e0a0;
+            padding: 2px 8px;
+            border-radius: 20px;
+            color: #3d2b1a;
+        }
+
+        .highlight {
+            background: #fbe192;
+            padding: 2px 6px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #2f4d2d;
+        }
+
+        .variable-info {
+            background: #d9e6c3;
+            border-radius: 40px;
+            padding: 10px 16px;
+            margin: 16px 0 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .botol-stats {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1a472a;
+        }
+
+        .target-kebutuhan {
+            font-size: 0.95rem;
+            background: white;
+            padding: 5px 12px;
+            border-radius: 40px;
+            color: #ab6f2c;
+        }
+
+        .slider-area {
+            background: #fff7e8;
+            border-radius: 40px;
+            padding: 14px 16px 18px;
+            margin: 18px 0;
+            box-shadow: inset 0 1px 4px #0001, 0 6px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #2c5a2e;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Slider Touch Optimization */
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            -webkit-appearance: none;
+            background: #cbdbb6;
+            border-radius: 10px;
+            outline: none;
+            touch-action: pan-y;
+        }
+
+        input[type="range"]:focus {
+            outline: none;
+        }
+
+        /* Thumb style - larger for touch */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 36px;
+            height: 36px;
+            background: #f3a712;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid #4f6b2e;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+        }
+
+        /* Firefox */
+        input[type="range"]::-moz-range-thumb {
+            width: 36px;
+            height: 36px;
+            background: #f3a712;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid #4f6b2e;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        /* IE/Edge */
+        input[type="range"]::-ms-thumb {
+            width: 36px;
+            height: 36px;
+            background: #f3a712;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid #4f6b2e;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-top: 12px;
+            display: inline-block;
+            width: auto;
+            padding: 8px 24px;
+            border-radius: 80px;
+            background: #f5eace;
+            color: #3c5e2b;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 24px 0 14px;
+        }
+
+        button {
+            border: none;
+            background: #4e8234;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            padding: 14px 28px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-weight: 600;
+            touch-action: manipulation;
+            min-width: 130px;
+        }
+
+        button:active {
+            transform: scale(0.96);
+            background: #2f5a22;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .cek-btn {
+            background: #f5a623;
+            color: #2d2b1f;
+        }
+
+        .cek-btn:active {
+            background: #e08e1a;
+        }
+
+        .baru-btn {
+            background: #2c6e9e;
+        }
+
+        .baru-btn:active {
+            background: #1e5580;
+        }
+
+        .feedback {
+            background: #fcf4dd;
+            border-radius: 36px;
+            margin-top: 20px;
+            padding: 14px 18px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: bold;
+            border: 1px solid #eddea4;
+            color: #3d5a2b;
+            transition: 0.1s;
+            line-height: 1.4;
+        }
+
+        .feedback.warning {
+            background: #fff0cf;
+            color: #c45c0a;
+        }
+
+        .feedback.success {
+            background: #d0e6b5;
+            color: #1c661c;
+            border-left: 8px solid #3d9e3d;
+        }
+
+        .feedback.error {
+            background: #ffebdd;
+            color: #c23b0e;
+        }
+
+        hr {
+            margin: 18px 0 0;
+            border-color: #e2dbba;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 10px;
+            background: #e2d9be;
+            color: #4b5c3b;
+        }
+
+        /* Touch-friendly spacing */
+        .slider-area p {
+            font-size: 0.75rem;
+            text-align: center;
+            margin: 14px 0 0 0;
+            color: #7a6a42;
+        }
+
+        .soal-box .petunjuk {
+            font-size: 0.8rem;
+            background: #faf2df;
+            border-radius: 28px;
+            padding: 8px 14px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 550px) {
+            .soal-text {
+                font-size: 1rem;
+            }
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            button {
+                padding: 12px 22px;
+                font-size: 0.95rem;
+                min-width: 120px;
+            }
+            .slider-value {
+                font-size: 1.5rem;
+                padding: 6px 20px;
+            }
+            .content {
+                padding: 16px 14px 22px;
+            }
+            .variable-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .slider-label {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 400px) {
+            .card {
+                border-radius: 36px 28px 36px 28px;
+            }
+            .hero h1 {
+                font-size: 1.4rem;
+            }
+            .soal-text {
+                font-size: 0.95rem;
+            }
+            .botol-stats {
+                font-size: 1rem;
+            }
+            button {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+                min-width: 100px;
+            }
+            .feedback {
+                font-size: 0.9rem;
+                padding: 12px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="hero">
+        <h1>
+            🧴 Botol Bekas 
+            <span>♻️</span>
+        </h1>
+        <p style="margin: 8px 0 0; opacity:0.9;">Ayo Menabung di Bank Sampah!</p>
+    </div>
+
+	<!-- ========== GAMBAR ILUSTRASI (sebelum kartu tugas) ========== -->
+	<div class="illustration-container">
+	    <img src="assets/ilustrasi-botol.png" alt="Ilustrasi Bank Sampah" onerror="this.style.display='none'">
+	</div>
+
+    <div class="content">
+        <div class="soal-box" id="soalBox">
+            <!-- dinamis oleh javascript -->
+        </div>
+
+        <!-- slider untuk menentukan kekurangan botol - touch optimized -->
+        <div class="slider-area">
+            <div class="slider-label">
+                <span>📦 Kekurangan botol yang kamu hitung:</span>
+                <span id="sliderJumlahLabel">0 botol</span>
+            </div>
+            <input type="range" id="kekuranganSlider" min="0" max="650" value="0" step="1">
+            <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                <span>0</span>
+                <span>⬅️ geser ➡️</span>
+                <span>650</span>
+            </div>
+            <div style="text-align: center; margin-top: 10px;">
+                <span class="slider-value" id="sliderValueDisplay">0 botol</span>
+            </div>
+            <p>yang masih harus dikumpulkan</p>
+        </div>
+
+        <div class="action-buttons">
+            <button class="cek-btn" id="cekBtn">🔍 Cek Jawaban</button>
+            <button class="baru-btn" id="soalBaruBtn">✨ Soal Baru</button>
+        </div>
+
+        <div id="feedbackArea" class="feedback">
+            💡 Geser slider, lalu tekan "Cek Jawaban" untuk melihat hasil.
+        </div>
+        <hr />
+        <footer>
+            💰 1 botol = Rp100 • Hitung kekurangan botol!
+        </footer>
+    </div>
+</div>
+
+<script>
+    // ---------- DAFTAR KASUS ACAK (tanpa bocor jawaban) ----------
+    const KASUS_LIST = [
+        { deskripsi: "membeli sebuah bola sepak untuk dimainkan saat jam pelajaran olahraga", biaya: 50000 },
+        { deskripsi: "mengecat ulang gerbang sekolah", biaya: 90000 },
+        { deskripsi: "mengganti bohlam lampu di beberapa kelas", biaya: 60000 },
+        { deskripsi: "menanam beberapa tanaman hias", biaya: 80000 },
+        { deskripsi: "memperbaiki papan nama sekolah", biaya: 70000 }
+    ];
+
+    // Variabel state (tidak ditampilkan mentah ke user, hanya untuk hitung internal)
+    let currentJumlahBotolAwal = 0;      // antara 250 - 450
+    let currentKasus = null;              // { deskripsi, biaya }
+    let currentTargetBiaya = 0;           // biaya dari kasus
+    let currentKekuranganBenar = 0;       // jumlah botol yg masih kurang (jawaban sebenarnya)
+
+    // DOM Elements
+    const soalBox = document.getElementById('soalBox');
+    const kekuranganSlider = document.getElementById('kekuranganSlider');
+    const sliderValueDisplay = document.getElementById('sliderValueDisplay');
+    const sliderJumlahLabel = document.getElementById('sliderJumlahLabel');
+    const cekBtn = document.getElementById('cekBtn');
+    const soalBaruBtn = document.getElementById('soalBaruBtn');
+    const feedbackArea = document.getElementById('feedbackArea');
+
+    // Helper: random integer antara min dan max (inklusif)
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Fungsi menghitung kekurangan botol sebenarnya (pure)
+    // Diketahui: jumlahBotolSekarang, target biaya (Rp), harga per botol = 100
+    // Kekurangan = (target_biaya / 100) - jumlahBotolSekarang , jika positif 
+    // Jika sudah cukup / lebih, kekurangan = 0
+    function hitungKekuranganBenar(jumlahBotol, biayaRupiah) {
+        const botolDibutuhkan = Math.ceil(biayaRupiah / 100);   // karena harga per botol 100 rupiah
+        const kekurangan = botolDibutuhkan - jumlahBotol;
+        return kekurangan > 0 ? kekurangan : 0;
+    }
+
+    // Membuat soal baru: generate jumlah botol acak (250-450) + kasus acak
+    function generateSoalBaru() {
+        // 1. jumlah botol acak antara 250 sampai 450
+        const jumlahBotolBaru = randomInt(250, 450);
+        // 2. pilih kasus secara acak
+        const randomIndex = Math.floor(Math.random() * KASUS_LIST.length);
+        const kasusTerpilih = { ...KASUS_LIST[randomIndex] };
+        
+        // 3. simpan state
+        currentJumlahBotolAwal = jumlahBotolBaru;
+        currentKasus = kasusTerpilih;
+        currentTargetBiaya = kasusTerpilih.biaya;
+        
+        // 4. hitung kekurangan yang benar (jawaban sebenarnya)
+        currentKekuranganBenar = hitungKekuranganBenar(currentJumlahBotolAwal, currentTargetBiaya);
+        
+        // 5. render ulang teks soal & reset slider & feedback
+        renderSoalKeHTML();
+        
+        // Reset slider ke 0 setiap soal baru (agar siswa mulai dari 0)
+        kekuranganSlider.value = 0;
+        updateSliderDisplay();
+        
+        // Reset feedback ke mode netral (tanpa bocor)
+        feedbackArea.innerHTML = "📐 Geser slider sesuai hitunganmu, lalu tekan tombol 'Cek Jawaban'.";
+        feedbackArea.className = "feedback";
+        
+        // Optional: sedikit efek animasi bukan bocoran
+    }
+    
+    // Menampilkan soal ke dalam .soal-box dengan bahasa yang jelas TANPA memberikan jawaban
+    function renderSoalKeHTML() {
+        if (!currentKasus) return;
+        
+        // Membuat deskripsi yang rapi, dengan highlight jumlah botol dan keperluan
+        const jumlahBotol = currentJumlahBotolAwal;
+        const biaya = currentTargetBiaya;
+        const rupiahFormat = new Intl.NumberFormat('id-ID').format(biaya);
+        const deskripsiKasus = currentKasus.deskripsi;
+        
+        // JANGAN pernah menampilkan 'kekurangan' di sini. Hanya cerita.
+        // Yang ditampilkan: jumlah botol yang sudah terkumpul, harga per botol, tujuan, biaya.
+        // Biarkan pengguna menghitung berapa botol lagi yang diperlukan.
+        const htmlSoal = `
+            <div class="soal-text">
+                🧴 Bank Sampah membayar <strong>Rp100 per botol bekas</strong>.<br><br>
+                Sekolahmu berhasil mengumpulkan <strong class="highlight">${jumlahBotol} botol bekas</strong>.<br><br>
+                📋 Jika sekolahmu ingin <strong>${deskripsiKasus}</strong> dengan biaya <strong class="highlight">Rp ${rupiahFormat}</strong>, <br>
+                🎯 <strong>berapa botol bekas <em>lagi</em> yang harus dikumpulkan?</strong>
+            </div>
+            <div class="variable-info">
+                <span class="botol-stats">📦 Botol saat ini: ${jumlahBotol} botol</span>
+                <span class="target-kebutuhan">🎯 Target biaya: Rp ${rupiahFormat}</span>
+            </div>
+            <div class="petunjuk">
+                💡 Petunjuk: 1 botol = Rp100, hitung total botol yang diperlukan, kurangi dengan botol yang ada.
+            </div>
+        `;
+        soalBox.innerHTML = htmlSoal;
+    }
+    
+    // update tampilan nilai slider
+    function updateSliderDisplay() {
+        const val = parseInt(kekuranganSlider.value, 10);
+        sliderValueDisplay.innerText = `${val} botol`;
+        sliderJumlahLabel.innerText = `${val} botol`;
+    }
+    
+    // Cek jawaban user berdasarkan slider yang dipilih
+    function cekJawaban() {
+        // pastikan state sudah diinisiasi
+        if (currentKasus === null) {
+            generateSoalBaru();
+        }
+        const userAnswer = parseInt(kekuranganSlider.value, 10);
+        const correctAnswer = currentKekuranganBenar;
+        
+        // validasi sedikit
+        if (isNaN(userAnswer)) {
+            feedbackArea.innerHTML = "⚠️ Geser slider terlebih dahulu untuk memilih jumlah kekurangan botol.";
+            feedbackArea.className = "feedback warning";
+            return;
+        }
+        
+        // Bandingkan
+        if (userAnswer === correctAnswer) {
+            // jawaban tepat
+            feedbackArea.innerHTML = `✅ ✅ ✅ Hebat! Jawabanmu tepat. Kekurangan botol yang diperlukan adalah ${correctAnswer} botol. Selamat! 🎉`;
+            feedbackArea.className = "feedback success";
+        } else {
+            // jawaban salah, beri petunjuk TANPA membocorkan jawaban persis?
+            // instruksi: "Jangan dibocorkan jawabannya, biarkan pengguna menghitung sendiri"
+            // Maka feedback tidak menyebutkan jawaban benar secara langsung, tetapi memberi semangat hitung ulang.
+            // Namun untuk pengalaman belajar, kita bisa kasih petunjuk apakah kelebihan/kekurangan tebakan tanpa angka absolut.
+            // Tidak menyebut angka correctAnswer. Hanya menyatakan bahwa tebakan masih kurang/lebih secara kualitatif.
+            let pesanHint = "";
+            if (userAnswer < correctAnswer) {
+                pesanHint = "📈 Tebakanmu masih terlalu kecil. Coba hitung lagi berapa banyak botol yang kurang. Periksa target biaya dan botol yang sudah ada!";
+            } else if (userAnswer > correctAnswer) {
+                pesanHint = "📉 Tebakanmu terlalu besar. Periksa kembali: apakah target biaya membutuhkan botol sebanyak itu? Hitung dengan teliti.";
+            } else {
+                pesanHint = "Coba periksa kembali perhitunganmu dengan teliti.";
+            }
+            feedbackArea.innerHTML = `❌ Jawabanmu (${userAnswer} botol) belum tepat. ${pesanHint} ✏️ Coba hitung ulang, lalu geser slider dan cek lagi.`;
+            feedbackArea.className = "feedback error";
+        }
+        
+        // sedikit tambahan: jika jawaban benar sekali, tidak perlu hint berlebih
+        // mematuhi aturan tidak membocorkan jawaban mutlak saat salah
+    }
+    
+    // Event listener untuk slider - touch optimized
+    function bindEvents() {
+        // Touch & mouse events untuk slider
+        kekuranganSlider.addEventListener('input', function() {
+            updateSliderDisplay();
+            // Jika user menggeser, kita bisa hapus pesan error sebelumnya? optional agar lebih fresh
+            // Tapi jangan langsung hapus total, biarkan user nyaman. Hapus jika sedang mode feedback eror/sukses?
+            // Supaya pengalaman baik, hapus feedback berat ketika slider digerakkan, tapi jangan sampai menghilangkan clue
+            // Tapi sesuai permintaan tidak membocorkan, ini tidak masalah.
+            if (feedbackArea.classList.contains('success') || feedbackArea.classList.contains('error')) {
+                feedbackArea.innerHTML = "🔄 Geser slider, lalu tekan 'Cek Jawaban' untuk menilai hitunganmu.";
+                feedbackArea.className = "feedback";
+            } else if (feedbackArea.innerHTML.includes("tepat") || feedbackArea.innerHTML.includes("belum tepat")) {
+                feedbackArea.innerHTML = "🎚️ Silakan tekan 'Cek Jawaban' setelah menentukan nilai.";
+                feedbackArea.className = "feedback";
+            }
+        });
+        
+        // Touch events untuk button (already handled by CSS :active)
+        cekBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            cekJawaban();
+        });
+        
+        soalBaruBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            generateSoalBaru();
+        });
+        
+        // Prevent accidental zoom on double-tap buttons (optional, improves UX)
+        cekBtn.addEventListener('touchstart', (e) => {
+            // just to ensure no zoom interference, fine as is
+        }, { passive: true });
+        
+        soalBaruBtn.addEventListener('touchstart', (e) => {
+            // passive
+        }, { passive: true });
+    }
+    
+    // inisialisasi pertama: generate soal random
+    function init() {
+        generateSoalBaru();
+        bindEvents();
+    }
+    
+    init();
+</script>
+</body>
+</html>

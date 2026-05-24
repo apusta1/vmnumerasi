@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Perjalanan Darat</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* Hilangkan highlight biru saat tap di mobile */
+        }
+        body {
+            background: #eef3fc;
+            margin: 0;
+            padding: 12px; /* Kurangi padding untuk HP kecil */
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px; /* Kurangi sedikit border-radius */
+            box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+            overflow: hidden;
+            padding: 16px; /* Kurangi padding untuk HP */
+        }
+        h1 {
+            font-size: 1.6rem; /* Sedikit lebih kecil di mobile */
+            margin: 0 0 4px 0;
+            color: #1a4c7a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sub {
+            color: #2c6979;
+            border-left: 5px solid #f5a623;
+            padding-left: 14px;
+            margin-bottom: 16px;
+            font-size: 0.85rem; /* Lebih kecil untuk HP */
+        }
+        /* Tombol navigasi carousel - Diperbesar untuk mobile */
+        .nav-btn {
+            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            border: none;
+            width: 52px; /* Ukuran tetap nyaman untuk jari */
+            height: 52px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            transition: 0.15s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            touch-action: manipulation;
+            z-index: 10;
+        }
+        /* Hapus efek hover di mobile (gak kepake), fokus ke active */
+        .nav-btn:active {
+            transform: scale(0.94);
+            background: rgba(0,0,0,0.85);
+        }
+        /* Dot indicator - perkecil gap untuk HP */
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 12px 0 4px;
+            flex-wrap: wrap;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: #cbdae9;
+            border-radius: 20px;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            min-width: 10px; /* Mencegah shrink berlebihan */
+        }
+        .dot.active {
+            background: #f5a623;
+            width: 26px;
+        }
+        /* Info rute */
+        .info-rute {
+            background: #fef6e8;
+            border-radius: 28px;
+            padding: 14px 18px;
+            margin: 12px 0 20px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .info-value {
+            font-size: 1.1rem;
+        }
+        /* Kartu tugas */
+        .task-card {
+            background: #ffffff;
+            border: 1px solid #e2edf7;
+            border-radius: 28px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+        }
+        .task-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0 10px;
+        }
+        .input-row label {
+            font-weight: 600;
+            min-width: 120px;
+            font-size: 0.9rem;
+        }
+        select, input {
+            flex: 2;
+            min-width: 130px;
+            padding: 12px 16px; /* Sedikit lebih kecil agar tidak terlalu tinggi */
+            border-radius: 60px;
+            border: 1.5px solid #cde1f0;
+            background: #ffffff;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: 0.2s;
+            touch-action: manipulation;
+        }
+        button {
+            background: #f5a623;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.15s;
+            touch-action: manipulation;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        button:active {
+            transform: scale(0.96);
+            background: #e08e1a;
+        }
+        .feedback {
+            margin-top: 12px;
+            padding: 10px 16px;
+            border-radius: 28px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        /* Frame carousel untuk mobile - pastikan tidak overflow */
+        .carousel-frame {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
+        #routeCard {
+            flex: 1;
+            min-width: 0; /* Mencegah overflow di flex */
+            max-width: 380px;
+            padding: 8px;
+        }
+        #routeImg {
+            width: 100%;
+            border-radius: 20px;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            display: block;
+        }
+        h3 {
+            font-size: 1rem;
+            margin: 8px 0 4px;
+        }
+        @media (max-width: 550px) {
+            body { padding: 8px; }
+            .container { padding: 12px; border-radius: 28px; }
+            .nav-btn { width: 44px; height: 44px; font-size: 32px; }
+            .task-title { font-size: 1.2rem; }
+            .info-value { font-size: 0.95rem; }
+            button { padding: 10px 18px; font-size: 0.85rem; }
+            select, input { padding: 10px 14px; font-size: 0.9rem; }
+            .input-row label { min-width: 100px; font-size: 0.85rem; }
+            .carousel-frame { gap: 8px; }
+            h1 { font-size: 1.4rem; }
+        }
+        /* Untuk HP yang sangat kecil (< 400px) */
+        @media (max-width: 400px) {
+            .carousel-frame {
+                gap: 6px;
+            }
+            .nav-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 28px;
+            }
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .input-row label {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🚐 Jalan Darat</h1>
+    <div class="sub">Geser gambar / tekan panah ◀ ▶ untuk <strong>pilih rute</strong>. Hitung waktu berangkat & biaya BBM.</div>
+
+    <!-- CAROUSEL DESAIN -->
+	<div class="carousel-section" style="text-align: center; margin-bottom: 16px;">
+	    <div class="carousel-frame">
+	        <button class="nav-btn" id="prevBtn" aria-label="Rute sebelumnya">◀</button>
+	        
+	        <div id="routeCard" class="task-card" style="margin-bottom: 0; padding: 8px;">
+	            <div id="slideContent">
+	                <img id="routeImg" src="" alt="Rute">
+	                <h3 id="routeName" style="margin: 8px 0 4px; color: #1a4c7a;">Nama Rute</h3>
+	            </div>
+	        </div>
+
+	        <button class="nav-btn" id="nextBtn" aria-label="Rute berikutnya">▶</button>
+	    </div>
+	    <div class="carousel-dots" id="carouselDots"></div>
+	</div>
+
+    <!-- Informasi jarak & kecepatan dinamis -->
+    <div class="info-rute" id="infoRute">
+        <div class="info-item"><span class="info-label">📏 Jarak:</span> <span id="jarakValue" class="info-value">-- km</span></div>
+        <div class="info-item"><span class="info-label">⚡ Kecepatan Rata-Rata:</span> <span id="kecepatanValue" class="info-value">-- km/jam</span></div>
+    </div>
+
+    <!-- TUGAS 1: waktu keberangkatan -->
+    <div class="task-card">
+        <div class="task-title">⏰ Tugas 1 – Jam Keberangkatan</div>
+        <div style="margin-bottom: 8px; font-size: 0.9rem;">Pilih jam tiba di kota tujuan:</div>
+        <div class="input-row">
+            <label>🕒 Jam Tiba:</label>
+            <select id="arrivalTimeSelect">
+                <option value="13:00">13.00</option>
+                <option value="13:30">13.30</option>
+                <option value="14:00">14.00</option>
+                <option value="14:30">14.30</option>
+                <option value="15:00">15.00</option>
+            </select>
+        </div>
+        <div style="font-size: 0.85rem; color: #5e6f8d;">Jika kamu harus sampai di Kota Tujuan pada jam tersebut, maka maksimal kamu harus berangkat jam berapa?</div>
+    	</div>
+	<div class="input-row">
+            <label>🚀 Berangkat jam:</label>
+            <input type="text" id="departureInput" placeholder="HH:MM (contoh: 08:15)" value="">
+            <button id="checkTimeBtn">🔍 Cek</button>
+        </div>
+        <div id="timeFeedback" class="feedback"></div>
+
+    <!-- TUGAS 2: biaya bahan bakar -->
+    <div class="task-card">
+        <div class="task-title">⛽ Tugas 2 – Biaya BBM</div>
+        <div style="font-size: 0.85rem;">📌 1 liter = 10 km | Harga = Rp 15.000/liter</div>
+	    <div style="font-size: 0.85rem; margin-top: 6px;"><br>Hitung perkiraan total biaya BBM:</div>
+        <div class="input-row">
+            <label>💰 Biaya BBM:</label>
+            <input type="number" id="fuelCostInput" placeholder="contoh: 225000" value="">
+            <button id="checkFuelBtn">🔍 Cek</button>
+        </div>
+        <div id="fuelFeedback" class="feedback"></div>
+    </div>
+    <div class="footer-note"><center>✨ Geser/tekan panah untuk ganti rute. Hitung yang teliti ya!</center></div>
+</div>
+
+<script>
+    const routes = [
+        { name: "Ende → Maumere", jarak: 150, kecepatan: 50 },
+        { name: "Bima → Dompu", jarak: 100, kecepatan: 50 },
+        { name: "Bontang → Samarinda", jarak: 125, kecepatan: 50 },
+        { name: "Pontianak → Singkawang", jarak: 150, kecepatan: 40 },
+        { name: "Padang → Bukittinggi", jarak: 90, kecepatan: 36 },
+        { name: "Denpasar → Gilimanuk", jarak: 140, kecepatan: 40 },
+        { name: "Polewali → Majene", jarak: 50, kecepatan: 40 }
+    ];
+
+    let currentIndex = 0;
+
+    const routeImg = document.getElementById('routeImg');
+    const routeName = document.getElementById('routeName');
+    const jarakSpan = document.getElementById('jarakValue');
+    const kecepatanSpan = document.getElementById('kecepatanValue');
+    const dotsContainer = document.getElementById('carouselDots');
+    const timeFeedback = document.getElementById('timeFeedback');
+    const fuelFeedback = document.getElementById('fuelFeedback');
+
+    function updateDisplay() {
+        const r = routes[currentIndex];
+        routeImg.src = `assets/rute_${currentIndex + 1}.png`;
+        routeImg.onerror = () => {
+            routeImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect width='200' height='120' fill='%232c5a7a'/%3E%3Ctext x='20' y='65' fill='white' font-size='14'%3ERute%3C/text%3E%3C/svg%3E";
+        };
+        routeName.innerText = r.name;
+        jarakSpan.innerText = `${r.jarak} km`;
+        kecepatanSpan.innerText = `${r.kecepatan} km/jam`;
+        updateDots();
+        
+        // Reset input
+        document.getElementById('departureInput').value = "";
+        document.getElementById('fuelCostInput').value = "";
+        timeFeedback.innerHTML = "Silakan hitung waktu berangkat...";
+        timeFeedback.className = "feedback";
+        fuelFeedback.innerHTML = "Masukkan biaya BBM...";
+        fuelFeedback.className = "feedback";
+    }
+
+    function updateDots() {
+        dotsContainer.innerHTML = '';
+        routes.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = i === currentIndex ? 'dot active' : 'dot';
+            dot.onclick = () => { currentIndex = i; updateDisplay(); };
+            dotsContainer.appendChild(dot);
+        });
+    }
+
+    document.getElementById('prevBtn').onclick = () => {
+        currentIndex = (currentIndex > 0) ? currentIndex - 1 : routes.length - 1;
+        updateDisplay();
+    };
+
+    document.getElementById('nextBtn').onclick = () => {
+        currentIndex = (currentIndex < routes.length - 1) ? currentIndex + 1 : 0;
+        updateDisplay();
+    };
+
+    // TUGAS 1
+    document.getElementById('checkTimeBtn').onclick = () => {
+        const r = routes[currentIndex];
+        const travelMinutes = (r.jarak / r.kecepatan) * 60;
+        const [targetH, targetM] = document.getElementById('arrivalTimeSelect').value.split(':').map(Number);
+        
+        let totalTargetMin = targetH * 60 + targetM;
+        let departMin = totalTargetMin - travelMinutes;
+        if (departMin < 0) departMin += 1440;
+
+        const h = Math.floor(departMin / 60) % 24;
+        const m = Math.round(departMin % 60);
+        const correct = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+        if (document.getElementById('departureInput').value.trim() === correct) {
+            timeFeedback.innerHTML = `✅ Benar! Berangkat pukul ${correct}.`;
+            timeFeedback.className = "feedback correct";
+        } else {
+            timeFeedback.innerHTML = `❌ Kurang tepat. Coba hitung lagi: waktu = jarak ÷ kecepatan.`;
+            timeFeedback.className = "feedback wrong";
+        }
+    };
+
+    // TUGAS 2
+    document.getElementById('checkFuelBtn').onclick = () => {
+        const correctCost = (routes[currentIndex].jarak / 10) * 15000;
+        const userVal = parseInt(document.getElementById('fuelCostInput').value);
+
+        if (userVal === correctCost) {
+            fuelFeedback.innerHTML = `✅ Tepat! Biaya Rp ${correctCost.toLocaleString('id-ID')}.`;
+            fuelFeedback.className = "feedback correct";
+        } else {
+            fuelFeedback.innerHTML = `❌ Salah. Rumus: (jarak ÷ 10) × 15000.`;
+            fuelFeedback.className = "feedback wrong";
+        }
+    };
+
+    updateDisplay();
+</script>
+</body>
+</html>

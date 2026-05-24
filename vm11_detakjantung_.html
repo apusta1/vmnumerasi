@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Denyut Jantung & Zona Aktivitas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #e9f0f5;
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Noto Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* container utama mobile-first */
+        .heart-container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin: 0 0 0.25rem 0;
+            color: #1e2a3e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        h1 small {
+            font-size: 0.85rem;
+            font-weight: normal;
+            background: #eef2f5;
+            padding: 4px 12px;
+            border-radius: 40px;
+            color: #2c5f8a;
+        }
+
+        .info-text {
+            background: #f0f7fc;
+            border-left: 5px solid #e63946;
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin: 16px 0;
+            font-size: 1rem;
+            line-height: 1.4;
+            color: #1f3a4b;
+        }
+
+        .simulasi-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+            margin: 20px 0;
+            padding: 10px 0 5px 0;
+            border: 1px solid #e2edf2;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #fefefe;
+            border-radius: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin: 0 auto;
+        }
+
+        /* canvas tetap rasio & touch friendly */
+        #ecgCanvas {
+            width: 100%;
+            height: auto;
+            background: #fbfdfe;
+            border: 1px solid #cbdde6;
+            border-radius: 18px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0 8px;
+        }
+
+        .btn-ukur {
+            background: #e63946;
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 14px 28px;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            width: 80%;
+            max-width: 260px;
+            font-family: inherit;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-ukur:active {
+            transform: scale(0.97);
+            background: #bb2e3b;
+        }
+
+        .status-waktu {
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #eef2fa;
+            display: inline-block;
+            width: auto;
+            margin: 8px auto 0;
+            padding: 6px 16px;
+            border-radius: 50px;
+            color: #1e4663;
+        }
+
+        .interaksi-hasil {
+            margin-top: 24px;
+            background: #fafcff;
+            padding: 8px 4px;
+        }
+
+        .form-jawaban {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 12px 0;
+        }
+
+        .field-group {
+            margin: 18px 0;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            color: #1f2f3e;
+        }
+
+        .bpm-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        #bpmUser {
+            flex: 2;
+            min-width: 140px;
+            padding: 14px 18px;
+            font-size: 1rem;
+            border: 2px solid #d4e0e8;
+            border-radius: 60px;
+            font-family: monospace;
+            font-weight: 600;
+            text-align: center;
+            background: white;
+            transition: 0.2s;
+        }
+
+        #bpmUser:focus {
+            border-color: #e63946;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(230,57,70,0.2);
+        }
+
+        .btn-cek {
+            background: #2c6e9e;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+            white-space: nowrap;
+        }
+
+        .btn-cek:active {
+            background: #1e4e72;
+            transform: scale(0.96);
+        }
+
+        .zona-option {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 8px 0 16px;
+        }
+
+        .zona-btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px 6px;
+            border-radius: 60px;
+            font-weight: bold;
+            border: 2px solid transparent;
+            background: #edf2f7;
+            transition: 0.1s linear;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .zona-btn[data-zona="normal"]:active, .zona-btn[data-zona="normal"].zona-active {
+            background: #bef5cf;
+            border-color: #2b7e3a;
+            color: #1b4d2a;
+        }
+        .zona-btn[data-zona="olahraga"]:active, .zona-btn[data-zona="olahraga"].zona-active {
+            background: #fff1b5;
+            border-color: #e6b422;
+            color: #7a5d00;
+        }
+        .zona-btn[data-zona="bahaya"]:active, .zona-btn[data-zona="bahaya"].zona-active {
+            background: #ffcfcf;
+            border-color: #c7362b;
+            color: #a12218;
+        }
+
+        .feedback-area {
+            background: #eef3fa;
+            border-radius: 28px;
+            padding: 16px 20px;
+            margin: 20px 0 12px;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            color: #144d6b;
+        }
+
+        .message-feedback {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: baseline;
+        }
+
+        .skenario-bar {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .btn-skenario {
+            background: #475569;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            max-width: 260px;
+        }
+
+        .btn-skenario:active {
+            background: #1e293b;
+        }
+
+        hr {
+            margin: 20px 0 10px;
+            border-color: #e2edf2;
+        }
+
+        /* responsif touch */
+        @media (max-width: 560px) {
+            .heart-container {
+                padding: 1rem;
+            }
+            .zona-btn {
+                font-size: 0.85rem;
+                padding: 10px 4px;
+            }
+            .btn-ukur, .btn-cek, .btn-skenario {
+                font-size: 1rem;
+            }
+            .bpm-input {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-cek {
+                white-space: normal;
+                text-align: center;
+            }
+        }
+
+        .badge-beats {
+            font-size: 0.8rem;
+            background: #e6394610;
+            border-radius: 30px;
+            padding: 2px 12px;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #6c87a0;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="heart-container">
+    <h1>💓 Denyut Jantung</h1>
+
+    <div class="info-text">
+        📘 Denyut jantung normal saat istirahat untuk anak usia Sekolah Dasar umumnya berkisar antara <strong>75–100 bpm</strong>. 
+        Di bawah ini adalah alat simulasi pengukur denyut jantung selama <strong>15 detik</strong>. 
+        Hitung sendiri ada berapa <u>denyut per menit</u> (bpm) pada anak yang sedang diukur dengan alat ini:
+    </div>
+
+    <!-- Simulasi detak jantung -->
+    <div class="simulasi-card">
+        <div style="text-align: center; margin-top: 6px;">
+            <span class="status-waktu" id="status">🫀 Waktu: 0.0s / 15.0s</span><br><br>
+        </div>
+        <canvas id="ecgCanvas" width="800" height="200" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/200"></canvas>
+        <div class="controls">
+            <button class="btn-ukur" id="tombolUkur">📈 UKUR / MULAI</button>
+        </div>
+        <div style="font-size: 12px; text-align: center; margin-top: 4px; color:#386a8c;">
+            ⚡ setiap denyut = bunyi *beep* (pastikan volume tidak mute)
+        </div>
+    </div>
+
+    <!-- Bagian interaksi siswa -->
+    <div class="interaksi-hasil">
+        <div class="form-jawaban">
+            <div class="field-group">
+                <label>📝 Berapa bpm denyut jantung yang terukur? (bpm = denyut per menit)</label>
+                <div class="bpm-input">
+                    <input type="number" id="bpmUser" placeholder="Contoh: 88" value="" step="1">
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label>🏃‍♂️ Ketika olahraga/aktivitas fisik, denyut jantung dapat meningkat menjadi 101-170 bpm. Di atas 170 bpm, masuk zona berbahaya. Dari hasil pengukuranmu di atas, anak yang diukur berada pada zona yang mana?</label>
+                <div class="zona-option" id="zonaGroup">
+                    <div class="zona-btn" data-zona="normal">🟢 Normal Istirahat (≤100 bpm)</div>
+                    <div class="zona-btn" data-zona="olahraga">🟡 Olahraga / Aktif (101-170 bpm)</div>
+                    <div class="zona-btn" data-zona="bahaya">🔴 Bahaya (>170 bpm)</div>
+                </div>
+	                    <center><button class="btn-cek" id="cekJawabanBtn">✅ Cek Jawaban</button></center>
+            </div>
+
+            <div id="feedbackPanel" class="feedback-area">
+                💡 <strong>Catatan:</strong> <span id="feedbackText">Tekan "Cek Jawaban" setelah mengisi BPM dan memilih zona.</span>
+            </div>
+
+            <div style="font-size: 1 rem; background: #eef2f0; padding: 12px; border-radius: 24px; margin: 10px 0;">
+                📌 Dengan mengetahui zona tersebut, olahraga atau aktivitas fisik menjadi lebih terarah, efektif, dan aman karena mencegah latihan berlebihan (<em>overtraining</em>), mengurangi risiko cedera, dan mengoptimalkan kesehatan jantung.
+            </div>
+
+            <div class="skenario-bar">
+                <button class="btn-skenario" id="skenarioBaruBtn">🔄 Skenario Baru</button>
+                <p style="font-size: 0.7rem; margin-top: 8px;">★ Klik untuk mengubah jumlah denyut.</p>
+            </div>
+        </div>
+    </div>
+    <footer>Simulasi denyut jantung | Hitung denyut dalam 15 detik lalu konversi ke BPM</footer>
+</div>
+
+<script>
+    (function() {
+        // --- DOM elements
+        const canvas = document.getElementById('ecgCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusSpan = document.getElementById('status');
+        const ukurBtn = document.getElementById('tombolUkur');
+        const cekBtn = document.getElementById('cekJawabanBtn');
+        const skenarioBtn = document.getElementById('skenarioBaruBtn');
+        const bpmInput = document.getElementById('bpmUser');
+        const feedbackSpan = document.getElementById('feedbackText');
+        const zonaButtons = document.querySelectorAll('.zona-btn');
+        
+        // --- Ukuran canvas real (resolusi tetap 800x200)
+        canvas.width = 800;
+        canvas.height = 200;
+        
+        // --- variabel simulasi
+        let animationId = null;
+        let startTimestamp = null;
+        let currentX = 0;
+        let lastBeatIdx = -1;
+        let isSimulating = false;
+        let currentSimulationEnded = false;   // apakah sudah selesai 15 detik
+        
+        // --- data rahasia: jumlah denyut dalam 15 detik (random 18-48)
+        let currentBeatCount = 24;  // default
+        let currentBPM = 0;          // dihitung dari beatCount * 4
+        
+        // Audio Context
+        let audioCtx = null;
+        
+        // Durasi & interval antar detak berdasarkan jumlah denyut
+        let currentIntervalMs = 750;   // akan diupdate saat generate skenario
+        let totalDuration = 15000;      // 15 detik
+        
+        // --- Helper: generate denyut random (18-48)
+        function generateRandomBeatCount() {
+            return Math.floor(Math.random() * (48 - 18 + 1) + 18); // 18..48 inklusif
+        }
+        
+        // Hitung BPM & perbaharui interval antar detak
+        function updateParamsFromBeatCount(beatCount) {
+            currentBeatCount = beatCount;
+            currentBPM = Math.round((beatCount / totalDuration) * 60000);  // (denyut/15detik)*4 = denyut/menit
+            // interval dalam ms antar denyut (titik puncak)
+            currentIntervalMs = totalDuration / currentBeatCount;
+            return currentBPM;
+        }
+        
+        // generate skenario baru (random denyut, reset semua state)
+        function generateNewScenario(resetSimulationState = true) {
+            // hentikan animasi berjalan
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            isSimulating = false;
+            currentSimulationEnded = false;
+            startTimestamp = null;
+            currentX = 0;
+            lastBeatIdx = -1;
+            
+            // random beatCount
+            const newBeats = generateRandomBeatCount();
+            updateParamsFromBeatCount(newBeats);
+            
+            // reset tampilan canvas ke baseline + grid
+            drawFullGridAndBaseline();
+            statusSpan.innerHTML = `🫀 Waktu: 0.0s / 15.0s`;
+            // reset feedback UI 
+            feedbackSpan.innerHTML = "Tekan \"Cek Jawaban\" setelah mengisi BPM dan memilih zona.";
+            // Bersihkan zona active & highlight
+            zonaButtons.forEach(btn => btn.classList.remove('zona-active'));
+            // Kosongkan input
+            bpmInput.value = '';
+            bpmInput.style.borderColor = "#d4e0e8";
+            
+            // update tampilan rahasia: tidak ditampilkan ke user, hanya di console
+            console.log(`[SKENARIO BARU] Denyut dalam 15 detik = ${currentBeatCount} | BPM = ${currentBPM}`);
+        }
+        
+        // Fungsi menggambar grid & baseline
+        function drawFullGridAndBaseline() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            // gambar baseline tipis
+            ctx.beginPath();
+            ctx.strokeStyle = '#b0c4de';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.moveTo(0, canvas.height/2);
+            ctx.lineTo(canvas.width, canvas.height/2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+        
+        function drawGrid() {
+            ctx.save();
+            ctx.strokeStyle = '#e2eaf1';
+            ctx.lineWidth = 0.8;
+            // vertikal
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            // horisontal
+            for (let i = 0; i < canvas.height; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+        
+        // Fungsi nilai y (0 = baseline tengah 100) (height 200 -> baseline y=100)
+        function getHeartPointFromPhase(phase01) {
+            let t = phase01;
+            if (t < 0.1) return 0;
+            if (t >= 0.1 && t < 0.14) {
+                let p = (t - 0.1) / 0.04;
+                return -5 * p;
+            }
+            if (t >= 0.14 && t < 0.22) {
+                let p = (t - 0.14) / 0.08;
+                return -5 + (p * 55);
+            }
+            if (t >= 0.22 && t < 0.3) {
+                let p = (t - 0.22) / 0.08;
+                return 50 - (p * 65);
+            }
+            if (t >= 0.3 && t < 0.42) {
+                let p = (t - 0.3) / 0.12;
+                return -15 + (p * 18);
+            }
+            return 0;
+        }
+        
+        // draw gelombang sesuai dengan interval beat & elapsed
+        function getYByElapsed(elapsedMs) {
+            if (elapsedMs >= totalDuration) return canvas.height/2;
+            let beatIndex = Math.floor(elapsedMs / currentIntervalMs);
+            if (beatIndex >= currentBeatCount) return canvas.height/2;
+            let phaseInBeat = (elapsedMs % currentIntervalMs) / currentIntervalMs;
+            let offset = getHeartPointFromPhase(phaseInBeat);
+            return canvas.height/2 - offset;
+        }
+        
+        // fungsi animasi (mirip simulasi rolling)
+        function animateSimulation(now) {
+            if (!isSimulating) return;
+            if (!startTimestamp) {
+                startTimestamp = now;
+                requestAnimationFrame(animateSimulation);
+                return;
+            }
+            const elapsed = now - startTimestamp;
+            if (elapsed >= totalDuration) {
+                // selesai
+                isSimulating = false;
+                currentSimulationEnded = true;
+                statusSpan.innerHTML = `✅ SELESAI! 15 detik. Hitung jumlah denyut lalu konversi ke BPM.`;
+                if (animationId) cancelAnimationFrame(animationId);
+                animationId = null;
+                drawFullGridAndBaseline();
+                drawCompleteTrace();
+                return;
+            }
+            
+            // update status waktu
+            const secs = (elapsed / 1000).toFixed(1);
+            statusSpan.innerHTML = `🫀 Waktu: ${secs}s / 15.0s`;
+            
+            // Cek detak baru untuk beep
+            const currentBeatIdx = Math.floor(elapsed / currentIntervalMs);
+            if (currentBeatIdx > lastBeatIdx && currentBeatIdx < currentBeatCount && currentBeatIdx >= 0) {
+                playBeepSound();
+                lastBeatIdx = currentBeatIdx;
+            }
+            
+            // teknik geser canvas (trailing)
+            ctx.fillStyle = 'rgba(250, 252, 255, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            
+            // gambar garis baseline tipis
+            ctx.beginPath();
+            ctx.strokeStyle = '#b0c4de';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 4]);
+            ctx.moveTo(0, canvas.height/2);
+            ctx.lineTo(canvas.width, canvas.height/2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // gambar kurva realtime dengan poin mundur
+            const step = 3; // per pixel shift
+            let drawStartX = currentX;
+            ctx.beginPath();
+            ctx.strokeStyle = '#e63946';
+            ctx.lineWidth = 2.5;
+            ctx.lineJoin = 'round';
+            
+            // Nilai y untuk posisi sebelumnya dan sekarang
+            let prevTime = elapsed - 16;
+            if (prevTime < 0) prevTime = 0;
+            let prevY = getYByElapsed(prevTime);
+            let currentY = getYByElapsed(elapsed);
+            
+            let prevX = drawStartX - step;
+            if (prevX < 0) prevX = 0;
+            ctx.moveTo(prevX, prevY);
+            ctx.lineTo(drawStartX, currentY);
+            ctx.stroke();
+            
+            currentX = (currentX + step) % canvas.width;
+            
+            animationId = requestAnimationFrame(animateSimulation);
+        }
+        
+        // gambar trace lengkap untuk tampilan setelah selesai
+        function drawCompleteTrace() {
+            drawFullGridAndBaseline();
+            ctx.beginPath();
+            ctx.strokeStyle = '#e63946';
+            ctx.lineWidth = 2.2;
+            let first = true;
+            for (let t = 0; t <= totalDuration; t += 16) {
+                let xPos = (t / totalDuration) * canvas.width;
+                let yVal = getYByElapsed(t);
+                if (first) {
+                    ctx.moveTo(xPos, yVal);
+                    first = false;
+                } else {
+                    ctx.lineTo(xPos, yVal);
+                }
+            }
+            ctx.stroke();
+        }
+        
+        // Sound beep
+        function initAudioOnUserGesture() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+        
+        function playBeepSound() {
+            if (!audioCtx) return;
+            if (audioCtx.state !== 'running') return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 720;
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.12);
+            } catch(e) { console.warn(e); }
+        }
+        
+        // Mulai Simulasi (tombol UKUR)
+        function startSimulation() {
+            // pastikan audio terinisiasi
+            initAudioOnUserGesture();
+            if (animationId) cancelAnimationFrame(animationId);
+            // reset state animasi
+            isSimulating = true;
+            currentSimulationEnded = false;
+            startTimestamp = null;
+            currentX = 0;
+            lastBeatIdx = -1;
+            drawFullGridAndBaseline();
+            // jalankan
+            animationId = requestAnimationFrame(animateSimulation);
+        }
+        
+        // --- Cek Jawaban (tanpa hint angka BPM yang benar di pesan salah)
+        function cekJawaban() {
+            if (!currentSimulationEnded && !isSimulating) {
+                feedbackSpan.innerHTML = "⚠️ Silakan tekan tombol UKUR terlebih dahulu dan tunggu hingga 15 detik selesai!";
+                return;
+            }
+            if (isSimulating) {
+                feedbackSpan.innerHTML = "⏳ Simulasi masih berjalan. Tunggu hingga selesai (15 detik) untuk mengukur denyut.";
+                return;
+            }
+            let userBPM = parseInt(bpmInput.value.trim());
+            if (isNaN(userBPM)) {
+                feedbackSpan.innerHTML = "❌ Masukkan angka BPM hasil perhitunganmu (denyut dalam 15 detik × 4).";
+                return;
+            }
+            
+            let selectedZona = null;
+            for (let btn of zonaButtons) {
+                if (btn.classList.contains('zona-active')) {
+                    selectedZona = btn.getAttribute('data-zona');
+                    break;
+                }
+            }
+            if (!selectedZona) {
+                feedbackSpan.innerHTML = "📌 Silakan pilih zona (Normal/Olahraga/Bahaya) berdasarkan hasil BPM.";
+                return;
+            }
+            
+            const trueBPM = currentBPM;
+            const isBPMCorrect = (userBPM === trueBPM);
+            
+            let correctZona = '';
+            if (trueBPM <= 100) correctZona = 'normal';
+            else if (trueBPM >= 101 && trueBPM <= 170) correctZona = 'olahraga';
+            else correctZona = 'bahaya';
+            
+            const isZonaCorrect = (selectedZona === correctZona);
+            
+            // KASUS JAWABAN BENAR semua
+            if (isBPMCorrect && isZonaCorrect) {
+                feedbackSpan.innerHTML = `🎉✨ Jawaban tepat! bpm = ${trueBPM}, zona ${correctZona.toUpperCase()} sesuai. 💪 Pemahamanmu bagus!`;
+            } 
+            // KASUS: ZONA BENAR tapi BPM SALAH → tanpa hint angka yang benar
+            else if (!isBPMCorrect && isZonaCorrect) {
+                feedbackSpan.innerHTML = `⚠️ Zona yang kamu pilih sudah tepat (${correctZona}), tetapi perhitungan bpm-mu belum sesuai. Coba hitung ulang jumlah denyut dalam simulasi 15 detik dengan teliti, lalu kalikan 4.`;
+            } 
+            // KASUS: BPM BENAR tapi ZONA SALAH → tanpa hint angka BPM (karena BPM sudah benar, tapi zona salah)
+            else if (isBPMCorrect && !isZonaCorrect) {
+                feedbackSpan.innerHTML = `❗ Nilai bpm yang kamu hitung benar, tetapi zona yang dipilih kurang tepat. Perhatikan kembali rentang nilai untuk zona Normal (≤100 bpm), Olahraga (101-170 bpm), dan Bahaya (>170 bpm).`;
+            } 
+            // KASUS: BPM SALAH dan ZONA SALAH → tanpa menyebutkan angka yang benar
+            else {
+                feedbackSpan.innerHTML = `❌ Jawaban belum tepat. Coba ulang pengukuranmu: hitung denyut yang muncul selama 15 detik dengan saksama, lalu tentukan zona berdasarkan bpm yang diperoleh.`;
+            }
+        }
+        
+        // skenario baru (ubah jumlah denyut)
+        function handleNewScenario() {
+            if (isSimulating) {
+                if (animationId) cancelAnimationFrame(animationId);
+                isSimulating = false;
+            }
+            generateNewScenario(true);
+            currentSimulationEnded = false;
+            if (audioCtx && audioCtx.state === 'running') {
+                // biarkan aja
+            }
+            feedbackSpan.innerHTML = "✨ Skenario baru dengan denyut berbeda. Tekan UKUR dan hitung denyut dalam 15 detik!";
+            zonaButtons.forEach(btn => btn.classList.remove('zona-active'));
+            bpmInput.value = '';
+        }
+        
+        // zona aktif pada klik
+        zonaButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                zonaButtons.forEach(b => b.classList.remove('zona-active'));
+                btn.classList.add('zona-active');
+            });
+        });
+        
+        // event listeners
+        ukurBtn.addEventListener('click', () => {
+            startSimulation();
+        });
+        
+        cekBtn.addEventListener('click', cekJawaban);
+        skenarioBtn.addEventListener('click', handleNewScenario);
+        
+        // Inisialisasi grid awal dan generate skenario default random
+        generateNewScenario(true);
+        drawFullGridAndBaseline();
+        
+    })();
+</script>
+</body>
+</html>
