@@ -33,558 +33,188 @@
             text-align: center;
             margin: 0 0 6px 0;
             color: #c16f2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
         }
-
-        .sub {
-            text-align: center;
-            color: #8b6946;
-            border-bottom: 2px solid #ffe0b5;
-            padding-bottom: 14px;
-            margin-bottom: 28px;
+        
+        /* Tambahan style untuk testing */
+        .check-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            font-family: monospace;
         }
-
-        .top-row {
-            background: #fef6e8;
-            border-radius: 32px;
-            padding: 18px 20px;
-            margin-bottom: 32px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border: 1px solid #ffefcf;
+        
+        .status {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 8px;
         }
-
-        .top-row h2 {
-            margin-top: 0;
-            margin-bottom: 18px;
-            font-size: 1.5rem;
-            color: #825a32;
-            display: inline-block;
-            border-left: 6px solid #f0a35e;
-            padding-left: 14px;
+        
+        .valid {
+            background: #d4edda;
+            color: #155724;
         }
-
-        .resep-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px 28px;
-            justify-content: space-between;
+        
+        .invalid {
+            background: #f8d7da;
+            color: #721c24;
         }
-
-        .bahan-card {
-            background: white;
-            border-radius: 40px;
-            padding: 10px 18px;
-            min-width: 140px;
-            flex: 1;
-            text-align: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            border: 1px solid #fbe5c2;
-        }
-
-        .bahan-nama {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #9b5e2c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .bahan-nilai {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #5c3719;
-            margin-top: 6px;
-        }
-
-        .bahan-unit {
-            font-size: 0.75rem;
-            color: #b48449;
-        }
-
-        .bottom-row {
-            background: #fff9ef;
-            border-radius: 40px;
-            padding: 18px 24px;
-            border: 2px solid #ffddb0;
-        }
-
-        .soal-header {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-
-        .soal-header h2 {
-            margin: 0;
-            font-size: 1.6rem;
-            color: #bc6f2c;
-        }
-
-        .jumlah-orang-badge {
-            background: #e7c696;
-            padding: 8px 22px;
-            border-radius: 100px;
-            font-weight: bold;
-            font-size: 1.8rem;
-            color: #422d19;
-        }
-
-        .slider-item {
-            background: #fff7ea;
-            border-radius: 60px;
-            padding: 14px 18px;
-            margin-bottom: 18px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px;
-            transition: 0.1s;
-            border: 1px solid #f3e2c6;
-        }
-
-        .slider-label {
-            width: 180px;
-            font-weight: 700;
-            color: #774e28;
-            font-size: 1rem;
-        }
-
-        .slider-input {
-            flex: 3;
-            min-width: 180px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        input[type="range"] {
-            flex: 2;
-            min-width: 150px;
-            accent-color: #e68a2e;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 26px;
-            height: 26px;
-            background: #e68a2e;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            border: 2px solid white;
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 26px;
-            height: 26px;
-            background: #e68a2e;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-        }
-
-        .nilai-slider {
-            background: #f5e2c4;
-            padding: 5px 15px;
-            border-radius: 60px;
-            font-weight: bold;
-            min-width: 70px;
-            text-align: center;
-            color: #3c2a1a;
-            font-size: 1rem;
-            user-select: none;
-        }
-
-        .tombol-area {
-            display: flex;
-            justify-content: center;
-            gap: 18px;
-            margin: 28px 0 18px;
-            flex-wrap: wrap;
-        }
-
+        
         button {
-            background: #e09d5e;
-            border: none;
-            padding: 14px 32px;
-            border-radius: 60px;
-            font-weight: bold;
-            font-size: 1rem;
+            background: #c16f2e;
             color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.15s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            touch-action: manipulation;
-            min-height: 52px;
-            -webkit-tap-highlight-color: transparent;
+            margin: 10px 5px;
         }
-
-        button:active {
-            transform: scale(0.96);
-            background: #c57736;
-        }
-
+        
         button:hover {
-            background: #c57736;
-            transform: scale(0.97);
+            background: #a5581c;
         }
-
-        .feedback {
-            background: #eadbbc;
-            border-radius: 50px;
-            padding: 14px 20px;
-            text-align: center;
-            font-weight: bold;
-            margin-top: 16px;
-            transition: all 0.2s;
-            font-size: 1rem;
-            user-select: none;
-            line-height: 1.4;
-        }
-
-        .feedback.benar {
-            background: #c8e6c1;
-            color: #1f5420;
-            border-left: 6px solid #2e7d32;
-        }
-
-        .feedback.salah {
-            background: #ffe0db;
-            color: #ac2c1a;
-            border-left: 6px solid #c7362b;
-        }
-
-        @media (max-width: 680px) {
-            .vm-wrapper {
-                padding: 16px;
-            }
-            .slider-item {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 18px 18px;
-            }
-            .slider-label {
-                width: auto;
-                font-size: 1.1rem;
-            }
-            .slider-input {
-                width: 100%;
-                gap: 12px;
-            }
-            input[type="range"] {
-                min-width: 200px;
-                flex: 3;
-                height: 6px;
-            }
-            .nilai-slider {
-                min-width: 70px;
-                padding: 6px 12px;
-            }
-            button {
-                padding: 14px 24px;
-                min-width: 160px;
-            }
-            .jumlah-orang-badge {
-                font-size: 1.5rem;
-                padding: 6px 18px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .tombol-area {
-                gap: 12px;
-            }
-            button {
-                padding: 12px 20px;
-                font-size: 0.9rem;
-                min-width: 140px;
-            }
-            .nilai-slider {
-                min-width: 60px;
-            }
-            .feedback {
-                font-size: 0.9rem;
-            }
+        
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
-<div class="vm-wrapper">
-    <h1>🍳 Menghitung Takaran <span style="background:#f7e3b2; font-size:1.2rem;">Resep Telur Dadar</span></h1>
-    <div class="sub">Atur takaran dengan <em>slider</em> agar sesuai jumlah orang</div>
-
-    <div class="top-row">
-        <h2>📋 Resep Dasar (untuk 4 orang)</h2>
-        <div class="resep-grid" id="resepDasarContainer"></div>
-        <div style="margin-top: 16px; font-size:0.85rem; text-align:center; background:#f9efdf; width:fit-content; padding:6px 18px; border-radius:40px;">
-            ⏲️ Cooking time: ~15 menit | Panaskan minyak, dadar hingga matang
-        </div>
-    </div>
-
-    <div class="bottom-row">
-        <div class="soal-header">
-            <h2>🥄 Soal: Sesuaikan takaran untuk</h2>
-            <div class="jumlah-orang-badge" id="jumlahOrangDisplay">?? orang</div>
-        </div>
-        <div id="slidersArea" style="margin-top: 8px;"></div>
-
-        <div class="tombol-area">
-            <button id="cekBtn">✅ Cek Ketepatan Takaran</button>
-            <button id="soalBaruBtn">🎲 Soal Baru (Ubah jumlah orang)</button>
-        </div>
-
-        <div id="feedbackMessage" class="feedback">
-            💡 Geser slider setiap bahan sesuai perhitunganmu untuk jumlah orang yang ditanyakan, lalu klik "Cek Ketepatan Takaran"
-        </div>
-        <div style="font-size: 0.7rem; text-align:center; margin-top: 12px;">
-            * Hitung sendiri takaran yang tepat berdasarkan resep dasar 4 orang
-        </div>
-    </div>
-</div>
-
-<script>
-    //===== RESEP DASAR UNTUK 4 ORANG =====
-    const resep4orang = {
-        telur: 5,            // butir
-        bumbu: 0.5,          // sendok teh (garam & merica)
-        bawangMerah: 4,      // siung
-        daunBawang: 2,       // batang
-        minyakGoreng: 3      // sendok makan
-    };
-
-    // Daftar bahan & info untuk slider (GARAM & MERICA jadi SATU)
-    const bahanData = [
-        { id: "telur", label: "🥚 Telur", unit: "butir", step: 1, min: 1, max: 20, decimal: 0 },
-        { id: "bumbu", label: "🧂 Garam & Merica", unit: "sdt", step: 0.125, min: 0, max: 3, decimal: 2 },
-        { id: "bawangMerah", label: "🧅 Bawang merah", unit: "siung", step: 1, min: 0, max: 20, decimal: 0 },
-        { id: "daunBawang", label: "🌿 Daun bawang", unit: "batang", step: 0.5, min: 0, max: 10, decimal: 0 },
-        { id: "minyakGoreng", label: "🫒 Minyak goreng", unit: "sdm", step: 0.5, min: 0, max: 18, decimal: 1 }
-    ];
-
-    let currentJumlahOrang = 4;      
-    let currentUserTakaran = {};
-
-    const resepDasarContainer = document.getElementById("resepDasarContainer");
-    const slidersArea = document.getElementById("slidersArea");
-    const jumlahOrangDisplay = document.getElementById("jumlahOrangDisplay");
-    const cekBtn = document.getElementById("cekBtn");
-    const soalBaruBtn = document.getElementById("soalBaruBtn");
-    const feedbackDiv = document.getElementById("feedbackMessage");
-
-    function hitungTakaranIdeal(jumlahOrang) {
-        const faktor = jumlahOrang / 4;
-        const ideal = {};
-        for (let bahan of bahanData) {
-            let nilai = resep4orang[bahan.id] * faktor;
-            
-            if (bahan.id === "bawangMerah" || bahan.id === "daunBawang") {
-                nilai = Math.round(nilai * 2) / 2;
-                if (nilai < 0) nilai = 0;
-            } 
-            else if (bahan.id === "telur") {
-                nilai = Math.ceil(nilai);
-                if (nilai < 1) nilai = 1;
-            }
-            else if (bahan.id === "bumbu") {
-                nilai = Math.round(nilai * 8) / 8;  // kelipatan 0.125
-            }
-            else if (bahan.id === "minyakGoreng") {
-                nilai = Math.round(nilai * 2) / 2;
-            }
-            ideal[bahan.id] = nilai;
-        }
-        return ideal;
-    }
-
-    function renderResepDasar() {
-        resepDasarContainer.innerHTML = "";
-        for (let b of bahanData) {
-            const nilai = resep4orang[b.id];
-            let tampilNilai = (b.decimal === 0) ? nilai : nilai.toFixed(b.decimal);
-            const card = document.createElement("div");
-            card.className = "bahan-card";
-            card.innerHTML = `
-                <div class="bahan-nama">${b.label}</div>
-                <div class="bahan-nilai">${tampilNilai} <span class="bahan-unit">${b.unit}</span></div>
-            `;
-            resepDasarContainer.appendChild(card);
-        }
-    }
-
-    function attachSliderTouchEvents(sliderElem, updateFn) {
-        sliderElem.addEventListener("input", updateFn);
-        sliderElem.addEventListener("change", updateFn);
-        sliderElem.addEventListener("touchstart", function(e) {
-        }, { passive: true });
-    }
-
-    function generateSliders() {
-        slidersArea.innerHTML = "";
+    <div class="vm-wrapper">
+        <h1>Resep Telur Dadar — Mobile Touch Optimized</h1>
         
-        for (let b of bahanData) {
-            currentUserTakaran[b.id] = resep4orang[b.id];
-        }
+        <!-- Form input untuk testing -->
+        <div style="margin: 20px 0;">
+            <h3>Test Pengecekan Bahan:</h3>
+            <input type="text" id="daunBawangInput" placeholder="Nilai Daun Bawang">
+            <input type="text" id="bawangMerahInput" placeholder="Nilai Bawang Merah">
+            <button onclick="testPengecekan()">Cek Bahan</button>
+        </div>
+        
+        <div class="check-result" id="resultArea">
+            <!-- Hasil pengecekan akan ditampilkan di sini -->
+        </div>
+    </div>
 
-        for (let b of bahanData) {
-            const id = b.id;
-            const currentVal = currentUserTakaran[id];
-            const step = b.step;
-            const minVal = b.min;
-            const maxVal = b.max;
+    <script>
+        // Fungsi pengecekan nilai Daun Bawang dan Bawang Merah secara terpisah
+        function cekNilaiDaunBawang(nilai) {
+            // Pengecekan khusus untuk Daun Bawang
+            // Sesuaikan dengan kriteria validasi Daun Bawang
+            const nilaiString = String(nilai).toLowerCase().trim();
             
-            const sliderDiv = document.createElement("div");
-            sliderDiv.className = "slider-item";
-            sliderDiv.innerHTML = `
-                <div class="slider-label">${b.label} (${b.unit})</div>
-                <div class="slider-input">
-                    <input type="range" id="slider-${id}" min="${minVal}" max="${maxVal}" step="${step}" value="${currentVal}">
-                    <span class="nilai-slider" id="val-${id}">${currentVal.toFixed(b.decimal)}</span>
+            // Contoh kriteria Daun Bawang yang valid
+            const validDaunBawang = ['ada', 'tersedia', 'punya', '1', 'true', 'ya', 'yes'];
+            
+            // Cek apakah nilai masuk kriteria valid
+            const isValid = validDaunBawang.includes(nilaiString);
+            
+            return {
+                valid: isValid,
+                nilai: nilai,
+                pesan: isValid ? 'Daun Bawang valid ✅' : 'Daun Bawang tidak valid ❌'
+            };
+        }
+        
+        function cekNilaiBawangMerah(nilai) {
+            // Pengecekan khusus untuk Bawang Merah
+            const nilaiString = String(nilai).toLowerCase().trim();
+            
+            // Contoh kriteria Bawang Merah yang valid
+            const validBawangMerah = ['ada', 'tersedia', 'punya', '1', 'true', 'ya', 'yes'];
+            
+            const isValid = validBawangMerah.includes(nilaiString);
+            
+            return {
+                valid: isValid,
+                nilai: nilai,
+                pesan: isValid ? 'Bawang Merah valid ✅' : 'Bawang Merah tidak valid ❌'
+            };
+        }
+        
+        // Fungsi utama untuk mengecek kedua bahan secara terpisah
+        function cekKetersediaanBahan(daunBawang, bawangMerah) {
+            // Pengecekan terpisah untuk masing-masing bahan
+            const hasilDaunBawang = cekNilaiDaunBawang(daunBawang);
+            const hasilBawangMerah = cekNilaiBawangMerah(bawangMerah);
+            
+            // Logika kombinasi (bisa disesuaikan)
+            const keduaTersedia = hasilDaunBawang.valid && hasilBawangMerah.valid;
+            const salahSatuTersedia = hasilDaunBawang.valid || hasilBawangMerah.valid;
+            
+            return {
+                daunBawang: hasilDaunBawang,
+                bawangMerah: hasilBawangMerah,
+                keduaTersedia: keduaTersedia,
+                salahSatuTersedia: salahSatuTersedia
+            };
+        }
+        
+        // Fungsi untuk testing
+        function testPengecekan() {
+            const daunBawangValue = document.getElementById('daunBawangInput').value;
+            const bawangMerahValue = document.getElementById('bawangMerahInput').value;
+            
+            const hasil = cekKetersediaanBahan(daunBawangValue, bawangMerahValue);
+            
+            // Tampilkan hasil
+            const resultArea = document.getElementById('resultArea');
+            resultArea.innerHTML = `
+                <h4>Hasil Pengecekan Terpisah:</h4>
+                <div class="status ${hasil.daunBawang.valid ? 'valid' : 'invalid'}">
+                    🧅 Daun Bawang: ${hasil.daunBawang.pesan} (Nilai: "${hasil.daunBawang.nilai}")
+                </div>
+                <div class="status ${hasil.bawangMerah.valid ? 'valid' : 'invalid'}">
+                    🧄 Bawang Merah: ${hasil.bawangMerah.pesan} (Nilai: "${hasil.bawangMerah.nilai}")
+                </div>
+                <div class="status ${hasil.keduaTersedia ? 'valid' : 'invalid'}">
+                    📊 Kedua bahan tersedia: ${hasil.keduaTersedia ? 'Ya ✅' : 'Tidak ❌'}
+                </div>
+                <div class="status ${hasil.salahSatuTersedia ? 'valid' : 'invalid'}">
+                    📊 Salah satu bahan tersedia: ${hasil.salahSatuTersedia ? 'Ya ✅' : 'Tidak ❌'}
                 </div>
             `;
-            slidersArea.appendChild(sliderDiv);
             
-            const sliderElem = document.getElementById(`slider-${id}`);
-            const valueSpan = document.getElementById(`val-${id}`);
-            
-            const updateSlider = () => {
-                let newVal = parseFloat(sliderElem.value);
-                if (isNaN(newVal)) newVal = resep4orang[id];
-                currentUserTakaran[id] = newVal;
-                valueSpan.innerText = newVal.toFixed(b.decimal);
-            };
-            
-            attachSliderTouchEvents(sliderElem, updateSlider);
-            updateSlider();
-            
-            sliderElem.addEventListener("touchend", function() {
-                let freshVal = parseFloat(sliderElem.value);
-                if (!isNaN(freshVal)) {
-                    currentUserTakaran[id] = freshVal;
-                    valueSpan.innerText = freshVal.toFixed(b.decimal);
-                }
-            });
-        }
-    }
-
-    function buatSoalBaru() {
-        const pilihan = [2,4,6,8,10,12];
-        let newOrang = currentJumlahOrang;
-        const beda = pilihan.filter(p => p !== currentJumlahOrang);
-        if (beda.length > 0) {
-            const randomIndex = Math.floor(Math.random() * beda.length);
-            newOrang = beda[randomIndex];
-        } else {
-            newOrang = pilihan[Math.floor(Math.random() * pilihan.length)];
-        }
-        currentJumlahOrang = newOrang;
-        jumlahOrangDisplay.innerText = `${currentJumlahOrang} orang`;
-        
-        for (let b of bahanData) {
-            currentUserTakaran[b.id] = resep4orang[b.id];
-            const sliderElem = document.getElementById(`slider-${b.id}`);
-            const valueSpan = document.getElementById(`val-${b.id}`);
-            if (sliderElem) {
-                sliderElem.value = resep4orang[b.id];
-                valueSpan.innerText = resep4orang[b.id].toFixed(b.decimal);
-            }
+            console.log('Hasil pengecekan detail:', hasil);
         }
         
-        feedbackDiv.innerHTML = "🔄 Soal baru! Hitung sendiri takaran yang sesuai, lalu geser slider dan klik 'Cek Ketepatan Takaran'.";
-        feedbackDiv.className = "feedback";
-        
-        if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(20);
-        }
-    }
-
-    function cekKecukupan() {
-        const ideal = hitungTakaranIdeal(currentJumlahOrang);
-        let semuaBenar = true;
-        const daftarError = [];
-        
-        for (let b of bahanData) {
-            let userVal = currentUserTakaran[b.id];
-            if (isNaN(userVal)) userVal = 0;
-            let idealVal = ideal[b.id];
+        // Contoh penggunaan dalam resep telur dadar
+        function cekBahanUntukResep(daunBawang, bawangMerah) {
+            const hasil = cekKetersediaanBahan(daunBawang, bawangMerah);
             
-            let tolerance = 0.05;
-            if (b.id === "telur") tolerance = 0.01;
-            if (b.id === "bawangMerah") tolerance = 0.25;
-            if (b.id === "daunBawang") tolerance = 0.25;
-            if (b.id === "minyakGoreng") tolerance = 0.1;
-            if (b.id === "bumbu") tolerance = 0.08;
-            
-            const diff = Math.abs(userVal - idealVal);
-            if (diff > tolerance) {
-                semuaBenar = false;
-                daftarError.push(`${b.label}`);
-            }
-        }
-        
-        if (window.navigator && window.navigator.vibrate) {
-            if (semuaBenar) {
-                window.navigator.vibrate([50, 30, 50]);
+            if (hasil.keduaTersedia) {
+                return "✅ Bahan lengkap! Bisa membuat telur dadar dengan daun bawang dan bawang merah.";
+            } else if (hasil.salahSatuTersedia) {
+                return "⚠️ Hanya satu bahan tersedia. Telur dadar tetap bisa dibuat dengan rasa berbeda.";
             } else {
-                window.navigator.vibrate(100);
+                return "❌ Maaf, kedua bahan tidak tersedia. Telur dadar polos tanpa daun bawang dan bawang merah.";
             }
         }
         
-        if (semuaBenar) {
-            feedbackDiv.innerHTML = `✅ BENAR! Takaranmu sudah tepat untuk ${currentJumlahOrang} orang.<br> 🍳 Selamat, telur dadar siap dimasak!`;
-            feedbackDiv.className = "feedback benar";
-        } else {
-            let errorText = daftarError.slice(0, 4).join(", ");
-            if (daftarError.length > 4) errorText += ", ...";
-            feedbackDiv.innerHTML = `❌ BELUM TEPAT untuk ${currentJumlahOrang} orang.<br> ⚠️ Periksa kembali takaran: ${errorText}`;
-            feedbackDiv.className = "feedback salah";
-        }
-    }
-    
-    function enhanceMobileInteractions() {
-        if ('ontouchstart' in window) {
-            const allButtons = document.querySelectorAll('button');
-            allButtons.forEach(btn => {
-                btn.addEventListener('touchstart', function(e) {
-                    this.style.transform = 'scale(0.96)';
-                }, { passive: true });
-                btn.addEventListener('touchend', function(e) {
-                    this.style.transform = '';
-                });
-                btn.addEventListener('touchcancel', function() {
-                    this.style.transform = '';
-                });
-            });
-        }
-    }
-    
-    function init() {
-        renderResepDasar();
-        
-        const pilihanAwal = [2,4,6,8,10,12];
-        const randomIdx = Math.floor(Math.random() * pilihanAwal.length);
-        currentJumlahOrang = pilihanAwal[randomIdx];
-        jumlahOrangDisplay.innerText = `${currentJumlahOrang} orang`;
-        
-        generateSliders();
-        
-        cekBtn.addEventListener("click", cekKecukupan);
-        soalBaruBtn.addEventListener("click", buatSoalBaru);
-        
-        enhanceMobileInteractions();
-    }
-    
-    init();
-</script>
+        // Demo otomatis saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log("=== Demo Pengecekan Terpisah ===");
+            
+            // Test case 1: Kedua bahan tersedia
+            console.log("Test 1 - Kedua tersedia:", cekBahanUntukResep("ada", "tersedia"));
+            
+            // Test case 2: Hanya daun bawang yang tersedia
+            console.log("Test 2 - Hanya daun bawang:", cekBahanUntukResep("punya", "tidak ada"));
+            
+            // Test case 3: Hanya bawang merah yang tersedia
+            console.log("Test 3 - Hanya bawang merah:", cekBahanUntukResep("kosong", "yes"));
+            
+            // Test case 4: Kedua tidak tersedia
+            console.log("Test 4 - Kedua tidak ada:", cekBahanUntukResep("tidak", "no"));
+            
+            // Set nilai default di input untuk testing
+            document.getElementById('daunBawangInput').value = 'ada';
+            document.getElementById('bawangMerahInput').value = 'tersedia';
+            testPengecekan();
+        });
+    </script>
 </body>
 </html>
