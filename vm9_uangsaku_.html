@@ -315,24 +315,24 @@
             <div class="form-title">✏️ Isi nominal ke amplop (Rp)</div>
             <div class="field-group">
                 <label>🍔 Jajan (60% dari Uang Saku)</label>
-                <input type="number" id="jajanInput" placeholder="Masukkan nominal rupiah" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" id="jajanInput" placeholder="Contoh: 150.000" inputmode="numeric" autocomplete="off">
             </div>
             <div class="field-group">
                 <label>🚌 Transportasi (25% dari Uang Saku)</label>
-                <input type="number" id="transportInput" placeholder="Masukkan nominal rupiah" inputmode="numeric">
+                <input type="text" id="transportInput" placeholder="Contoh: 150.000" inputmode="numeric" autocomplete="off">
             </div>
             <div class="field-group">
                 <label>🏦 Tabungan (10% dari Uang Saku)</label>
-                <input type="number" id="tabunganInput" placeholder="Masukkan nominal rupiah" inputmode="numeric">
+                <input type="text" id="tabunganInput" placeholder="Contoh: 150.000" inputmode="numeric" autocomplete="off">
             </div>
             <div class="field-group">
                 <label>🤝 Dana Sosial (5% dari Uang Saku)</label>
-                <input type="number" id="sosialInput" placeholder="Masukkan nominal rupiah" inputmode="numeric">
+                <input type="text" id="sosialInput" placeholder="Contoh: 150.000" inputmode="numeric" autocomplete="off">
             </div>
             <button class="btn-cek" id="cekBtn">✅ Cek Jawaban</button>
             <div id="feedbackBox" class="feedback">
                 💡 Tekan "Soal Baru" untuk latihan nominal berbeda.<br>
-                Isi rupiah sesuai proporsi!
+                Isi rupiah sesuai proporsi! (Boleh pakai titik sebagai pemisah ribuan, contoh: 150.000)
             </div>
         </div>
     </div>
@@ -391,18 +391,38 @@
             };
         }
 
-        // Update placeholder (tanpa petunjuk jawaban, hanya teks umum)
+        // Ubah format angka Indonesia (titik sebagai pemisah ribuan) menjadi integer murni
+        function parseIndonesianNumber(str) {
+            if (!str || typeof str !== 'string') return NaN;
+            // Hapus semua titik (pemisah ribuan), lalu hapus spasi, lalu konversi ke integer
+            let cleaned = str.replace(/\./g, '').replace(/\s/g, '');
+            // Jika ada koma sebagai desimal (misal 150.000,5) kita abaikan karena untuk rupiah biasanya tidak pakai koma
+            // Tapi jika terlanjur ada koma, kita ambil sebelum koma
+            if (cleaned.includes(',')) {
+                cleaned = cleaned.split(',')[0];
+            }
+            const num = parseInt(cleaned, 10);
+            if (isNaN(num)) return NaN;
+            return num;
+        }
+
+        // Format angka dengan titik sebagai pemisah ribuan (untuk display)
+        function formatRupiah(angka) {
+            if (isNaN(angka)) return '0';
+            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Update placeholder tidak mengganggu
         function updatePlaceholders() {
-            // Hanya placeholder umum, tidak memberikan contoh jawaban
-            jajanInput.placeholder = "Masukkan nominal rupiah";
-            transportInput.placeholder = "Masukkan nominal rupiah";
-            tabunganInput.placeholder = "Masukkan nominal rupiah";
-            sosialInput.placeholder = "Masukkan nominal rupiah";
+            jajanInput.placeholder = "Contoh: 150.000";
+            transportInput.placeholder = "Contoh: 150.000";
+            tabunganInput.placeholder = "Contoh: 150.000";
+            sosialInput.placeholder = "Contoh: 150.000";
         }
 
         // Update tampilan nominal di hero
         function updateUangSakuDisplay() {
-            uangSakuSpan.innerText = `Rp ${currentUangSaku.toLocaleString('id-ID')}`;
+            uangSakuSpan.innerText = `Rp ${formatRupiah(currentUangSaku)}`;
             updatePlaceholders();
         }
 
@@ -453,7 +473,6 @@
                                 },
                                 formatter: (value, context) => {
                                     const label = context.chart.data.labels[context.dataIndex];
-                                    // Bersihkan emoji untuk tampilan rapi
                                     let shortLabel = label.replace(/[🍔🚌🏦🤝]/g, '').trim();
                                     return `${shortLabel}\n${value}%`;
                                 },
@@ -463,13 +482,11 @@
                                 anchor: 'center',
                             },
                             legend: {
-                                display: false,   // Label sudah melekat, legend tidak perlu
+                                display: false,
                             },
                             tooltip: {
-                                // Tooltip hanya menampilkan persentase saja (tidak double label)
                                 callbacks: {
                                     label: (tooltipItem) => {
-                                        // Hanya tampilkan: "60%" tanpa label berulang
                                         return `${tooltipItem.raw}%`;
                                     }
                                 }
@@ -487,7 +504,7 @@
             transportInput.value = '';
             tabunganInput.value = '';
             sosialInput.value = '';
-            feedbackDiv.innerHTML = `✨ Uang saku Rp ${currentUangSaku.toLocaleString('id-ID')}. Isi keempat nominal amplop.`;
+            feedbackDiv.innerHTML = `✨ Uang saku Rp ${formatRupiah(currentUangSaku)}. Isi keempat nominal amplop (boleh pakai titik, contoh: 150.000).`;
             feedbackDiv.className = "feedback";
             updatePlaceholders();
         }
@@ -496,22 +513,52 @@
         function loadNewQuestion() {
             currentUangSaku = generateRandomUangSaku();
             updateUangSakuDisplay();
-            renderPieChart();       // data persen tetap, tapi panggil untuk konsistensi
+            renderPieChart();
             resetFormAndFeedback();
         }
 
-        // Cek jawaban user - TIDAK MEMBOCORKAN JAWABAN BENAR
+        // Auto-format input saat user mengetik: tambah titik pemisah ribuan
+        function formatInputNumberWithDots(inputElement) {
+            inputElement.addEventListener('input', function(e) {
+                // Simpan posisi kursor (untuk menghindari loncatan)
+                let cursorPos = this.selectionStart;
+                let rawValue = this.value;
+                // Hapus semua karakter non-digit
+                let digits = rawValue.replace(/\D/g, '');
+                if (digits === '') {
+                    this.value = '';
+                    return;
+                }
+                // Konversi ke integer
+                let number = parseInt(digits, 10);
+                if (isNaN(number)) {
+                    this.value = '';
+                    return;
+                }
+                // Format dengan titik ribuan
+                let formatted = number.toLocaleString('id-ID');
+                this.value = formatted;
+                // Atur ulang posisi kursor (kira-kira)
+                let newCursorPos = formatted.length - (rawValue.length - cursorPos);
+                if (newCursorPos < 0) newCursorPos = 0;
+                if (newCursorPos > formatted.length) newCursorPos = formatted.length;
+                this.setSelectionRange(newCursorPos, newCursorPos);
+            });
+        }
+
+        // Cek jawaban user - support format titik sebagai pemisah ribuan
         function cekJawaban() {
             const correct = getCorrectAnswers();
             
-            const userJajan = parseInt(jajanInput.value, 10);
-            const userTransport = parseInt(transportInput.value, 10);
-            const userTabungan = parseInt(tabunganInput.value, 10);
-            const userSosial = parseInt(sosialInput.value, 10);
+            // Ambil nilai dari input dan parse menggunakan fungsi parseIndonesianNumber
+            const userJajan = parseIndonesianNumber(jajanInput.value);
+            const userTransport = parseIndonesianNumber(transportInput.value);
+            const userTabungan = parseIndonesianNumber(tabunganInput.value);
+            const userSosial = parseIndonesianNumber(sosialInput.value);
             
             // Validasi isian kosong / bukan angka
             if (isNaN(userJajan) || isNaN(userTransport) || isNaN(userTabungan) || isNaN(userSosial)) {
-                feedbackDiv.innerHTML = "⚠️ Semua kolom harus diisi dengan angka!";
+                feedbackDiv.innerHTML = "⚠️ Semua kolom harus diisi dengan angka! Gunakan format seperti 150.000 (boleh pakai titik)";
                 feedbackDiv.className = "feedback warning";
                 return;
             }
@@ -530,10 +577,9 @@
             const semuaBenar = benarJajan && benarTransport && benarTabungan && benarSosial;
             
             if (semuaBenar) {
-                feedbackDiv.innerHTML = `🎉 Selamat! Jawaban tepat! Uang saku Rp ${correct.total.toLocaleString('id-ID')} terbagi sempurna. ✅ Hebat!`;
+                feedbackDiv.innerHTML = `🎉 Selamat! Jawaban tepat! Uang saku Rp ${formatRupiah(correct.total)} terbagi sempurna. ✅ Hebat!`;
                 feedbackDiv.className = "feedback success";
             } else {
-                // Membuat daftar amplop yang sudah benar dan yang masih salah (tanpa menyebut angka benar)
                 let statusList = [];
                 if (benarJajan) {
                     statusList.push("✅ Jajan & Makan sudah benar");
@@ -556,36 +602,25 @@
                     statusList.push("❌ Dana Sosial masih salah");
                 }
                 
-                let pesan = `📝 Periksa kembali hitunganmu:<br><br> ${statusList.join('<br> ')}<br><br>💡 Hitung dengan teliti: (persentase × total uang saku) ÷ 100`;
+                let pesan = `📝 Periksa kembali hitunganmu:<br><br> ${statusList.join('<br> ')}<br><br>💡 Hitung dengan teliti: (persentase × total uang saku) ÷ 100<br>Gunakan format angka seperti 150.000 jika perlu.`;
                 feedbackDiv.innerHTML = pesan;
                 feedbackDiv.className = "feedback warning";
             }
         }
         
-        // Sanitasi input number untuk mobile (hindari huruf & negatif)
-        function sanitizeNumberField(inputElement) {
-            inputElement.addEventListener('input', function(e) {
-                let val = parseInt(this.value, 10);
-                if (this.value === '-') {
-                    this.value = '';
-                } else if (!isNaN(val) && val < 0) {
-                    this.value = 0;
-                } else if (isNaN(val) && this.value !== '') {
-                    // jika terdeteksi huruf atau input tidak valid, kosongkan
-                    if (this.value.length > 0 && /[^0-9]/.test(this.value)) {
-                        this.value = '';
-                    }
-                }
-            });
-        }
-        
         // Inisialisasi event dan state
         function init() {
-            // pertama generate random uang saku (tidak selalu 100k)
+            // pertama generate random uang saku
             currentUangSaku = generateRandomUangSaku();
             updateUangSakuDisplay();
             renderPieChart();
-            resetFormAndFeedback();   // set placeholder & kosongkan input
+            resetFormAndFeedback();
+            
+            // Pasang auto-format titik untuk semua input
+            formatInputNumberWithDots(jajanInput);
+            formatInputNumberWithDots(transportInput);
+            formatInputNumberWithDots(tabunganInput);
+            formatInputNumberWithDots(sosialInput);
             
             // Event listeners
             btnSoalBaru.addEventListener('click', () => {
@@ -594,13 +629,7 @@
             
             cekBtn.addEventListener('click', cekJawaban);
             
-            // Sanitasi input
-            sanitizeNumberField(jajanInput);
-            sanitizeNumberField(transportInput);
-            sanitizeNumberField(tabunganInput);
-            sanitizeNumberField(sosialInput);
-            
-            // Dukungan tekan Enter untuk cek jawaban (mobile friendly)
+            // Dukungan tekan Enter untuk cek jawaban
             const inputs = [jajanInput, transportInput, tabunganInput, sosialInput];
             inputs.forEach(inp => {
                 inp.addEventListener('keypress', (e) => {
@@ -611,9 +640,9 @@
                 });
             });
             
-            // Agar tidak ada zoom berlebih pada input number di iOS (opsi)
+            // Agar font-size input tidak mengecil di iOS
             const style = document.createElement('style');
-            style.textContent = 'input[type="number"] { font-size: 16px !important; }';
+            style.textContent = 'input { font-size: 16px !important; }';
             document.head.appendChild(style);
         }
         
