@@ -386,176 +386,177 @@
 </div>
 
 <script>
-    // DATA DESAIN ARSITEKTUR
-    const desainList = [
-        { nama: "🏡 Rumah Mungil", luas: 75, fileGambar: "assets/rumah_mungil.png" },
-        { nama: "🏘️ Vila Keluarga", luas: 210, fileGambar: "assets/rumah_vila_keluarga.png" },
-        { nama: "🏢 Ruko 2 Lantai", luas: 480, fileGambar: "assets/rumah_ruko_2lantai.png" },
-        { nama: "🏛️ Balai Serbaguna", luas: 850, fileGambar: "assets/rumah_balai_serbaguna.png" },
-        { nama: "🏠 Rumah Tropis", luas: 125, fileGambar: "assets/rumah_tropis.png" }
-    ];
-    
-    let currentIndex = 0;
-    let liter1Unit = 0, liter2_5Unit = 0, liter20Unit = 0;
 
-    // DOM elements
-    const desainImg = document.getElementById('desainImg');
-    const desainNama = document.getElementById('desainNama');
-    const desainLuasSpan = document.getElementById('desainLuas');
-    const carouselDot = document.getElementById('carouselDot');
-    const valLiter1Span = document.getElementById('valLiter1');
-    const valLiter2_5Span = document.getElementById('valLiter2_5');
-    const valLiter20Span = document.getElementById('valLiter20');
-    const liter1TotalSpan = document.getElementById('liter1Total');
-    const liter2_5TotalSpan = document.getElementById('liter2_5Total');
-    const liter20TotalSpan = document.getElementById('liter20Total');
-    const feedbackT1 = document.getElementById('feedbackTugas1');
-    const feedbackT2 = document.getElementById('feedbackTugas2');
-    const inputBiaya = document.getElementById('inputBiaya');
+// DATA DESAIN ARSITEKTUR
+const desainList = [
+    { nama: "🏡 Rumah Mungil", luas: 75, fileGambar: "assets/rumah_mungil.png" },
+    { nama: "🏘️ Vila Keluarga", luas: 210, fileGambar: "assets/rumah_vila_keluarga.png" },
+    { nama: "🏢 Ruko 2 Lantai", luas: 480, fileGambar: "assets/rumah_ruko_2lantai.png" },
+    { nama: "🏛️ Balai Serbaguna", luas: 850, fileGambar: "assets/rumah_balai_serbaguna.png" },
+    { nama: "🏠 Rumah Tropis", luas: 125, fileGambar: "assets/rumah_tropis.png" }
+];
 
-    // Hitung total liter tanpa menampilkan ke user (hanya untuk kalkulasi internal)
-    function hitungTotalLiter() {
-        return (liter1Unit * 1) + (liter2_5Unit * 2.5) + (liter20Unit * 20);
-    }
+let currentIndex = 0;
+let liter1Unit = 0, liter2_5Unit = 0, liter20Unit = 0;
 
-    // Update tampilan jumlah unit dan total liter per jenis kaleng
-    function refreshStepperUI() {
-        valLiter1Span.innerText = liter1Unit;
-        valLiter2_5Span.innerText = liter2_5Unit;
-        valLiter20Span.innerText = liter20Unit;
-        liter1TotalSpan.innerText = (liter1Unit * 1).toFixed(1);
-        liter2_5TotalSpan.innerText = (liter2_5Unit * 2.5).toFixed(1);
-        liter20TotalSpan.innerText = (liter20Unit * 5).toFixed(1);
-    }
+// DOM elements
+const desainImg = document.getElementById('desainImg');
+const desainNama = document.getElementById('desainNama');
+const desainLuasSpan = document.getElementById('desainLuas');
+const carouselDot = document.getElementById('carouselDot');
+const valLiter1Span = document.getElementById('valLiter1');
+const valLiter2_5Span = document.getElementById('valLiter2_5');
+const valLiter20Span = document.getElementById('valLiter20');
+const liter1TotalSpan = document.getElementById('liter1Total');
+const liter2_5TotalSpan = document.getElementById('liter2_5Total');
+const liter20TotalSpan = document.getElementById('liter20Total');
+const feedbackT1 = document.getElementById('feedbackTugas1');
+const feedbackT2 = document.getElementById('feedbackTugas2');
+const inputBiaya = document.getElementById('inputBiaya');
 
-    function tambah(jenis) {
-        if (jenis === 'liter1' && liter1Unit < 10) liter1Unit++;
-        else if (jenis === 'liter2_5' && liter2_5Unit < 10) liter2_5Unit++;
-        else if (jenis === 'liter20' && liter20Unit < 10) liter5Unit++;
-        refreshStepperUI();
-    }
-    
-    function kurangi(jenis) {
-        if (jenis === 'liter1' && liter1Unit > 0) liter1Unit--;
-        else if (jenis === 'liter2_5' && liter2_5Unit > 0) liter2_5Unit--;
-        else if (jenis === 'liter20' && liter20Unit > 0) liter5Unit--;
-        refreshStepperUI();
-    }
+// Hitung total liter
+function hitungTotalLiter() {
+    return (liter1Unit * 1) + (liter2_5Unit * 2.5) + (liter20Unit * 20);
+}
 
-    function updateCarousel() {
-        const data = desainList[currentIndex];
-        desainNama.innerText = data.nama;
-        desainLuasSpan.innerText = data.luas;
-        desainImg.src = data.fileGambar;
-        desainImg.onerror = function() {
-            this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23d4c9a8'/%3E%3Ctext x='15' y='45' fill='%235a4a2a' font-size='9'%3EGambar tidak ditemukan%3C/text%3E%3C/svg%3E";
-        };
-        let dots = "";
-        for (let i = 0; i < desainList.length; i++) {
-            dots += (i === currentIndex) ? "● " : "○ ";
-        }
-        carouselDot.innerText = dots.trim();
-    }
+// Update tampilan
+function refreshStepperUI() {
+    valLiter1Span.innerText = liter1Unit;
+    valLiter2_5Span.innerText = liter2_5Unit;
+    valLiter20Span.innerText = liter20Unit;
+    liter1TotalSpan.innerText = (liter1Unit * 1).toFixed(1);
+    liter2_5TotalSpan.innerText = (liter2_5Unit * 2.5).toFixed(1);
+    liter20TotalSpan.innerText = (liter20Unit * 20).toFixed(1);
+}
 
-    // TUGAS 1
-    function cekKecukupan() {
-        const luasTembok = desainList[currentIndex].luas;
-        const totalLiter = hitungTotalLiter();
-        const mampuM2 = totalLiter * 10;
-        const neededLiter = luasTembok / 10;
-        
-        if (mampuM2 >= luasTembok) {
-            const kelebihanLiter = totalLiter - neededLiter;
-            const kelebihanM2 = mampuM2 - luasTembok;
-            if (kelebihanLiter > 0) {
-                feedbackT1.innerHTML = `✅ Tugas 1: Cat yang dibeli BERLEBIHAN! <br> 
-                📌 Luas tembok = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). <br>
-                🛢️ Total cat dibeli = ${totalLiter.toFixed(2)} liter (mampu mengecat ${mampuM2} m²). <br>
-                ✨ Kelebihan cat = ${kelebihanLiter.toFixed(2)} liter (bisa mengecat +${kelebihanM2} m² lagi). <br>
-                💡 Anda bisa mengurangi pembelian cat agar lebih hemat.`;
-                feedbackT1.className = "feedback kelebihan";
-            } else {
-                feedbackT1.innerHTML = `✅ Tugas 1: BENAR PAS! Total cat yang dibeli = ${totalLiter.toFixed(2)} liter (mampu cat ${mampuM2} m²). <br> Luas tembok pilihan = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). Cat pas dan efisien.`;
-                feedbackT1.className = "feedback benar";
-            }
-        } else {
-            const kekuranganLiter = neededLiter - totalLiter;
-            const kekuranganM2 = luasTembok - mampuM2;
-            feedbackT1.innerHTML = `❌ Tugas 1: Cat masih KURANG. <br> 
-            📌 Luas tembok = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). <br>
-            🛢️ Total cat dibeli = ${totalLiter.toFixed(2)} liter (hanya mampu ${mampuM2} m²). <br>
-            ⚠️ Kurang cat = ${kekuranganLiter.toFixed(2)} liter (masih kurang untuk ${kekuranganM2} m²). <br>
-            ➕ Silakan ubah jumlah kaleng.`;
-            feedbackT1.className = "feedback salah";
-        }
-    }
-
-    // TUGAS 2
-    function cekBiaya() {
-        const totalLiter = hitungTotalLiter();
-        const hargaPerLiter = 90000;
-        const biayaSebenarnya = totalLiter * hargaPerLiter;
-        let jawabanUser = parseFloat(inputBiaya.value);
-        
-        if (isNaN(jawabanUser)) {
-            feedbackT2.innerHTML = "⚠️ Masukkan angka nominal biaya (contoh: 2700000)";
-            feedbackT2.className = "feedback salah";
-            return;
-        }
-        
-        const selisih = Math.abs(jawabanUser - biayaSebenarnya);
-        if (selisih < 500 || jawabanUser === biayaSebenarnya) { 
-            feedbackT2.innerHTML = `✅ Tugas 2: BENAR! Total cat = ${totalLiter.toFixed(2)} liter × Rp${hargaPerLiter.toLocaleString('id-ID')} = Rp ${biayaSebenarnya.toLocaleString('id-ID')}. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Selamat!`;
-            feedbackT2.className = "feedback benar";
-        } else {
-            feedbackT2.innerHTML = `❌ Tugas 2: Kurang tepat. Harga total cat yang diperlukan = ${totalLiter.toFixed(2)} liter × 90.000. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Coba hitung ulang.`;
-            feedbackT2.className = "feedback salah";
-        }
-    }
-
-    // Event listeners
-    document.querySelectorAll('.min').forEach(btn => {
-        const jenis = btn.getAttribute('data-jenis');
-        if (jenis) btn.addEventListener('click', (e) => { e.preventDefault(); kurangi(jenis); });
-    });
-    document.querySelectorAll('.plus').forEach(btn => {
-        const jenis = btn.getAttribute('data-jenis');
-        if (jenis) btn.addEventListener('click', (e) => { e.preventDefault(); tambah(jenis); });
-    });
-
-    document.getElementById('prevDesainBtn').addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + desainList.length) % desainList.length;
-        updateCarousel();
-        feedbackT1.innerHTML = "⏳ Pilihan desain berubah. Klik Cek Jawaban (Tugas 1) untuk mengecek ulang.";
-        feedbackT1.className = "feedback";
-    });
-    document.getElementById('nextDesainBtn').addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % desainList.length;
-        updateCarousel();
-        feedbackT1.innerHTML = "⏳ Pilihan desain berubah. Klik Cek Jawaban (Tugas 1) untuk mengecek ulang.";
-        feedbackT1.className = "feedback";
-    });
-
-    document.getElementById('cekKebutuhanBtn').addEventListener('click', cekKecukupan);
-    document.getElementById('cekBiayaBtn').addEventListener('click', cekBiaya);
-
-	// TAMBAHAN UNTUK TOUCH MOBILE - Mencegah zoom berlebihan saat tap dua kali
-	document.querySelectorAll('button, .stepper button, .carousel-btn, .cek').forEach(btn => {
-	    btn.addEventListener('touchstart', function(e) {
-	        // Hanya untuk memberikan feedback sentuhan tanpa mengganggu klik
-	        this.style.opacity = '0.7';
-	    });
-	    btn.addEventListener('touchend', function(e) {
-	        this.style.opacity = '1';
-	    });
-	    btn.addEventListener('touchcancel', function(e) {
-	        this.style.opacity = '1';
-	    });
-	});
-
-    // Inisialisasi
-    updateCarousel();
+function tambah(jenis) {
+    if (jenis === 'liter1' && liter1Unit < 10) liter1Unit++;
+    else if (jenis === 'liter2_5' && liter2_5Unit < 10) liter2_5Unit++;
+    else if (jenis === 'liter20' && liter20Unit < 10) liter20Unit++;
     refreshStepperUI();
+}
+
+function kurangi(jenis) {
+    if (jenis === 'liter1' && liter1Unit > 0) liter1Unit--;
+    else if (jenis === 'liter2_5' && liter2_5Unit > 0) liter2_5Unit--;
+    else if (jenis === 'liter20' && liter20Unit > 0) liter20Unit--;
+    refreshStepperUI();
+}
+
+function updateCarousel() {
+    const data = desainList[currentIndex];
+    desainNama.innerText = data.nama;
+    desainLuasSpan.innerText = data.luas;
+    desainImg.src = data.fileGambar;
+    desainImg.onerror = function() {
+        this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23d4c9a8'/%3E%3Ctext x='15' y='45' fill='%235a4a2a' font-size='9'%3EGambar tidak ditemukan%3C/text%3E%3C/svg%3E";
+    };
+    let dots = "";
+    for (let i = 0; i < desainList.length; i++) {
+        dots += (i === currentIndex) ? "● " : "○ ";
+    }
+    carouselDot.innerText = dots.trim();
+}
+
+// TUGAS 1
+function cekKecukupan() {
+    const luasTembok = desainList[currentIndex].luas;
+    const totalLiter = hitungTotalLiter();
+    const mampuM2 = totalLiter * 10;
+    const neededLiter = luasTembok / 10;
+    
+    if (mampuM2 >= luasTembok) {
+        const kelebihanLiter = totalLiter - neededLiter;
+        const kelebihanM2 = mampuM2 - luasTembok;
+        if (kelebihanLiter > 0) {
+            feedbackT1.innerHTML = `✅ Tugas 1: Cat yang dibeli BERLEBIHAN! <br> 
+            📌 Luas tembok = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). <br>
+            🛢️ Total cat dibeli = ${totalLiter.toFixed(2)} liter (mampu mengecat ${mampuM2} m²). <br>
+            ✨ Kelebihan cat = ${kelebihanLiter.toFixed(2)} liter (bisa mengecat +${kelebihanM2} m² lagi). <br>
+            💡 Anda bisa mengurangi pembelian cat agar lebih hemat.`;
+            feedbackT1.className = "feedback kelebihan";
+        } else {
+            feedbackT1.innerHTML = `✅ Tugas 1: BENAR PAS! Total cat yang dibeli = ${totalLiter.toFixed(2)} liter (mampu cat ${mampuM2} m²). <br> Luas tembok pilihan = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). Cat pas dan efisien.`;
+            feedbackT1.className = "feedback benar";
+        }
+    } else {
+        const kekuranganLiter = neededLiter - totalLiter;
+        const kekuranganM2 = luasTembok - mampuM2;
+        feedbackT1.innerHTML = `❌ Tugas 1: Cat masih KURANG. <br> 
+        📌 Luas tembok = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). <br>
+        🛢️ Total cat dibeli = ${totalLiter.toFixed(2)} liter (hanya mampu ${mampuM2} m²). <br>
+        ⚠️ Kurang cat = ${kekuranganLiter.toFixed(2)} liter (masih kurang untuk ${kekuranganM2} m²). <br>
+        ➕ Silakan ubah jumlah kaleng.`;
+        feedbackT1.className = "feedback salah";
+    }
+}
+
+// TUGAS 2
+function cekBiaya() {
+    const totalLiter = hitungTotalLiter();
+    const hargaPerLiter = 90000;
+    const biayaSebenarnya = totalLiter * hargaPerLiter;
+    let jawabanUser = parseFloat(inputBiaya.value);
+    
+    if (isNaN(jawabanUser)) {
+        feedbackT2.innerHTML = "⚠️ Masukkan angka nominal biaya (contoh: 2700000)";
+        feedbackT2.className = "feedback salah";
+        return;
+    }
+    
+    const selisih = Math.abs(jawabanUser - biayaSebenarnya);
+    if (selisih < 500 || jawabanUser === biayaSebenarnya) { 
+        feedbackT2.innerHTML = `✅ Tugas 2: BENAR! Total cat = ${totalLiter.toFixed(2)} liter × Rp${hargaPerLiter.toLocaleString('id-ID')} = Rp ${biayaSebenarnya.toLocaleString('id-ID')}. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Selamat!`;
+        feedbackT2.className = "feedback benar";
+    } else {
+        feedbackT2.innerHTML = `❌ Tugas 2: Kurang tepat. Harga total cat yang diperlukan = ${totalLiter.toFixed(2)} liter × 90.000. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Coba hitung ulang.`;
+        feedbackT2.className = "feedback salah";
+    }
+}
+
+// Event listeners
+document.querySelectorAll('.min').forEach(btn => {
+    const jenis = btn.getAttribute('data-jenis');
+    if (jenis) btn.addEventListener('click', (e) => { e.preventDefault(); kurangi(jenis); });
+});
+document.querySelectorAll('.plus').forEach(btn => {
+    const jenis = btn.getAttribute('data-jenis');
+    if (jenis) btn.addEventListener('click', (e) => { e.preventDefault(); tambah(jenis); });
+});
+
+document.getElementById('prevDesainBtn').addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + desainList.length) % desainList.length;
+    updateCarousel();
+    feedbackT1.innerHTML = "⏳ Pilihan desain berubah. Klik Cek Jawaban (Tugas 1) untuk mengecek ulang.";
+    feedbackT1.className = "feedback";
+});
+document.getElementById('nextDesainBtn').addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % desainList.length;
+    updateCarousel();
+    feedbackT1.innerHTML = "⏳ Pilihan desain berubah. Klik Cek Jawaban (Tugas 1) untuk mengecek ulang.";
+    feedbackT1.className = "feedback";
+});
+
+document.getElementById('cekKebutuhanBtn').addEventListener('click', cekKecukupan);
+document.getElementById('cekBiayaBtn').addEventListener('click', cekBiaya);
+
+// Touch mobile
+document.querySelectorAll('button, .stepper button, .carousel-btn, .cek').forEach(btn => {
+    btn.addEventListener('touchstart', function(e) {
+        this.style.opacity = '0.7';
+    });
+    btn.addEventListener('touchend', function(e) {
+        this.style.opacity = '1';
+    });
+    btn.addEventListener('touchcancel', function(e) {
+        this.style.opacity = '1';
+    });
+});
+
+// Inisialisasi
+updateCarousel();
+refreshStepperUI();
+	
 </script>
 </body>
 </html>
