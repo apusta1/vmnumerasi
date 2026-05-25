@@ -348,13 +348,13 @@
             <span>→ <span id="liter2_5Total">0.0</span> liter</span>
         </div>
         <div class="cat-item">
-            <span class="label-kaleng">🛢️ Kaleng Cat 5 Liter</span>
+            <span class="label-kaleng">🛢️ Kaleng Cat 20 Liter</span>
             <div class="stepper">
-                <button class="min" data-jenis="liter5">−</button>
-                <span id="valLiter5">0</span>
-                <button class="plus" data-jenis="liter5">+</button>
+                <button class="min" data-jenis="liter20">−</button>
+                <span id="valLiter20">0</span>
+                <button class="plus" data-jenis="liter20">+</button>
             </div>
-            <span>→ <span id="liter5Total">0</span> liter</span>
+            <span>→ <span id="liter20Total">0</span> liter</span>
         </div>
         <div class="info-cat">
             🧮 Hitung total cat yang dibeli dan perhitungkan luas (m²) yang dapat dicat
@@ -396,7 +396,7 @@
     ];
     
     let currentIndex = 0;
-    let liter1Unit = 0, liter2_5Unit = 0, liter5Unit = 0;
+    let liter1Unit = 0, liter2_5Unit = 0, liter20Unit = 0;
 
     // DOM elements
     const desainImg = document.getElementById('desainImg');
@@ -405,40 +405,40 @@
     const carouselDot = document.getElementById('carouselDot');
     const valLiter1Span = document.getElementById('valLiter1');
     const valLiter2_5Span = document.getElementById('valLiter2_5');
-    const valLiter5Span = document.getElementById('valLiter5');
+    const valLiter20Span = document.getElementById('valLiter20');
     const liter1TotalSpan = document.getElementById('liter1Total');
     const liter2_5TotalSpan = document.getElementById('liter2_5Total');
-    const liter5TotalSpan = document.getElementById('liter5Total');
+    const liter20TotalSpan = document.getElementById('liter20Total');
     const feedbackT1 = document.getElementById('feedbackTugas1');
     const feedbackT2 = document.getElementById('feedbackTugas2');
     const inputBiaya = document.getElementById('inputBiaya');
 
     // Hitung total liter tanpa menampilkan ke user (hanya untuk kalkulasi internal)
     function hitungTotalLiter() {
-        return (liter1Unit * 1) + (liter2_5Unit * 2.5) + (liter5Unit * 5);
+        return (liter1Unit * 1) + (liter2_5Unit * 2.5) + (liter20Unit * 20);
     }
 
     // Update tampilan jumlah unit dan total liter per jenis kaleng
     function refreshStepperUI() {
         valLiter1Span.innerText = liter1Unit;
         valLiter2_5Span.innerText = liter2_5Unit;
-        valLiter5Span.innerText = liter5Unit;
+        valLiter20Span.innerText = liter20Unit;
         liter1TotalSpan.innerText = (liter1Unit * 1).toFixed(1);
         liter2_5TotalSpan.innerText = (liter2_5Unit * 2.5).toFixed(1);
-        liter5TotalSpan.innerText = (liter5Unit * 5).toFixed(1);
+        liter20TotalSpan.innerText = (liter20Unit * 5).toFixed(1);
     }
 
     function tambah(jenis) {
         if (jenis === 'liter1' && liter1Unit < 10) liter1Unit++;
         else if (jenis === 'liter2_5' && liter2_5Unit < 10) liter2_5Unit++;
-        else if (jenis === 'liter5' && liter5Unit < 10) liter5Unit++;
+        else if (jenis === 'liter20' && liter20Unit < 10) liter5Unit++;
         refreshStepperUI();
     }
     
     function kurangi(jenis) {
         if (jenis === 'liter1' && liter1Unit > 0) liter1Unit--;
         else if (jenis === 'liter2_5' && liter2_5Unit > 0) liter2_5Unit--;
-        else if (jenis === 'liter5' && liter5Unit > 0) liter5Unit--;
+        else if (jenis === 'liter20' && liter20Unit > 0) liter5Unit--;
         refreshStepperUI();
     }
 
