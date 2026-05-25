@@ -1,1 +1,620 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Menata Telur - Kuis Matematika Puluhan Satuan</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
+        body {
+            background: linear-gradient(145deg, #f9e7b3 0%, #f5d98f 100%);
+            font-family: 'Segoe UI', 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 550px;
+            width: 100%;
+            margin: 0 auto;
+            background: #fffef7;
+            border-radius: 64px 64px 48px 48px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2), 0 8px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px 20px 30px;
+            transition: all 0.2s ease;
+            border: 2px solid #ffcd94;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            text-align: center;
+            margin: 0 0 8px 0;
+            color: #c25d2e;
+            text-shadow: 3px 3px 0 #ffe0a3;
+            letter-spacing: -0.5px;
+            word-break: keep-all;
+            background: #fff1cf;
+            display: inline-block;
+            width: 100%;
+            border-radius: 60px;
+            padding: 10px 5px;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.05), 0 6px 0 #e0a46b;
+        }
+
+        .egg-counter-card {
+            background: #fbe9c3;
+            border-radius: 48px;
+            padding: 8px 20px;
+            margin: 15px 0 10px 0;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: inset 0 0 0 2px white, 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .egg-counter-card p {
+            font-size: 1.35rem;
+            font-weight: bold;
+            margin: 0;
+            color: #734222;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .egg-counter-card span {
+            background: #f9cf86;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 1.7rem;
+            font-weight: bold;
+            color: #4b2e16;
+            min-width: 60px;
+            display: inline-block;
+            text-align: center;
+            box-shadow: inset 0 1px 3px #8b6946, 0 2px 3px white;
+        }
+
+        .instruction-badge {
+            background: #a9d6e5;
+            border-radius: 50px;
+            padding: 8px 12px;
+            margin: 0 0 15px 0;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #1d4c5e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            border: 1px solid #c0e0ed;
+        }
+
+        .instruction-badge::before {
+            content: "✨";
+            font-size: 1.4rem;
+        }
+
+        .basket {
+            min-height: 140px;
+            background: #f7e6c4;
+            border: 4px dashed #c2814a;
+            border-radius: 48px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            padding: 18px 14px;
+            margin: 12px 0 20px;
+            box-shadow: inset 0 0 0 3px #fff0cf, 0 6px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .egg {
+            width: 48px;
+            height: 54px;
+            background: radial-gradient(circle at 35% 30%, #fff3b0, #f5d742);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #b97f3a, inset -3px -2px 6px rgba(0,0,0,0.2), inset 2px 2px 8px rgba(255,255,200,0.8);
+            transition: transform 0.1s ease, box-shadow 0.1s;
+            position: relative;
+        }
+
+        .egg:active {
+            transform: scale(0.92);
+            box-shadow: 0 2px 0 #b97f3a;
+        }
+
+        .cartons-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 15px 0 10px;
+        }
+
+        .carton {
+            background: #e6d5b8;
+            border-radius: 28px;
+            padding: 12px 10px;
+            box-shadow: 0 8px 0 #aa8c62, inset 0 1px 3px #fff3df;
+            border: 1px solid #ffe3b5;
+        }
+
+        .carton-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(46px, 1fr));
+            gap: 10px 8px;
+            justify-items: center;
+            align-items: center;
+        }
+
+        .slot {
+            background: #c0a16b;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 58px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 1px 0 #ebd5a4;
+            transition: all 0.05s linear;
+            background: radial-gradient(circle at 40% 40%, #dabb84, #b58b4a);
+        }
+
+        .slot .egg {
+            width: 85%;
+            height: 85%;
+            transform: scale(0.92);
+            cursor: default;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slot .egg:active {
+            transform: scale(0.92);
+            cursor: default;
+        }
+
+        .question-panel {
+            background: #fffaec;
+            border-radius: 48px;
+            padding: 18px 16px;
+            margin-top: 18px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ffe3af;
+        }
+
+        .question-group {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .question-group label {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #9b4b1e;
+            background: #ffefcf;
+            padding: 5px 14px;
+            border-radius: 60px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        select {
+            font-size: 1.4rem;
+            padding: 12px 18px;
+            border-radius: 48px;
+            background: #fff1cf;
+            border: 2px solid #e3b87c;
+            font-weight: bold;
+            color: #5e3a1f;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        button {
+            background: #ffb347;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 12px 20px;
+            border-radius: 60px;
+            width: 100%;
+            color: white;
+            text-shadow: 0 1px 1px #9b4f1a;
+            box-shadow: 0 6px 0 #b4621a;
+            transition: 0.07s linear;
+            cursor: pointer;
+            margin: 12px 0 8px;
+            font-family: inherit;
+        }
+
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #b4621a;
+        }
+
+        .reset-btn {
+            background: #7d5d42;
+            box-shadow: 0 6px 0 #4c351f;
+            margin-top: 10px;
+        }
+
+        #feedback1 {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: #ebcba0;
+            padding: 10px;
+            border-radius: 36px;
+            margin-top: 15px;
+            color: #2d2b1f;
+            letter-spacing: 1px;
+        }
+
+        #feedback2 {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #ebcba0;
+            padding: 10px;
+            border-radius: 36px;
+            margin-top: 15px;
+            color: #2d2b1f;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .carton-label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            background: #cfb27c;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            margin-bottom: 8px;
+            color: #2b241a;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #ad8a5a;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px 12px 25px;
+            }
+            .basket {
+                gap: 8px;
+                justify-content: center;
+            }
+            .egg {
+                width: 44px;
+                height: 50px;
+            }
+            .carton-grid {
+                gap: 6px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .question-group label {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🥚🐣 MENATA TELUR 🐣🥚</h1>
+    <div class="instruction-badge">
+        Klik telur untuk memindahkannya ke karton!
+    </div>
+    <div class="egg-counter-card">
+        <p>📦 Telur tersisa di keranjang:</p>
+        <span id="egg-count">0</span>
+    </div>
+
+    <p id="feedback1">🧺 KERANJANG 🧺</p>
+  
+    <div id="game-area">
+        <div id="basket-container">
+            <div id="basket" class="basket"></div>
+        </div>
+
+        <div id="cartons-container" class="cartons-wrapper"></div>
+    </div>
+
+    <div id="ui-panel" class="question-panel hidden">
+        <p id="feedback2"></p>
+        <div class="question-group">
+            <label>🥚 Berapa karton yang terisi penuh?<br>(1 karton = 10 telur)</label>
+            <select id="full-cartons-ans"></select>
+        </div>
+        <div class="question-group">
+            <label>📦 Pada karton yang terisi sebagian,<br>ada berapa telur?</label>
+            <select id="partial-eggs-ans"></select>
+        </div>
+        <button id="check-btn">✅ Cek Jawaban ✅</button>
+    </div>
+
+    <button id="reset-btn" class="reset-btn">🔄 Main Lagi 🔄</button>
+
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // GAME STATE
+    // --------------------------------------------------------------
+    let totalEggs = 0;          // jumlah telur awal (11-29, tidak boleh 20)
+    let eggsPlaced = 0;         // jumlah telur yang sudah dipindahkan ke karton
+
+    // DOM elements
+    const basketDiv = document.getElementById('basket');
+    const cartonsContainer = document.getElementById('cartons-container');
+    const eggCountSpan = document.getElementById('egg-count');
+    const uiPanel = document.getElementById('ui-panel');
+    const fullSelect = document.getElementById('full-cartons-ans');
+    const partialSelect = document.getElementById('partial-eggs-ans');
+    const feedbackDiv1 = document.getElementById('feedback1');
+    const feedbackDiv2 = document.getElementById('feedback2');
+    const resetBtn = document.getElementById('reset-btn');
+    const checkBtn = document.getElementById('check-btn');
+
+    // --------------------------------------------------------------
+    // Helper: membangun 3 karton (masing-masing 10 slot / 5x2 grid)
+    // --------------------------------------------------------------
+    function buildCartons() {
+        cartonsContainer.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+            const cartonDiv = document.createElement('div');
+            cartonDiv.className = 'carton';
+            const labelSpan = document.createElement('div');
+            labelSpan.className = 'carton-label';
+            labelSpan.innerText = `📦 Karton ${i+1}`;
+            cartonDiv.appendChild(labelSpan);
+            
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'carton-grid';
+            // 10 slots (5 kolom x 2 baris)
+            for (let j = 0; j < 10; j++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                slot.setAttribute('data-slot-idx', `${i}-${j}`);
+                gridDiv.appendChild(slot);
+            }
+            cartonDiv.appendChild(gridDiv);
+            cartonsContainer.appendChild(cartonDiv);
+        }
+    }
+
+    // --------------------------------------------------------------
+    // Membuat elemen telur untuk keranjang (bisa diklik)
+    // --------------------------------------------------------------
+    function createEggElement() {
+        const egg = document.createElement('div');
+        egg.className = 'egg';
+        
+        const moveHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            moveEggToCarton(egg);
+        };
+        
+        egg.addEventListener('touchstart', moveHandler, { passive: false });
+        egg.addEventListener('click', moveHandler);
+        return egg;
+    }
+    
+    // --------------------------------------------------------------
+    // Mengisi keranjang sesuai totalEggs
+    // --------------------------------------------------------------
+    function setupBasket() {
+        basketDiv.innerHTML = "";
+        for (let i = 0; i < totalEggs; i++) {
+            const egg = createEggElement();
+            basketDiv.appendChild(egg);
+        }
+    }
+
+    // --------------------------------------------------------------
+    // Membuat telur yang sudah ditempatkan di karton (tidak bisa diklik)
+    // --------------------------------------------------------------
+    function createPlacedEgg() {
+        const egg = document.createElement('div');
+        egg.className = 'egg';
+        egg.style.cursor = 'default';
+        // hapus event listener yang mungkin tersisa
+        return egg;
+    }
+
+    // --------------------------------------------------------------
+    // Memindahkan telur ke slot karton pertama yang kosong
+    // --------------------------------------------------------------
+    function moveEggToCarton(eggElement) {
+        // Validasi: telur harus ada di keranjang
+        if (!eggElement || !eggElement.parentNode || eggElement.parentNode !== basketDiv) {
+            return;
+        }
+
+        // Jika semua telur sudah dipindahkan, tidak boleh klik lagi
+        if (eggsPlaced >= totalEggs) {
+            return;
+        }
+        
+        // Cari slot pertama yang kosong (belum berisi telur)
+        const allSlots = document.querySelectorAll('.slot');
+        let targetSlot = null;
+        
+        for (let i = 0; i < allSlots.length; i++) {
+            if (allSlots[i].children.length === 0) {
+                targetSlot = allSlots[i];
+                break;
+            }
+        }
+        
+        // Jika tidak ada slot kosong (seharusnya tidak mungkin karena total telur max 29 dan slot ada 30)
+        if (!targetSlot) {
+            console.warn('Tidak ada slot kosong');
+            return;
+        }
+        
+        // Hapus telur dari keranjang
+        eggElement.remove();
+        
+        // Buat telur baru untuk ditempatkan di karton (biar animasi halus)
+        const newEgg = createPlacedEgg();
+        targetSlot.appendChild(newEgg);
+        
+        // Animasi kecil
+        newEgg.style.transform = 'scale(0.65)';
+        newEgg.style.transition = 'transform 0.12s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+        setTimeout(() => {
+            newEgg.style.transform = 'scale(0.92)';
+        }, 15);
+        
+        eggsPlaced++;
+        const remainingEggs = totalEggs - eggsPlaced;
+        eggCountSpan.innerText = remainingEggs;
+        
+        // Jika semua telur sudah dipindahkan, munculkan panel kuis dan ubah tampilan feedback
+        if (eggsPlaced === totalEggs) {
+            uiPanel.classList.remove('hidden');
+            feedbackDiv1.innerHTML = "📝 Sekarang jawab pertanyaan di bawah! 📝";
+            feedbackDiv2.innerHTML = "✨ Semua telur sudah di karton! ✨";
+            // reset pilihan dropdown ke nilai awal agar anak bisa memilih
+            fullSelect.value = "0";
+            partialSelect.value = "0";
+        }
+    }
+
+    // --------------------------------------------------------------
+    // Setup dropdown pilihan (0-3 karton penuh, 0-9 telur sisa)
+    // --------------------------------------------------------------
+    function setupDropdowns() {
+        fullSelect.innerHTML = "";
+        partialSelect.innerHTML = "";
+        for (let i = 0; i <= 3; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `${i} karton`;
+            fullSelect.appendChild(option);
+        }
+        for (let i = 0; i <= 9; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `${i} telur`;
+            partialSelect.appendChild(option);
+        }
+    }
+
+    // --------------------------------------------------------------
+    // Logika PENGECEKAN JAWABAN (puluhan & satuan) 
+    // tanpa error, terpisah dan akurat
+    // --------------------------------------------------------------
+    function checkAnswerHandler() {
+        // Pastikan semua telur sudah ditempatkan
+        if (eggsPlaced !== totalEggs) {
+            feedbackDiv2.innerHTML = "🥚 Masih ada telur di keranjang! Letakkan semua telur dulu ya 🥚";
+            return;
+        }
+        
+        // Hitung jawaban benar berdasarkan totalEggs
+        const correctFull = Math.floor(totalEggs / 10);     // jumlah karton penuh (puluhan)
+        const correctPartial = totalEggs % 10;              // sisa telur di karton terakhir (satuan)
+        
+        // Ambil jawaban user dari dropdown
+        const userFull = parseInt(fullSelect.value, 10);
+        const userPartial = parseInt(partialSelect.value, 10);
+        
+        // Cek apakah user menjawab dengan benar
+        if (userFull === correctFull && userPartial === correctPartial) {
+            feedbackDiv2.innerHTML = "🎉🎉 Tepat sekali! Hebat! 🎉🎉 <br> 🥳 Kamu paham puluhan dan satuan! 🥳";
+        } else {
+            // Berikan petunjuk yang membantu tanpa membingungkan
+            // (tidak langsung memberi jawaban benar tapi mengarahkan)
+            if (userFull !== correctFull && userPartial !== correctPartial) {
+                feedbackDiv2.innerHTML = `🤔 Hmm, coba hitung lagi ya. Ada ${correctFull} karton penuh dan ${correctPartial} telur di karton sebagian. Tetap semangat! ✨`;
+            } else if (userFull !== correctFull) {
+                feedbackDiv2.innerHTML = `🤔 Jumlah karton penuh kurang tepat. Coba perhatikan lagi berapa kelompok 10 telur yang kamu punya. Semangat! ✨`;
+            } else if (userPartial !== correctPartial) {
+                feedbackDiv2.innerHTML = `🤔 Jumlah telur di karton yang terisi sebagian kurang tepat. Hitung sisa telur yang tidak cukup untuk satu karton penuh. Kamu pasti bisa! ✨`;
+            } else {
+                feedbackDiv2.innerHTML = `🤔 Coba hitung sekali lagi dengan teliti. Ingat, 1 karton berisi 10 telur. Semangat! ✨`;
+            }
+        }
+    }
+
+    // --------------------------------------------------------------
+    // Inisialisasi / Reset permainan (acak telur 11-29 kecuali 20)
+    // --------------------------------------------------------------
+    function initGame() {
+        // Pilih jumlah telur antara 11 sampai 29, TAPI TIDAK BOLEH 20
+        do {
+            totalEggs = Math.floor(Math.random() * (29 - 11 + 1)) + 11; // 11 sampai 29
+        } while (totalEggs === 20);   // menghindari angka 20 agar tidak "genap tanpa sisa"
+        
+        eggsPlaced = 0;
+        
+        // Update tampilan sisa telur di keranjang
+        eggCountSpan.innerText = totalEggs;
+        
+        // Reset teks keterangan
+        feedbackDiv1.innerHTML = "🧺 KERANJANG 🧺";
+        feedbackDiv2.innerHTML = "";
+        uiPanel.classList.add('hidden');
+        
+        // Bangun ulang karton (semua slot kosong)
+        buildCartons();
+        // Buat telur di keranjang sesuai jumlah baru
+        setupBasket();
+        
+        // Reset dropdown ke nilai default
+        fullSelect.value = "0";
+        partialSelect.value = "0";
+    }
+    
+    // --------------------------------------------------------------
+    // Setup pertama kali
+    // --------------------------------------------------------------
+    function firstTimeSetup() {
+        setupDropdowns();
+        initGame();
+    }
+    
+    // Event listeners
+    resetBtn.addEventListener('click', initGame);
+    checkBtn.addEventListener('click', checkAnswerHandler);
+    
+    // Mulai game
+    firstTimeSetup();
+</script>
+</body>
+</html>
+        
+    
