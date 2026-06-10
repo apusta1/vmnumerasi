@@ -305,7 +305,7 @@
         🔄  Skenario Baru
     </button>
     <div class="catatan-mobile">
-        🏫 Batas akhir tiba sekolah: <strong>07.15</strong> • Keputusan tepat = tidak terlambat + efisien
+        🏫 Batas akhir tiba sekolah: <strong>07:15</strong> • Keputusan tepat = tidak terlambat + efisien
     </div>
 </div>
 
@@ -315,8 +315,8 @@
         const BATAS_TERLAMBAT_MENIT = 7 * 60 + 15;      // 07:15 = 435 menit
         const DURASI_KERETA = 40;       // menit
         const DURASI_OJEK = 25;         // menit
-        const BIAYA_KERETA = 5000;
-        const BIAYA_OJEK = 50000;
+        const BIAYA_KERETA = 5.000;
+        const BIAYA_OJEK = 50.000;
 
         // Variabel global state (diperbaharui setiap skenario)
         let state = {
@@ -404,9 +404,9 @@
                     <p>🕒 <strong>Pertimbangan:</strong><br>
                     🚆 Kereta: waktu tempuh <strong>40 menit</strong> | biaya <strong>Rp ${BIAYA_KERETA.toLocaleString()}</strong><br>
                     🛵 Ojek: waktu tempuh <strong>25 menit</strong> | biaya <strong>Rp ${BIAYA_OJEK.toLocaleString()}</strong><br>
-                    🏫 Batas waktu tiba di sekolah: <strong>07.15</strong>.
+                    🏫 Batas waktu tiba di sekolah: <strong>07:15</strong>.
                     </p>
-                    <p class="badge-waktu">⏱️ Keputusan tepat = tidak melebihi jam 07.15 dan bijak secara finansial.</p>
+                    <p class="badge-waktu">⏱️ Keputusan tepat = tidak melebihi jam 07:15 dan bijak secara finansial.</p>
                 </div>
             `;
         }
@@ -438,7 +438,7 @@
                 else if (selisih < 0) statusWaktu = `lebih awal ${Math.abs(selisih)} menit dari batas`;
                 else statusWaktu = `tepat waktu (sampai pukul ${waktuTibaStr})`;
             } else {
-                statusWaktu = `TERLAMBAT ${Math.abs(selisih)} menit (melewati batas 07.15)`;
+                statusWaktu = `TERLAMBAT ${Math.abs(selisih)} menit (melewati batas 07:15)`;
             }
             
             // Analisis tambahan perbandingan dengan moda lain (nilai edukasi)
