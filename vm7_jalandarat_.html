@@ -258,18 +258,18 @@
         <div class="input-row">
             <label>🕒 Jam Tiba:</label>
             <select id="arrivalTimeSelect">
-                <option value="13:00">13.00</option>
-                <option value="13:30">13.30</option>
-                <option value="14:00">14.00</option>
-                <option value="14:30">14.30</option>
-                <option value="15:00">15.00</option>
+                <option value="13:00">13:00</option>
+                <option value="13:30">13:30</option>
+                <option value="14:00">14:00</option>
+                <option value="14:30">14:30</option>
+                <option value="15:00">15:00</option>
             </select>
         </div>
         <div style="font-size: 0.85rem; color: #5e6f8d;">Jika kamu harus sampai di Kota Tujuan pada jam tersebut, maka maksimal kamu harus berangkat jam berapa?</div>
     	</div>
 	<div class="input-row">
             <label>🚀 Berangkat jam:</label>
-            <input type="text" id="departureInput" placeholder="HH:MM (contoh: 08:15)" value="">
+            <input type="text" id="departureInput" placeholder="HH.MM (contoh: 08:15)" value="">
             <button id="checkTimeBtn">🔍 Cek</button>
         </div>
         <div id="timeFeedback" class="feedback"></div>
@@ -281,7 +281,7 @@
 	    <div style="font-size: 0.85rem; margin-top: 6px;"><br>Hitung perkiraan total biaya BBM:</div>
         <div class="input-row">
             <label>💰 Biaya BBM:</label>
-            <input type="number" id="fuelCostInput" placeholder="contoh: 225000" value="">
+            <input type="text" id="fuelCostInput" placeholder="contoh: 225.000" value="">
             <button id="checkFuelBtn">🔍 Cek</button>
         </div>
         <div id="fuelFeedback" class="feedback"></div>
@@ -309,6 +309,17 @@
     const dotsContainer = document.getElementById('carouselDots');
     const timeFeedback = document.getElementById('timeFeedback');
     const fuelFeedback = document.getElementById('fuelFeedback');
+    const fuelCostInput = document.getElementById('fuelCostInput');
+
+    // Fungsi otomatis mengubah input angka menjadi format ribuan dengan titik Indonesia
+    fuelCostInput.addEventListener('input', function(e) {
+        let value = this.value.replace(/\D/g, ''); // Hapus semua karakter non-angka
+        if (value !== '') {
+            this.value = parseInt(value, 10).toLocaleString('id-ID');
+        } else {
+            this.value = '';
+        }
+    });
 
     function updateDisplay() {
         const r = routes[currentIndex];
@@ -323,7 +334,7 @@
         
         // Reset input
         document.getElementById('departureInput').value = "";
-        document.getElementById('fuelCostInput').value = "";
+        fuelCostInput.value = "";
         timeFeedback.innerHTML = "Silakan hitung waktu berangkat...";
         timeFeedback.className = "feedback";
         fuelFeedback.innerHTML = "Masukkan biaya BBM...";
@@ -362,10 +373,15 @@
 
         const h = Math.floor(departMin / 60) % 24;
         const m = Math.round(departMin % 60);
-        const correct = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        
+        // Format jawaban benar menggunakan tanda titik sesuai format jam Indonesia (HH:MM)
+        const correctDisplay = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        
+        // Ambil input user dan bersihkan jika mereka tidak sengaja memakai titik 
+        const userClean = document.getElementById('departureInput').value.trim().replace('.', ':');
 
-        if (document.getElementById('departureInput').value.trim() === correct) {
-            timeFeedback.innerHTML = `✅ Benar! Berangkat pukul ${correct}.`;
+        if (userClean === correctDisplay) {
+            timeFeedback.innerHTML = `✅ Benar! Berangkat pukul ${correctDisplay}.`;
             timeFeedback.className = "feedback correct";
         } else {
             timeFeedback.innerHTML = `❌ Kurang tepat. Coba hitung lagi: waktu = jarak ÷ kecepatan.`;
@@ -376,13 +392,14 @@
     // TUGAS 2
     document.getElementById('checkFuelBtn').onclick = () => {
         const correctCost = (routes[currentIndex].jarak / 10) * 15000;
-        const userVal = parseInt(document.getElementById('fuelCostInput').value);
+        // Ambil input user, lalu bersihkan tanda titik agar bisa dihitung sebagai angka biasa di Javascript
+        const userVal = parseInt(fuelCostInput.value.replace(/\./g, ''), 10);
 
         if (userVal === correctCost) {
             fuelFeedback.innerHTML = `✅ Tepat! Biaya Rp ${correctCost.toLocaleString('id-ID')}.`;
             fuelFeedback.className = "feedback correct";
         } else {
-            fuelFeedback.innerHTML = `❌ Salah. Rumus: (jarak ÷ 10) × 15000.`;
+            fuelFeedback.innerHTML = `❌ Salah. Rumus: (jarak ÷ 10) × 15.000.`;
             fuelFeedback.className = "feedback wrong";
         }
     };
