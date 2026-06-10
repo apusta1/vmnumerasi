@@ -411,7 +411,6 @@
                 // Tapi tidak boleh kurang dari 0, dan dibatasi max
                 nilai = Math.round(nilai * 2) / 2;
                 if (nilai < 0) nilai = 0;
-                if (nilai > bahan.max) nilai = bahan.max;
             }
             else if (bahan.id === "minyakGoreng") {
                 // Minyak: kelipatan 0.5 sendok makan
@@ -543,7 +542,7 @@
             let tolerance = 0.05;
             if (b.id === "telur") tolerance = 0.01;   // telur harus pas karena hanya integer
             if (b.id === "bawangMerah") tolerance = 0.25;  // bawang merah boleh sedikit longgar karena setengah siung
-            if (b.id === "daunBawang") tolerance = 0.25;   // daun bawang toleransi 0.25 batang (setengah dari step 0.5)
+            if (b.id === "daunBawang") tolerance = 0.5;   // daun bawang toleransi 0.5 batang (setengah dari step 0.5)
             if (b.id === "minyakGoreng") tolerance = 0.1;   // minyak toleransi kecil
             if (b.id === "bumbu") tolerance = 0.08;        // bumbu toleransi
             
