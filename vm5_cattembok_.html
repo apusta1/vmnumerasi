@@ -256,51 +256,51 @@
             justify-content: center;
         }
 
-	/* TAMBAHAN UNTUK MOBILE TOUCH */
-	button, .stepper button, .carousel-btn, .cek {
-	    touch-action: manipulation;
-	    -webkit-tap-highlight-color: transparent;
-	}
-	
-	.stepper button:active, .carousel-btn:active, .cek:active {
-	    transform: scale(0.96);
-	    transition: transform 0.05s ease;
-	}
-	
-	/* Perbaikan ukuran touch target */
-	.stepper button {
-	    min-width: 48px;
-	    min-height: 48px;
-	    display: inline-flex;
-	    align-items: center;
-	    justify-content: center;
-	}
+        /* TAMBAHAN UNTUK MOBILE TOUCH */
+        button, .stepper button, .carousel-btn, .cek {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .stepper button:active, .carousel-btn:active, .cek:active {
+            transform: scale(0.96);
+            transition: transform 0.05s ease;
+        }
+        
+        /* Perbaikan ukuran touch target */
+        .stepper button {
+            min-width: 48px;
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-	.carousel-btn {
-	    min-width: 52px;
-	    min-height: 52px;
-	}
+        .carousel-btn {
+            min-width: 52px;
+            min-height: 52px;
+        }
 
-	@media (max-width: 700px) {
-	    .stepper {
-	        gap: 20px;
-	        padding: 8px 16px;
-	    }
-	    .stepper button {
-	        width: 48px;
-	        height: 48px;
-	        font-size: 1.8rem;
-	    }
-	    .cek {
-	        padding: 14px 24px;
-	        font-size: 1rem;
-	        min-width: 200px;
-	    }
-	    input {
-	        padding: 14px 16px;
-	        font-size: 1rem;
-	    }
-	}
+        @media (max-width: 700px) {
+            .stepper {
+                gap: 20px;
+                padding: 8px 16px;
+            }
+            .stepper button {
+                width: 48px;
+                height: 48px;
+                font-size: 1.8rem;
+            }
+            .cek {
+                padding: 14px 24px;
+                font-size: 1rem;
+                min-width: 200px;
+            }
+            input {
+                padding: 14px 16px;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -308,7 +308,6 @@
     <h1>🎨 Menghitung Cat Tembok</h1>
     <div class="sub">📐 1 liter cat dapat dipakai untuk mengecat 10 m² | 💰 Harga = Rp90.000 / liter</div>
 
-    <!-- CAROUSEL DESAIN -->
     <div class="carousel-section">
         <div class="carousel-title">
             🏠 Pilih Desain Arsitektur
@@ -326,7 +325,6 @@
         <div class="indikator" id="carouselDot">● ○ ○ ○ ○</div>
     </div>
 
-    <!-- PILIHAN KALENG CAT -->
     <div class="cat-panel">
         <div style="font-weight: bold; margin-bottom: 8px;">🛒 Tugas 1: Tentukan jumlah kaleng cat yang tepat!</div>
         <div class="cat-item">
@@ -361,7 +359,6 @@
         </div>
     </div>
 
-    <!-- TUGAS 1 -->
     <div class="tombol-area">
         <button class="cek" id="cekKebutuhanBtn">🔍 CEK JAWABAN (Tugas 1)</button>
     </div>
@@ -369,12 +366,11 @@
         ⏳ Klik tombol untuk mengecek kecukupan cat.
     </div>
 
-    <!-- TUGAS 2 -->
     <div class="tugas2-area">
         <div style="font-weight: bold; margin-bottom: 8px;">💰 Tugas 2: Hitung total biaya pembelian cat</div>
         <div class="flex-row">
             <span>Total biaya = Rp </span>
-            <input type="number" id="inputBiaya" placeholder="contoh: 2700000" step="5000">
+            <input type="text" id="inputBiaya" placeholder="contoh: 2.700.000">
             <button class="cek" id="cekBiayaBtn" style="background:#1e6091;">🔍 CEK JAWABAN (Tugas 2)</button>
         </div>
         <div id="feedbackTugas2" class="feedback" style="margin-top:12px;">
@@ -463,6 +459,18 @@ function updateCarousel() {
     carouselDot.innerText = dots.trim();
 }
 
+// FORMAT OTOMATIS INPUT BIAYA SAAT DIKETIK (Menambahkan titik otomatis)
+inputBiaya.addEventListener('input', function(e) {
+    // Ambil hanya angka saja
+    let value = this.value.replace(/\D/g, '');
+    if (value !== '') {
+        // Format angka dengan titik sebagai pemisah ribuan
+        this.value = parseInt(value, 10).toLocaleString('id-ID');
+    } else {
+        this.value = '';
+    }
+});
+
 // TUGAS 1
 function cekKecukupan() {
     const luasTembok = desainList[currentIndex].luas;
@@ -506,7 +514,10 @@ function cekBiaya() {
     const totalLiter = hitungTotalLiter();
     const hargaPerLiter = 90000;
     const biayaSebenarnya = totalLiter * hargaPerLiter;
-    let jawabanUser = parseFloat(inputBiaya.value);
+    
+    // Hilangkan semua tanda titik sebelum dikonversi menjadi angka/float matematika
+    let cleanValue = inputBiaya.value.replace(/\./g, '');
+    let jawabanUser = parseFloat(cleanValue);
     
     if (isNaN(jawabanUser)) {
         feedbackT2.innerHTML = "⚠️ Masukkan angka nominal biaya (contoh: 2.700.000)";
