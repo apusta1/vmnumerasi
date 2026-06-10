@@ -156,19 +156,11 @@
       letter-spacing: 0.5px;
       outline: none;
       transition: 0.2s;
-      -moz-appearance: textfield;
     }
 
     .jawaban-row input:focus {
       border-color: #c13b1b;
       box-shadow: 0 0 0 3px rgba(193,59,27,0.2);
-    }
-
-    /* Hilangkan spinner number di mobile */
-    .jawaban-row input::-webkit-inner-spin-button,
-    .jawaban-row input::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
     }
 
     .button-group {
@@ -366,7 +358,7 @@
     <p>Jajan pizza bareng teman, hitung bagi bayar yang adil!</p>
   </div>
 
-  <!-- GAMBAR ILUSTRASI PIZZA - menempel di bawah header bata merah -->
+  <!-- GAMBAR ILUSTRASI PIZZA -->
   <div class="ilustrasi-pizza">
     <img id="ilustrasiImg" class="ilustrasi-img" src="assets/ilustrasi-pizza.png" alt="Ilustrasi Pizza Resto" onerror="this.onerror=null; this.style.display='none'; document.getElementById('imgPlaceholder').style.display='flex';">
     <div id="imgPlaceholder" style="display: none; justify-content: center; align-items: center; background: #f7ede1; border-radius: 24px; padding: 24px 12px; width: 100%; color: #b97f54; font-size: 0.85rem; text-align: center; gap: 6px; flex-direction: column;">
@@ -383,7 +375,8 @@
     <div class="input-jawaban">
       <label>💰 Berapa rupiah per orang? (bulatkan ke atas ke ribuan terdekat)</label>
       <div class="jawaban-row">
-        <input type="number" id="jawabanUser" placeholder="Contoh: 152000" step="1000" inputmode="numeric">
+        <!-- Mengubah type menjadi text agar mendukung format titik otomatis -->
+        <input type="text" id="jawabanUser" placeholder="Contoh: 152.000" inputmode="numeric">
         <button class="btn-cek" id="cekBtn">✅ Cek Jawaban</button>
       </div>
       <div class="button-group">
@@ -431,9 +424,9 @@
 
 <script>
   // --- Variabel dinamis ---
-  let currentBiayaAwal = 350000;     // range 300-600rb increment 50rb
-  let currentJumlahOrang = 4;        // total orang termasuk diri sendiri (teman lain + 1)
-  let currentJawabanBenar = 0;       // hasil pembulatan ke atas ribuan
+  let currentBiayaAwal = 350000;     
+  let currentJumlahOrang = 4;        
+  let currentJawabanBenar = 0;       
 
   // Helper: pembulatan ke atas ke ribuan terdekat
   function roundUpToNearestThousand(value) {
@@ -441,8 +434,11 @@
     return Math.ceil(value / 1000) * 1000;
   }
 
-  // Hitung ulang jawaban benar berdasarkan biaya awal dan jumlah orang (total termasuk user)
-  // PPN + service charge 15% diterapkan secara internal (tidak ditampilkan)
+  // Format angka ke gaya penulisan Indonesia (titik pemisah ribuan)
+  function formatRupiahFormat(angka) {
+    return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
   function recalculate() {
     const pajakService = currentBiayaAwal * 0.15;
     const totalTagihan = currentBiayaAwal + pajakService;
@@ -450,29 +446,25 @@
     currentJawabanBenar = roundUpToNearestThousand(bagiRata);
   }
 
-  // Generate random / acak parameter baru
   function generateRandomParams() {
-    // biaya awal: 300rb, 350rb, 400rb, 450rb, 500rb, 550rb, 600rb
     const steps = [300000, 350000, 400000, 450000, 500000, 550000, 600000];
     const randomIndex = Math.floor(Math.random() * steps.length);
     const newBiaya = steps[randomIndex];
     
-    // jumlah teman lain: 1 sampai 7
-    const temanLain = Math.floor(Math.random() * 7) + 1; // 1 .. 7
-    const totalOrg = temanLain + 1; // termasuk user sendiri
+    const temanLain = Math.floor(Math.random() * 7) + 1; 
+    const totalOrg = temanLain + 1; 
     
     currentBiayaAwal = newBiaya;
     currentJumlahOrang = totalOrg;
     recalculate();
   }
 
-  // Perbarui tampilan soal (hanya info tagihan awal & jumlah orang)
   function updateUI() {
     const temanLain = currentJumlahOrang - 1;
     const soalHtml = `
-      <p>🍕 <strong>Tagihan awal restoran pizza:</strong> <span class="tagihan-nilai">Rp ${currentBiayaAwal.toLocaleString('id-ID')}</span></p>
+      <p>🍕 <strong>Tagihan awal restoran pizza:</strong> <span class="tagihan-nilai">Rp ${formatRupiahFormat(currentBiayaAwal)}</span></p>
       <div class="parameter">
-        <span>👤 Kamu makan bersama <strong>${temanLain}</strong> ${temanLain === 1 ? 'orang teman' : 'orang teman'}</span>
+        <span>👤 Kamu makan bersama <strong>${temanLain}</strong> orang teman</span>
         <span>👥 Total yang berbagi: <strong>${currentJumlahOrang} orang</strong></span>
       </div>
       <p><br>💸 Tagihan akhir akan termasuk PPN dan biaya jasa pelayanan sebesar 15% (ditambahkan ke tagihan awal).<br>
@@ -481,48 +473,43 @@
     `;
     document.getElementById('dynamicSoal').innerHTML = soalHtml;
     
-    // reset feedback & input
     const feedbackDiv = document.getElementById('feedbackArea');
     feedbackDiv.innerHTML = '';
     feedbackDiv.className = 'feedback';
     const inputField = document.getElementById('jawabanUser');
     inputField.value = '';
-    // inputField.focus();
   }
 
-  // Inisialisasi / halaman baru
   function initNewProblem() {
     generateRandomParams();
     updateUI();
   }
 
-  // Tombol Soal Baru
   function buatSoalBaru() {
     initNewProblem();
   }
 
-  // Fungsi cek jawaban + tutup keyboard mobile (biar lebih nyaman)
   function cekJawabanDanTurunkanKeyboard() {
     let inputVal = document.getElementById('jawabanUser').value;
-    if (inputVal === null || inputVal === "") {
+    if (inputVal === null || inputVal.trim() === "") {
       tampilkanFeedback("Masukkan jawaban terlebih dahulu!", false);
       document.activeElement.blur();
       return;
     }
-    // Bersihkan dari pemisah ribuan
-    const cleaned = String(inputVal).replace(/\./g, '').replace(/,/g, '').trim();
+    // Bersihkan dari titik agar murni menjadi angka kembali
+    const cleaned = String(inputVal).replace(/\./g, '').trim();
     let angkaUser = parseInt(cleaned, 10);
     if (isNaN(angkaUser)) {
-      tampilkanFeedback("Masukkan angka yang valid (contoh: 152000)", false);
+      tampilkanFeedback(`Masukkan angka yang valid (contoh: ${formatRupiahFormat(152000)})`, false);
       document.activeElement.blur();
       return;
     }
     if (angkaUser === currentJawabanBenar) {
       tampilkanFeedback("✅ Benar! Jawaban tepat.", true);
     } else {
-      tampilkanFeedback("❌ Salah. Coba hitung ulang dengan kalkulator, periksa pembulatan ke atas!", false);
+      tampilkanFeedback(`❌ Salah. Coba hitung ulang dengan kalkulator, periksa pembulatan ke atas! (Petunjuk jawaban yang benar: ${formatRupiahFormat(currentJawabanBenar)})`, false);
     }
-    document.activeElement.blur(); // tutup keyboard mobile setelah cek
+    document.activeElement.blur(); 
   }
 
   function tampilkanFeedback(pesan, isBenar) {
@@ -542,7 +529,13 @@
   
   function updateCalcScreen() {
     if (calcExpression === "" || calcExpression === undefined) calcExpression = "0";
-    screenElem.innerText = calcExpression;
+    
+    // Memformat angka di layar kalkulator agar jika berupa ribuan bulat, muncul titiknya
+    let displayFormat = calcExpression;
+    if (!isNaN(calcExpression) && calcExpression !== "Error" && !calcExpression.includes('.')) {
+      displayFormat = formatRupiahFormat(parseInt(calcExpression, 10));
+    }
+    screenElem.innerText = displayFormat;
   }
   
   function handleNumber(value) {
@@ -621,19 +614,28 @@
     document.getElementById('calcBack').addEventListener('click', () => backspaceCalc());
   }
   
-  // Mencegah enter di input jawaban, tutup keyboard & cek jawaban
   function preventEnterSubmit() {
     const inputField = document.getElementById('jawabanUser');
+    
+    // Otomatis menambahkan titik saat pengguna mengetik angka di kolom input
+    inputField.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, ""); // Ambil angka saja
+      if (value !== "") {
+        e.target.value = formatRupiahFormat(value);
+      } else {
+        e.target.value = "";
+      }
+    });
+
     inputField.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
         cekJawabanDanTurunkanKeyboard();
       }
     });
-    // Tutup keyboard jika klik di luar (optional) - tap area lain tidak terlalu mengganggu
+    
     document.addEventListener('touchstart', function(e) {
       if (e.target !== inputField && inputField === document.activeElement) {
-        // jangan paksa blur biar tidak mengganggu navigasi kalkulator, hanya blur jika tap di luar
         if (!e.target.closest('.calculator') && !e.target.closest('.btn-cek') && !e.target.closest('.btn-baru')) {
           inputField.blur();
         }
@@ -641,7 +643,6 @@
     });
   }
   
-  // Inisialisasi halaman dan event
   document.addEventListener('DOMContentLoaded', () => {
     generateRandomParams();
     updateUI();
@@ -654,7 +655,7 @@
     });
     document.getElementById('soalBaruBtn').addEventListener('click', () => {
       buatSoalBaru();
-      document.activeElement.blur(); // tutup keyboard jika terbuka
+      document.activeElement.blur(); 
     });
     
     clearCalculator();
