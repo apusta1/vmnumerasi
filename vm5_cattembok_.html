@@ -339,13 +339,13 @@
             <span>→ <span id="liter1Total">0</span> liter</span>
         </div>
         <div class="cat-item">
-            <span class="label-kaleng">📦 Kaleng Cat 2.5 Liter</span>
+            <span class="label-kaleng">📦 Kaleng Cat 2,5 Liter</span>
             <div class="stepper">
                 <button class="min" data-jenis="liter2_5">−</button>
                 <span id="valLiter2_5">0</span>
                 <button class="plus" data-jenis="liter2_5">+</button>
             </div>
-            <span>→ <span id="liter2_5Total">0.0</span> liter</span>
+            <span>→ <span id="liter2_5Total">0,0</span> liter</span>
         </div>
         <div class="cat-item">
             <span class="label-kaleng">🛢️ Kaleng Cat 20 Liter</span>
@@ -414,6 +414,11 @@ const feedbackT1 = document.getElementById('feedbackTugas1');
 const feedbackT2 = document.getElementById('feedbackTugas2');
 const inputBiaya = document.getElementById('inputBiaya');
 
+// Fungsi pembantu untuk memformat angka desimal ke standar Indonesia (koma)
+function formatDesimalIndo(angka) {
+    return angka.toFixed(1).replace('.', ',');
+}
+
 // Hitung total liter
 function hitungTotalLiter() {
     return (liter1Unit * 1) + (liter2_5Unit * 2.5) + (liter20Unit * 20);
@@ -424,9 +429,9 @@ function refreshStepperUI() {
     valLiter1Span.innerText = liter1Unit;
     valLiter2_5Span.innerText = liter2_5Unit;
     valLiter20Span.innerText = liter20Unit;
-    liter1TotalSpan.innerText = (liter1Unit * 1).toFixed(1);
-    liter2_5TotalSpan.innerText = (liter2_5Unit * 2.5).toFixed(1);
-    liter20TotalSpan.innerText = (liter20Unit * 20).toFixed(1);
+    liter1TotalSpan.innerText = formatDesimalIndo(liter1Unit * 1);
+    liter2_5TotalSpan.innerText = formatDesimalIndo(liter2_5Unit * 2.5);
+    liter20TotalSpan.innerText = formatDesimalIndo(liter20Unit * 20);
 }
 
 function tambah(jenis) {
@@ -446,7 +451,7 @@ function kurangi(jenis) {
 function updateCarousel() {
     const data = desainList[currentIndex];
     desainNama.innerText = data.nama;
-    desainLuasSpan.innerText = data.luas;
+    desainLuasSpan.innerText = data.luas.toLocaleString('id-ID');
     desainImg.src = data.fileGambar;
     desainImg.onerror = function() {
         this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23d4c9a8'/%3E%3Ctext x='15' y='45' fill='%235a4a2a' font-size='9'%3EGambar tidak ditemukan%3C/text%3E%3C/svg%3E";
@@ -465,27 +470,32 @@ function cekKecukupan() {
     const mampuM2 = totalLiter * 10;
     const neededLiter = luasTembok / 10;
     
+    const luasTembokFormated = luasTembok.toLocaleString('id-ID');
+    const totalLiterFormated = formatDesimalIndo(totalLiter);
+    const mampuM2Formated = mampuM2.toLocaleString('id-ID');
+    const neededLiterFormated = formatDesimalIndo(neededLiter);
+
     if (mampuM2 >= luasTembok) {
         const kelebihanLiter = totalLiter - neededLiter;
         const kelebihanM2 = mampuM2 - luasTembok;
         if (kelebihanLiter > 0) {
             feedbackT1.innerHTML = `✅ Tugas 1: Cat yang dibeli BERLEBIHAN! <br> 
-            📌 Luas tembok = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). <br>
-            🛢️ Total cat dibeli = ${totalLiter.toFixed(2)} liter (mampu mengecat ${mampuM2} m²). <br>
-            ✨ Kelebihan cat = ${kelebihanLiter.toFixed(2)} liter (bisa mengecat +${kelebihanM2} m² lagi). <br>
+            📌 Luas tembok = ${luasTembokFormated} m² (butuh ${neededLiterFormated} liter). <br>
+            🛢️ Total cat dibeli = ${totalLiterFormated} liter (mampu mengecat ${mampuM2Formated} m²). <br>
+            ✨ Kelebihan cat = ${formatDesimalIndo(kelebihanLiter)} liter (bisa mengecat +${kelebihanM2.toLocaleString('id-ID')} m² lagi). <br>
             💡 Anda bisa mengurangi pembelian cat agar lebih hemat.`;
             feedbackT1.className = "feedback kelebihan";
         } else {
-            feedbackT1.innerHTML = `✅ Tugas 1: BENAR PAS! Total cat yang dibeli = ${totalLiter.toFixed(2)} liter (mampu cat ${mampuM2} m²). <br> Luas tembok pilihan = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). Cat pas dan efisien.`;
+            feedbackT1.innerHTML = `✅ Tugas 1: BENAR PAS! Total cat yang dibeli = ${totalLiterFormated} liter (mampu cat ${mampuM2Formated} m²). <br> Luas tembok pilihan = ${luasTembokFormated} m² (butuh ${neededLiterFormated} liter). Cat pas dan efisien.`;
             feedbackT1.className = "feedback benar";
         }
     } else {
         const kekuranganLiter = neededLiter - totalLiter;
         const kekuranganM2 = luasTembok - mampuM2;
         feedbackT1.innerHTML = `❌ Tugas 1: Cat masih KURANG. <br> 
-        📌 Luas tembok = ${luasTembok} m² (butuh ${neededLiter.toFixed(2)} liter). <br>
-        🛢️ Total cat dibeli = ${totalLiter.toFixed(2)} liter (hanya mampu ${mampuM2} m²). <br>
-        ⚠️ Kurang cat = ${kekuranganLiter.toFixed(2)} liter (masih kurang untuk ${kekuranganM2} m²). <br>
+        📌 Luas tembok = ${luasTembokFormated} m² (butuh ${neededLiterFormated} liter). <br>
+        🛢️ Total cat dibeli = ${totalLiterFormated} liter (hanya mampu ${mampuM2Formated} m²). <br>
+        ⚠️ Kurang cat = ${formatDesimalIndo(kekuranganLiter)} liter (masih kurang untuk ${kekuranganM2.toLocaleString('id-ID')} m²). <br>
         ➕ Silakan ubah jumlah kaleng.`;
         feedbackT1.className = "feedback salah";
     }
@@ -499,17 +509,17 @@ function cekBiaya() {
     let jawabanUser = parseFloat(inputBiaya.value);
     
     if (isNaN(jawabanUser)) {
-        feedbackT2.innerHTML = "⚠️ Masukkan angka nominal biaya (contoh: 2700000)";
+        feedbackT2.innerHTML = "⚠️ Masukkan angka nominal biaya (contoh: 2.700.000)";
         feedbackT2.className = "feedback salah";
         return;
     }
     
     const selisih = Math.abs(jawabanUser - biayaSebenarnya);
     if (selisih < 500 || jawabanUser === biayaSebenarnya) { 
-        feedbackT2.innerHTML = `✅ Tugas 2: BENAR! Total cat = ${totalLiter.toFixed(2)} liter × Rp${hargaPerLiter.toLocaleString('id-ID')} = Rp ${biayaSebenarnya.toLocaleString('id-ID')}. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Selamat!`;
+        feedbackT2.innerHTML = `✅ Tugas 2: BENAR! Total cat = ${formatDesimalIndo(totalLiter)} liter × Rp${hargaPerLiter.toLocaleString('id-ID')} = Rp ${biayaSebenarnya.toLocaleString('id-ID')}. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Selamat!`;
         feedbackT2.className = "feedback benar";
     } else {
-        feedbackT2.innerHTML = `❌ Tugas 2: Kurang tepat. Harga total cat yang diperlukan = ${totalLiter.toFixed(2)} liter × 90.000. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Coba hitung ulang.`;
+        feedbackT2.innerHTML = `❌ Tugas 2: Kurang tepat. Harga total cat yang diperlukan = ${formatDesimalIndo(totalLiter)} liter × Rp90.000. <br> Jawaban Anda: Rp ${jawabanUser.toLocaleString('id-ID')}. Coba hitung ulang.`;
         feedbackT2.className = "feedback salah";
     }
 }
