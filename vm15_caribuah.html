@@ -124,6 +124,108 @@
             font-size: 0.8rem;
             pointer-events: none;
         }
+
+        /* ========== TAMBAHAN UNTUK INFO OVERLAY (TIDAK MENGUBAH YANG LAIN) ========== */
+        .info-trigger {
+            position: fixed;
+            bottom: 15px;
+            right: 170px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            color: #ffcc33;
+            font-size: 1.4rem;
+            font-weight: bold;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 200;
+            border: 1px solid #ffcc33;
+            font-family: monospace;
+        }
+
+        .info-modal {
+            background: #2d5a3f;
+            padding: 25px 35px;
+            border-radius: 30px;
+            border: 4px solid #ffcc33;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            max-width: 90%;
+            width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+            position: relative;
+        }
+        .info-modal h2 {
+            color: #ffcc33;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .info-modal h3 {
+            color: #ffdd77;
+            margin: 20px 0 10px 0;
+            font-size: 1.2rem;
+        }
+        .info-modal ul {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        .info-modal li {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1e3a2c;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .info-table th, .info-table td {
+            border: 1px solid #ffcc8877;
+            padding: 6px 10px;
+            text-align: left;
+            color: #f9f2cf;
+            font-size: 0.9rem;
+        }
+        .info-table th {
+            background-color: #ffcc33;
+            color: #1a3d2c;
+        }
+        .question-block {
+            background: #1f4635;
+            border-radius: 16px;
+            padding: 12px 15px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-left: 4px solid #ffcc33;
+        }
+        .close-info-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #ffcc33;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #1a3d2c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-info-btn:hover {
+            background: #ffdd77;
+        }
     </style>
 </head>
 <body>
@@ -131,9 +233,9 @@
 <div id="startOverlay" class="overlay">
     <div class="modal">
         <h1>🐒 Cari Buah!</h1>
-	<p>Kumpulkan buah yang tersebar di peta.<br>
+        <p>Kumpulkan buah yang tersebar di peta.<br>
            Lihat peta kecil di pojok kanan untuk mencari lokasi buah.<br>
-	   Klik layar untuk membuat Monyet bergerak.</p>
+           Klik layar untuk membuat Monyet bergerak.</p>
         <button class="btn-start" onclick="startGame()">Mulai Petualangan</button>
     </div>
 </div>
@@ -146,6 +248,35 @@
     </div>
 </div>
 
+<!-- TAMBAHAN: INFO OVERLAY -->
+<div id="infoOverlay" class="overlay hidden">
+    <div class="info-modal">
+        <button class="close-info-btn" id="closeInfoBtn">×</button>
+        <h2>🎯 Tujuan Pembelajaran</h2>
+        <ul>
+            <li>Mengenal angka 1–20 melalui suara (dalam Bahasa Indonesia).</li>
+            <li>Melatih koordinasi mata & tangan.</li>
+            <li>Melatih orientasi ruang menggunakan peta kecil (<i>minimap</i>).</li>
+            <li>Membangun strategi sederhana mencari lokasi buah tersisa.</li>
+        </ul>
+        <h3>🧠 Kompetensi</h3>
+        <table class="info-table">
+            <tr><th>Aspek</th><th>Kemampuan</th></tr>
+            <tr><td>Kognitif</td><td>Memahami peta kecil ↔ dunia besar</td></tr>
+            <tr><td>Bahasa</td><td>Mendengar angka dalam Bahasa Indonesia</td></tr>
+            <tr><td>Motorik</td><td>Klik presisi pada layar</td></tr>
+            <tr><td>Sosial-emosional</td><td>Menyelesaikan tugas & mengelola rasa puas</td></tr>
+        </table>
+        <h3>💬 Pertanyaan Pemandu</h3>
+        <div class="question-block">
+            “Buah yang belum dikumpulkan warnanya apa di peta kecil?” (titik kuning)<br>
+            “Sudah berapa banyak buah yang dikumpulkan monyet?”<br>
+            “Ke arah mana monyet harus berjalan berdasarkan peta?”<br>
+            “Apa yang terjadi jika kamu klik terlalu jauh?”
+        </div>
+    </div>
+</div>
+
 <div class="game-container">
     <canvas id="gameCanvas"></canvas>
 </div>
@@ -154,6 +285,8 @@
     <div class="fruit-counter">🍌 <span id="fruitCount">0</span> / <span id="totalFruits">0</span></div>
 </div>
 
+<!-- TAMBAHAN: Tombol info di sebelah kiri instruction-toast -->
+<div class="info-trigger" id="infoTriggerBtn">ℹ️</div>
 <div class="instruction-toast">Klik/Tap untuk jalan</div>
 
 <script>
@@ -179,6 +312,32 @@
             window.speechSynthesis.speak(utterance);
         }
 
+        // ========== TAMBAHAN: INFO OVERLAY LOGIC ==========
+        const infoOverlay = document.getElementById('infoOverlay');
+        const infoTrigger = document.getElementById('infoTriggerBtn');
+        const closeInfoBtn = document.getElementById('closeInfoBtn');
+        
+        if (infoTrigger) {
+            infoTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (infoOverlay) infoOverlay.classList.remove('hidden');
+            });
+        }
+        if (closeInfoBtn) {
+            closeInfoBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (infoOverlay) infoOverlay.classList.add('hidden');
+            });
+        }
+        if (infoOverlay) {
+            infoOverlay.addEventListener('click', function(e) {
+                if (e.target === infoOverlay) {
+                    infoOverlay.classList.add('hidden');
+                }
+            });
+        }
+        // ==================================================
+
         const WORLD_SIZE = 3200;
         const MOVE_SPEED = 320;
         let dpr = window.devicePixelRatio || 1;
@@ -191,8 +350,7 @@
         let fruits = [];
         let collected = 0;
         let isMoving = false;
-        
-        // Track current facing direction for dinosaur (true = facing right, false = facing left)
+                
         let facingRight = true;
 
         function resize() {
@@ -205,7 +363,7 @@
             canvas.style.height = height + 'px';
         }
 
-        // Fungsi untuk mengecek jarak antar buah dan jarak dengan start posisi dino
+        // Fungsi untuk mengecek jarak antar buah dan jarak dengan start posisi monyet
         function isTooClose(newX, newY, existingFruits, minDistance = 70, startPos = null) {
             for (let fruit of existingFruits) {
                 if (Math.hypot(newX - fruit.x, newY - fruit.y) < minDistance) {
@@ -247,7 +405,7 @@
                     attempts++;
                 }
                 
-                // Jika gagal menemukan posisi, taruh di posisi acak yang jauh dari area dino
+                // Jika gagal menemukan posisi, taruh di posisi acak yang jauh dari area monyet
                 if (!placed) {
                     let fallbackX, fallbackY;
                     do {
@@ -273,8 +431,8 @@
             facingRight = true;
         }
 
-        // FIX 2: Dinosaur faces direction based on movement (right when click on right side, left when click on left side)
-        function drawDino(x, y) {
+        // FIX 2: faces direction based on movement (right when click on right side, left when click on left side)
+        function drawAnimal(x, y) {
             const sx = x - camera.x;
             const sy = y - camera.y;
         
@@ -293,7 +451,7 @@
             ctx.ellipse(0, 18, 16, 7, 0, 0, Math.PI * 2);
             ctx.fill();
         
-            // Emoji Dino
+            // Emoji Monyet
             ctx.font = '52px serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -340,7 +498,7 @@
             });
             ctx.shadowBlur = 0;
 
-            drawDino(character.x, character.y);
+            drawAnimal(character.x, character.y);
 
             const mapSize = 150;
             const margin = 20;
